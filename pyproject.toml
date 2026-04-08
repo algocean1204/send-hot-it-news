@@ -1,0 +1,33 @@
+[project]
+name = "news-pulse"
+version = "1.0.0"
+description = "IT/AI 뉴스 자동 수집, 로컬 LLM 요약, 텔레그램 푸시 봇"
+requires-python = ">=3.12"
+
+dependencies = [
+    "httpx",
+    "feedparser",
+    "python-dotenv",
+    "psutil",
+    "lingua-language-detector",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+    "ruff",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["news_pulse/tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "UP", "B"]

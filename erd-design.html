@@ -1,0 +1,2094 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>news-pulse — ERD 데이터베이스 설계서</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-base: #F4F3EE;
+      --bg-surface-1: #FFFFFF;
+      --bg-surface-2: #EBE9E2;
+      --bg-surface-3: #E2E0D8;
+      --border-1: #D6D3C8;
+      --border-2: #C4C0B3;
+      --text-primary: #1a1a1a;
+      --text-secondary: #5c5c5c;
+      --text-muted: #8c8c8c;
+      --color-in: #0d9488;
+      --color-out: #d97706;
+      --color-api: #0891b2;
+      --color-event: #ca8a04;
+      --color-type: #2563eb;
+      --color-warning: #dc2626;
+      --color-deprecated: #8c8c8c;
+      --f-common: #0891b2;
+      --f1: #2563eb;
+      --f2: #7c3aed;
+      --f3: #d97706;
+      --f4: #0d9488;
+      --f5: #db2777;
+      --f6: #dc2626;
+      --f7: #ca8a04;
+      --f8: #65a30d;
+      --shadow-card: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+      --shadow-card-hover: 0 4px 6px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.06);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: var(--bg-base);
+      color: var(--text-primary);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    code, .mono, .type, .param, .module-id {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 24px;
+    }
+
+    .project-header {
+      text-align: center;
+      margin-bottom: 40px;
+      padding: 40px 32px;
+      background: var(--bg-surface-1);
+      border-radius: 16px;
+      border: 1px solid var(--border-1);
+      box-shadow: var(--shadow-card);
+    }
+
+    .version-badge {
+      display: inline-block;
+      padding: 4px 14px;
+      background: var(--bg-surface-2);
+      border: 1px solid var(--border-1);
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      letter-spacing: 0.5px;
+      margin-bottom: 16px;
+    }
+
+    .project-title {
+      font-size: 28px;
+      font-weight: 900;
+      margin-bottom: 8px;
+      color: var(--text-primary);
+    }
+
+    .project-desc {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+    }
+
+    .meta-info {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .meta-info span {
+      font-size: 12px;
+      color: var(--text-muted);
+      padding: 4px 12px;
+      background: var(--bg-surface-2);
+      border-radius: 6px;
+    }
+
+    .meta-info span strong {
+      color: var(--text-secondary);
+    }
+
+    .toc-nav {
+      margin-bottom: 32px;
+      padding: 24px;
+      background: var(--bg-surface-1);
+      border-radius: 12px;
+      border: 1px solid var(--border-1);
+      box-shadow: var(--shadow-card);
+    }
+
+    .toc-nav h2 {
+      font-size: 16px;
+      font-weight: 800;
+      margin-bottom: 16px;
+      color: var(--text-primary);
+    }
+
+    .toc-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 8px;
+    }
+
+    .toc-item {
+      display: block;
+      padding: 10px 14px;
+      background: var(--bg-base);
+      border: 1px solid var(--border-1);
+      border-left: 3px solid var(--border-2);
+      border-radius: 6px;
+      text-decoration: none;
+      color: var(--text-primary);
+      font-size: 12px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .toc-item:hover {
+      background: var(--bg-surface-3);
+      box-shadow: var(--shadow-card-hover);
+      transform: translateY(-1px);
+    }
+
+    .card {
+      margin-bottom: 24px;
+      background: var(--bg-surface-1);
+      border-radius: 12px;
+      border: 1px solid var(--border-1);
+      box-shadow: var(--shadow-card);
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 16px 24px;
+      background: var(--bg-surface-2);
+      border-bottom: 1px solid var(--border-1);
+    }
+
+    .card-header h2 {
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .card-body {
+      padding: 24px;
+    }
+
+    .info-box {
+      padding: 16px 20px;
+      background: #e0f2fe;
+      border: 1px solid #7dd3fc;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 12px;
+      line-height: 1.8;
+    }
+
+    .info-box strong {
+      color: var(--f1);
+    }
+
+    .info-box code {
+      background: rgba(37, 99, 235, 0.1);
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-size: 11px;
+    }
+
+    .retention-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .retention-permanent {
+      background: #dcfce7;
+      color: #166534;
+      border: 1px solid #86efac;
+    }
+
+    .retention-30d {
+      background: #fef3c7;
+      color: #92400e;
+      border: 1px solid #fcd34d;
+    }
+
+    .retention-90d {
+      background: #fed7aa;
+      color: #9a3412;
+      border: 1px solid #fdba74;
+    }
+
+    .retention-7d {
+      background: #fecaca;
+      color: #991b1b;
+      border: 1px solid #fca5a5;
+    }
+
+    .erd-canvas {
+      position: relative;
+      padding: 32px;
+      background: var(--bg-surface-1);
+      border-radius: 12px;
+      border: 1px solid var(--border-1);
+      box-shadow: var(--shadow-card);
+      overflow-x: auto;
+      min-height: 520px;
+    }
+
+    .erd-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .erd-table {
+      min-width: 220px;
+      border: 2px solid var(--table-color, var(--border-2));
+      border-radius: 8px;
+      background: var(--bg-base);
+      box-shadow: var(--shadow-card);
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .erd-table:hover {
+      box-shadow: var(--shadow-card-hover);
+      transform: translateY(-2px);
+    }
+
+    .erd-table.highlighted {
+      box-shadow: 0 0 0 3px var(--table-color, var(--f1)), var(--shadow-card-hover);
+    }
+
+    .erd-table-header {
+      padding: 10px 14px;
+      background: var(--bg-surface-2);
+      border-bottom: 1px solid var(--border-1);
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--table-color, var(--text-primary));
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .erd-table-icon { font-size: 14px; }
+    .erd-table-retention { margin-left: auto; }
+
+    .erd-columns { list-style: none; padding: 10px 14px; margin: 0; }
+
+    .erd-col {
+      padding: 3px 0;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-primary);
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+    }
+
+    .erd-col.pk { font-weight: 700; }
+    .col-type { color: var(--color-type); font-size: 10px; margin-left: auto; white-space: nowrap; }
+    .col-constraint { color: var(--color-warning); font-size: 9px; font-weight: 600; white-space: nowrap; }
+
+    .erd-indexes {
+      padding: 8px 14px;
+      border-top: 1px solid var(--border-1);
+      font-size: 10px;
+      color: var(--text-secondary);
+    }
+
+    .index-label {
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 9px;
+    }
+
+    .index-item {
+      display: block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9.5px;
+      color: var(--text-muted);
+      padding: 1px 0;
+    }
+
+    .erd-relations-svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .rel-line { stroke: var(--border-2); stroke-width: 2; fill: none; }
+    .rel-line.one-to-one { stroke: var(--f1); stroke-width: 2.5; }
+    .rel-line.one-to-many { stroke: var(--f3); stroke-width: 2.5; stroke-dasharray: 8 4; }
+    .rel-label { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; fill: var(--text-secondary); }
+
+    .rel-legend {
+      display: flex;
+      gap: 24px;
+      margin-top: 16px;
+      padding: 12px 20px;
+      background: var(--bg-surface-2);
+      border-radius: 8px;
+      font-size: 11px;
+      flex-wrap: wrap;
+    }
+
+    .rel-legend-item { display: flex; align-items: center; gap: 8px; }
+    .rel-legend-line { width: 32px; height: 3px; border-radius: 2px; }
+    .rel-legend-line.solid { background: var(--f1); }
+    .rel-legend-line.dashed {
+      background: repeating-linear-gradient(90deg, var(--f3) 0, var(--f3) 8px, transparent 8px, transparent 12px);
+    }
+    .rel-legend-line.none { background: var(--border-1); opacity: 0.5; }
+
+    .table-spec-block {
+      margin-bottom: 16px;
+      border: 1px solid var(--border-1);
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--bg-surface-1);
+    }
+
+    .table-spec-header {
+      padding: 12px 20px;
+      background: var(--bg-surface-2);
+      border-bottom: 1px solid var(--border-1);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      user-select: none;
+      transition: background 0.2s;
+    }
+
+    .table-spec-header:hover { background: var(--bg-surface-3); }
+
+    .table-spec-header h3 {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .table-spec-desc {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-left: auto;
+    }
+
+    .table-spec-toggle {
+      font-size: 12px;
+      color: var(--text-muted);
+      transition: transform 0.3s;
+    }
+
+    .table-spec-block.open .table-spec-toggle { transform: rotate(90deg); }
+
+    .table-spec-body { display: none; padding: 20px; }
+    .table-spec-block.open .table-spec-body { display: block; }
+
+    .spec-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11.5px;
+      margin-bottom: 16px;
+    }
+
+    .spec-table thead th {
+      background: var(--bg-surface-2);
+      padding: 8px 12px;
+      text-align: left;
+      font-weight: 700;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-secondary);
+      border-bottom: 2px solid var(--border-2);
+    }
+
+    .spec-table tbody td {
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border-1);
+      vertical-align: top;
+    }
+
+    .spec-table tbody tr:hover { background: var(--bg-surface-2); }
+
+    .spec-table code {
+      font-size: 11px;
+      background: rgba(37, 99, 235, 0.06);
+      padding: 1px 5px;
+      border-radius: 3px;
+    }
+
+    .pk-badge { display: inline-block; background: #dbeafe; color: #1d4ed8; padding: 1px 6px; border-radius: 4px; font-size: 9px; font-weight: 700; }
+    .fk-badge { display: inline-block; background: #ffedd5; color: #c2410c; padding: 1px 6px; border-radius: 4px; font-size: 9px; font-weight: 700; }
+    .unique-badge { display: inline-block; background: #f0fdf4; color: #166534; padding: 1px 6px; border-radius: 4px; font-size: 9px; font-weight: 700; }
+    .nn-badge { display: inline-block; background: #fef2f2; color: #991b1b; padding: 1px 6px; border-radius: 4px; font-size: 9px; font-weight: 700; }
+
+    .table-relations { margin-top: 12px; }
+    .relation-label { font-weight: 700; font-size: 11px; color: var(--text-secondary); margin-right: 8px; }
+
+    .relation-tag {
+      display: inline-block;
+      padding: 3px 10px;
+      margin: 2px 4px;
+      background: var(--bg-surface-2);
+      border: 1px solid var(--border-1);
+      border-radius: 4px;
+      font-size: 10.5px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-primary);
+    }
+
+    .index-list { margin-top: 12px; }
+
+    .index-list h4 {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .index-list-item {
+      display: flex;
+      gap: 12px;
+      align-items: baseline;
+      padding: 4px 0;
+      font-size: 11px;
+      border-bottom: 1px dashed var(--border-1);
+    }
+
+    .index-list-item:last-child { border-bottom: none; }
+    .index-name { font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 10.5px; color: var(--color-type); white-space: nowrap; }
+    .index-cols { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-muted); }
+    .index-purpose { color: var(--text-secondary); font-size: 10.5px; }
+
+    .seed-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 10.5px;
+      margin-top: 12px;
+    }
+
+    .seed-table thead th {
+      background: var(--bg-surface-2);
+      padding: 6px 10px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 9.5px;
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--border-2);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .seed-table tbody td {
+      padding: 5px 10px;
+      border-bottom: 1px solid var(--border-1);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--text-primary);
+      white-space: nowrap;
+    }
+
+    .seed-table tbody tr:hover { background: var(--bg-surface-2); }
+
+    .seed-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      margin-top: 16px;
+      margin-bottom: 4px;
+    }
+
+    .migration-step {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 16px;
+      margin-bottom: 8px;
+      background: var(--bg-base);
+      border: 1px solid var(--border-1);
+      border-radius: 8px;
+      font-size: 12px;
+    }
+
+    .migration-order {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-surface-2);
+      border: 2px solid var(--border-2);
+      border-radius: 50%;
+      font-weight: 900;
+      font-size: 14px;
+      color: var(--text-primary);
+      flex-shrink: 0;
+    }
+
+    .migration-tables { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .migration-table-tag {
+      padding: 3px 10px;
+      background: var(--bg-surface-1);
+      border: 1px solid var(--border-1);
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .migration-reason { font-size: 10.5px; color: var(--text-muted); margin-left: auto; white-space: nowrap; }
+
+    .migration-arrow {
+      display: flex;
+      justify-content: center;
+      padding: 4px 0;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    .controls { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+
+    .controls button {
+      padding: 6px 14px;
+      background: var(--bg-surface-2);
+      border: 1px solid var(--border-1);
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Noto Sans KR', sans-serif;
+    }
+
+    .controls button:hover { background: var(--bg-surface-3); box-shadow: var(--shadow-card-hover); }
+
+    .search-box {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--border-1);
+      border-radius: 8px;
+      font-size: 12px;
+      font-family: 'Noto Sans KR', sans-serif;
+      background: var(--bg-base);
+      margin-bottom: 16px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-box:focus { border-color: var(--color-type); }
+    .search-box::placeholder { color: var(--text-muted); }
+
+    .footer {
+      text-align: center;
+      padding: 24px;
+      margin-top: 40px;
+      font-size: 11px;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border-1);
+    }
+
+    @media (max-width: 900px) {
+      .erd-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 600px) {
+      .container { padding: 12px 8px; }
+      .erd-grid { grid-template-columns: 1fr; }
+      .meta-info { flex-direction: column; align-items: center; }
+      .spec-table { font-size: 10px; }
+      .seed-table { font-size: 9px; }
+    }
+
+    @keyframes highlightPulse {
+      0% { box-shadow: 0 0 0 0 rgba(37,99,235,0.4); }
+      50% { box-shadow: 0 0 0 6px rgba(37,99,235,0.1); }
+      100% { box-shadow: 0 0 0 0 rgba(37,99,235,0); }
+    }
+
+    .highlight-anim { animation: highlightPulse 1.5s ease 2; }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- 1. HEADER -->
+    <header class="project-header">
+      <span class="version-badge">ERD Database Design v1.0</span>
+      <h1 class="project-title">news-pulse ERD 데이터베이스 설계서</h1>
+      <p class="project-desc">12개 IT/AI 소스 뉴스 자동 수집 + 로컬 LLM 요약 + 텔레그램 푸시 시스템</p>
+      <div class="meta-info">
+        <span>생성일: <strong>2026-04-08</strong></span>
+        <span>DBMS: <strong>SQLite (WAL 모드)</strong></span>
+        <span>ORM: <strong>없음 (직접 SQL)</strong></span>
+        <span>테이블: <strong>7개</strong></span>
+        <span>관계: <strong>2개</strong> (1:1 + 1:N)</span>
+      </div>
+    </header>
+
+    <!-- 2. TOC -->
+    <nav class="toc-nav">
+      <h2>목차</h2>
+      <div class="toc-grid">
+        <a href="#wal-info" class="toc-item" style="border-left-color: var(--f-common)">1. SQLite WAL 모드 설명</a>
+        <a href="#erd-diagram" class="toc-item" style="border-left-color: var(--f1)">2. ERD 관계도</a>
+        <a href="#table-detail" class="toc-item" style="border-left-color: var(--f2)">3. 테이블 상세 명세</a>
+        <a href="#seed-data" class="toc-item" style="border-left-color: var(--f4)">4. 시드 데이터</a>
+        <a href="#migration" class="toc-item" style="border-left-color: var(--f3)">5. 마이그레이션 체크리스트</a>
+        <a href="#retention" class="toc-item" style="border-left-color: var(--f5)">6. 데이터 보관 정책</a>
+      </div>
+    </nav>
+
+    <!-- 3. WAL MODE INFO -->
+    <section id="wal-info" class="card">
+      <div class="card-header"><h2>1. SQLite WAL 모드 설명</h2></div>
+      <div class="card-body">
+        <div class="info-box">
+          <strong>WAL (Write-Ahead Logging) 모드</strong>란 SQLite의 동시 접근 모드이다.<br><br>
+          <strong>왜 필요한가?</strong><br>
+          news-pulse는 <strong>Python 파이프라인</strong>(매시 정각 실행)과 <strong>Flutter macOS 앱</strong>(대시보드)이 <strong>동일한 SQLite 파일을 공유</strong>한다.
+          기본 저널 모드에서는 쓰기 중 읽기가 차단되지만, WAL 모드에서는 <strong>읽기-쓰기 동시 접근</strong>이 가능하다.<br><br>
+          <strong>활성화 방법:</strong><br>
+          <code>PRAGMA journal_mode=WAL;</code> — DB 연결 시 1회 실행<br>
+          <code>PRAGMA busy_timeout=5000;</code> — 잠금 충돌 시 5초 대기<br><br>
+          <strong>주의사항:</strong><br>
+          - WAL 파일 (<code>.db-wal</code>) 과 SHM 파일 (<code>.db-shm</code>) 이 DB 파일 옆에 생성됨<br>
+          - 동시 <strong>쓰기-쓰기</strong>는 여전히 불가 (Python 파이프라인만 쓰기, Flutter는 읽기 전용 권장)<br>
+          - Flutter에서 설정 변경(filter_config, subscribers)은 Python 미실행 시에만 안전
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. ERD DIAGRAM -->
+    <section id="erd-diagram" class="card">
+      <div class="card-header"><h2>2. ERD 관계도 (시각적 다이어그램)</h2></div>
+      <div class="card-body">
+        <div class="erd-canvas" id="erdCanvas">
+          <svg class="erd-relations-svg" id="erdSvg"></svg>
+          <div class="erd-grid">
+
+            <!-- T1: processed_items -->
+            <div class="erd-table" style="--table-color: var(--f1)" data-table="processed_items" id="erd-card-processed_items" onclick="scrollToSpec('processed_items')">
+              <div class="erd-table-header">
+                <span class="erd-table-icon">&#9638;</span>
+                <span class="erd-table-name">processed_items</span>
+                <span class="erd-table-retention"><span class="retention-badge retention-30d">30일</span></span>
+              </div>
+              <ul class="erd-columns">
+                <li class="erd-col pk"><code>id</code> <span class="col-type">INTEGER</span> <span class="col-constraint">PK AI</span></li>
+                <li class="erd-col"><code>url_hash</code> <span class="col-type">TEXT</span> <span class="col-constraint">UNIQUE NN</span></li>
+                <li class="erd-col"><code>url</code> <span class="col-type">TEXT</span> <span class="col-constraint">NN</span></li>
+                <li class="erd-col"><code>title</code> <span class="col-type">TEXT</span> <span class="col-constraint">NN</span></li>
+                <li class="erd-col"><code>source</code> <span class="col-type">TEXT</span> <span class="col-constraint">NN</span></li>
+                <li class="erd-col"><code>language</code> <span class="col-type">TEXT</span> <span class="col-constraint">NN</span></li>
+                <li class="erd-col"><code>summary_ko</code> <span class="col-type">TEXT</span></li>
+                <li class="erd-col"><code>tags</code> <span class="col-type">TEXT</span></li>
+                <li class="erd-col"><code>is_hot</code> <span class="col-type">INTEGER</span></li>
+                <li class="erd-col"><code>telegram_sent</code> <span class="col-type">INTEGER</span></li>
+                <li class="erd-col"><code>created_at</code> <span class="col-type">TEXT</span> <span class="col-constraint">NN</span></li>
+              </ul>
+              <div class="erd-indexes">
+                <span class="index-label">INDEX:</span>
+                <span class="index-item">idx_processed_url_hash</span>
+                <span class="index-item">idx_processed_created</span>
+                <span class="index-item">idx_processed_source</span>
+              </div>
+            </div>
+
+            <!-- T2: hot_news -->
+            <div class="erd-table" style="--table-color: var(--f5)" data-table="hot_news" id="erd-card-hot_news" onclick="scrollToSpec('hot_news')">
+              <div class="erd-table-header">
+                <span class="erd-table-icon">&#9638;</span>
+                <span class="erd-table-name">hot_news</span>
+                <span class="erd-table-retention"><span class="retention-badge retention-permanent">영구</span></span>
+              </div>
+              <ul class="erd-columns">
+                <li class="erd-col pk"><code>id</code> <span class="col-type">INTEGER</span> <span class="col-constraint">PK AI</span></li>
+                <li class="erd-col fk"><code>processed_item_id</code> <span class="col-type">INTEGER</span> <span class="col-constraint">NN FK</span></li>
+                <li class="erd-col"><code>url</code> <span class="col-type">TEXT</span> <span class="col-constraint">NN</span></li>
+                <li class="erd-col"><code>title</code> <span class="col-type">TEXT</span> <span class="col-constraint">NN</span></li>
+                <li class="erd-col"><code>source</code> <span class="col-type">TEXT</span> <span class="col-constraint">NN</span></li>
+                <li class="erd-col"><code>summary_ko</code> <span class="col-type">TEXT</span> <span class="col-constraint">NN</span></li>
+                <li class="erd-col"><code>hot_reason</code> <span class="col-type">TEXT</span> <span class="col-constraint">NN</span></li>
+                <li class="erd-col"><code>created_at</code> <span class="col-type">TEXT</span> <span class="col-constraint">NN</span></li>
+              </ul>
+              <div class="erd-indexes">
+                <span class="index-label">INDEX:</span>
+                <span class="index-item">idx_hot_created</span>
+              </div>
+            </div>
+
+            <!-- T3: subscribers -->
+            <div class="erd-table" style="--table-color: var(--f4)" data-table="subscribers" id="erd-card-subscribers" onclick="scrollToSpec('subscribers')">
+              <div class="erd-table-header">
+                <span class="erd-table-icon">&#9638;</span>
+                <span class="erd-table-name">subscribers</span>
+                <span class="erd-table-retention"><span class="retention-badge retention-permanent">영구</span></span>
+              </div>
+              <ul class="erd-columns">
+                <li class="erd-col pk"><code>id</code> <span class="col-type">INTEGER</span> <span class="col-constraint">PK AI</span></li>
+                <li class="erd-col"><code>chat_id</code> <span class="col-type">INTEGER</span> <span class="col-constraint">UNIQUE NN</span></li>
+                <li class="erd-col"><code>username</code> <span class="col-type">TEXT</span></li>
+                <li class="erd-col"><code>first_name</code> <span class="col-type">TEXT</span></li>
+                <li class="erd-col"><code>status</code> <span class="col-type">TEXT</span> <span class="col-constraint">NN</span></li>
+                <li class="erd-col"><code>is_admin</code> <span class="col-type">INTEGER</span></li>
+              </ul>
+              <div class="erd-indexes">
+                <span class="index-label">INDEX:</span>
+                <span class="index-item">idx_subs_chat_id</span>
+                <span class="index-item">idx_subs_status</span>
+              </div>
+            </div>
+
+            <!-- T4: run_history -->
+            <div class="erd-table" style="--table-color: var(--f3)" data-table="run_history" id="erd-card-run_history" onclick="scrollToSpec('run_history')">
+              <div class="erd-table-header">
+                <span class="erd-table-icon">&#9638;</span>
+                <span class="erd-table-name">run_history</span>
+                <span class="erd-table-retention"><span class="retention-badge retention-90d">90일</span></span>
+              </div>
+              <ul class="erd-columns">
+                <li class="erd-col pk"><code>id</code> <span class="col-type">INTEGER</span> <span class="col-constraint">PK AI</span></li>
+                <li class="erd-col"><code>started_at</code> <span class="col-type">TEXT</span> <span class="col-constraint">NN</span></li>
+                <li class="erd-col"><code>finished_at</code> <span class="col-type">TEXT</span></li>
+                <li class="erd-col"><code>status</code> <span class="col-type">TEXT</span> <span class="col-constraint">NN</span></li>
+                <li class="erd-col"><code>fetched_count</code> <span class="col-type">INTEGER</span></li>
+                <li class="erd-col"><code>sent_count</code> <span class="col-type">INTEGER</span></li>
+                <li class="erd-col"><code>total_duration_ms</code> <span class="col-type">INTEGER</span></li>
+                <li class="erd-col"><code>memory_mode</code> <span class="col-type">TEXT</span></li>
+              </ul>
+              <div class="erd-indexes">
+                <span class="index-label">INDEX:</span>
+                <span class="index-item">idx_run_started</span>
+              </div>
+            </div>
+
+            <!-- T5: error_log -->
+            <div class="erd-table" style="--table-color: var(--f6)" data-table="error_log" id="erd-card-error_log" onclick="scrollToSpec('error_log')">
+              <div class="erd-table-header">
+                <span class="erd-table-icon">&#9638;</span>
+                <span class="erd-table-name">error_log</span>
+                <span class="erd-table-retention"><span class="retention-badge retention-30d">30일</span></span>
+              </div>
+              <ul class="erd-columns">
+                <li class="erd-col pk"><code>id</code> <span class="col-type">INTEGER</span> <span class="col-constraint">PK AI</span></li>
+                <li class="erd-col fk"><code>run_id</code> <span class="col-type">INTEGER</span> <span class="col-constraint">FK (nullable)</span></li>
+                <li class="erd-col"><code>severity</code> <span class="col-type">TEXT</span> <span class="col-constraint">NN</span></li>
+                <li class="erd-col"><code>module</code> <span class="col-type">TEXT</span> <span class="col-constraint">NN</span></li>
+                <li class="erd-col"><code>message</code> <span class="col-type">TEXT</span> <span class="col-constraint">NN</span></li>
+                <li class="erd-col"><code>traceback</code> <span class="col-type">TEXT</span></li>
+                <li class="erd-col"><code>created_at</code> <span class="col-type">TEXT</span> <span class="col-constraint">NN</span></li>
+              </ul>
+              <div class="erd-indexes">
+                <span class="index-label">INDEX:</span>
+                <span class="index-item">idx_error_created</span>
+                <span class="index-item">idx_error_severity</span>
+              </div>
+            </div>
+
+            <!-- T6: filter_config -->
+            <div class="erd-table" style="--table-color: var(--f7)" data-table="filter_config" id="erd-card-filter_config" onclick="scrollToSpec('filter_config')">
+              <div class="erd-table-header">
+                <span class="erd-table-icon">&#9638;</span>
+                <span class="erd-table-name">filter_config</span>
+                <span class="erd-table-retention"><span class="retention-badge retention-permanent">영구</span></span>
+              </div>
+              <ul class="erd-columns">
+                <li class="erd-col pk"><code>id</code> <span class="col-type">INTEGER</span> <span class="col-constraint">PK AI</span></li>
+                <li class="erd-col"><code>key</code> <span class="col-type">TEXT</span> <span class="col-constraint">UNIQUE NN</span></li>
+                <li class="erd-col"><code>value</code> <span class="col-type">TEXT</span> <span class="col-constraint">NN</span></li>
+                <li class="erd-col"><code>description</code> <span class="col-type">TEXT</span></li>
+                <li class="erd-col"><code>updated_at</code> <span class="col-type">TEXT</span> <span class="col-constraint">NN</span></li>
+              </ul>
+              <div class="erd-indexes">
+                <span class="index-label">INDEX:</span>
+                <span class="index-item">idx_config_key</span>
+              </div>
+            </div>
+
+            <!-- T7: health_check_results -->
+            <div class="erd-table" style="--table-color: var(--f8)" data-table="health_check_results" id="erd-card-health_check_results" onclick="scrollToSpec('health_check_results')">
+              <div class="erd-table-header">
+                <span class="erd-table-icon">&#9638;</span>
+                <span class="erd-table-name">health_check_results</span>
+                <span class="erd-table-retention"><span class="retention-badge retention-7d">7일</span></span>
+              </div>
+              <ul class="erd-columns">
+                <li class="erd-col pk"><code>id</code> <span class="col-type">INTEGER</span> <span class="col-constraint">PK AI</span></li>
+                <li class="erd-col"><code>check_type</code> <span class="col-type">TEXT</span> <span class="col-constraint">NN</span></li>
+                <li class="erd-col"><code>target</code> <span class="col-type">TEXT</span> <span class="col-constraint">NN</span></li>
+                <li class="erd-col"><code>status</code> <span class="col-type">TEXT</span> <span class="col-constraint">NN</span></li>
+                <li class="erd-col"><code>message</code> <span class="col-type">TEXT</span></li>
+                <li class="erd-col"><code>response_time_ms</code> <span class="col-type">INTEGER</span></li>
+                <li class="erd-col"><code>created_at</code> <span class="col-type">TEXT</span> <span class="col-constraint">NN</span></li>
+              </ul>
+              <div class="erd-indexes">
+                <span class="index-label">INDEX:</span>
+                <span class="index-item">idx_health_created</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Relationship Legend -->
+        <div class="rel-legend">
+          <div class="rel-legend-item">
+            <div class="rel-legend-line solid"></div>
+            <span><strong>1:1</strong> — processed_items &#x2194; hot_news</span>
+          </div>
+          <div class="rel-legend-item">
+            <div class="rel-legend-line dashed"></div>
+            <span><strong>1:N</strong> — run_history &#x2192; error_log</span>
+          </div>
+          <div class="rel-legend-item">
+            <div class="rel-legend-line none"></div>
+            <span><strong>독립</strong> — subscribers, filter_config, health_check_results</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. TABLE DETAIL SPECS -->
+    <section id="table-detail" class="card">
+      <div class="card-header"><h2>3. 테이블 상세 명세</h2></div>
+      <div class="card-body">
+        <input type="text" class="search-box" id="tableSearch" placeholder="테이블명 또는 컬럼명으로 검색..." oninput="filterTables(this.value)">
+
+        <div class="controls">
+          <button onclick="toggleAllSpecs(true)">&#9660; 모두 펼치기</button>
+          <button onclick="toggleAllSpecs(false)">&#9650; 모두 접기</button>
+        </div>
+
+        <!-- T1: processed_items -->
+        <div class="table-spec-block" data-spec-table="processed_items" id="spec-processed_items">
+          <div class="table-spec-header" onclick="toggleSpec(this)">
+            <span class="table-spec-toggle">&#9654;</span>
+            <h3 style="color: var(--f1)">processed_items</h3>
+            <span class="retention-badge retention-30d">30일 보관</span>
+            <span class="table-spec-desc">뉴스 아이템 저장 + URL 해시 기반 중복 방지</span>
+          </div>
+          <div class="table-spec-body">
+            <table class="spec-table">
+              <thead>
+                <tr><th>컬럼명</th><th>타입</th><th>제약조건</th><th>기본값</th><th>설명</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>id</code></td>
+                  <td><code class="col-type">INTEGER</code></td>
+                  <td><span class="pk-badge">PK</span> AUTOINCREMENT</td>
+                  <td>-</td>
+                  <td>고유 식별자</td>
+                </tr>
+                <tr>
+                  <td><code>url_hash</code></td>
+                  <td><code class="col-type">TEXT</code></td>
+                  <td><span class="unique-badge">UNIQUE</span> <span class="nn-badge">NOT NULL</span></td>
+                  <td>-</td>
+                  <td>SHA-256 해시 (중복 체크용)</td>
+                </tr>
+                <tr>
+                  <td><code>url</code></td>
+                  <td><code class="col-type">TEXT</code></td>
+                  <td><span class="nn-badge">NOT NULL</span></td>
+                  <td>-</td>
+                  <td>원문 URL</td>
+                </tr>
+                <tr>
+                  <td><code>title</code></td>
+                  <td><code class="col-type">TEXT</code></td>
+                  <td><span class="nn-badge">NOT NULL</span></td>
+                  <td>-</td>
+                  <td>기사 제목</td>
+                </tr>
+                <tr>
+                  <td><code>source</code></td>
+                  <td><code class="col-type">TEXT</code></td>
+                  <td><span class="nn-badge">NOT NULL</span></td>
+                  <td>-</td>
+                  <td>소스명 (geeknews, hackernews, reddit_localllama 등)</td>
+                </tr>
+                <tr>
+                  <td><code>language</code></td>
+                  <td><code class="col-type">TEXT</code></td>
+                  <td><span class="nn-badge">NOT NULL</span></td>
+                  <td><code>'en'</code></td>
+                  <td>언어 코드 (ko/en)</td>
+                </tr>
+                <tr>
+                  <td><code>raw_content</code></td>
+                  <td><code class="col-type">TEXT</code></td>
+                  <td>-</td>
+                  <td>NULL</td>
+                  <td>원본 콘텐츠 (선택적 저장)</td>
+                </tr>
+                <tr>
+                  <td><code>summary_ko</code></td>
+                  <td><code class="col-type">TEXT</code></td>
+                  <td>-</td>
+                  <td>NULL</td>
+                  <td>한국어 요약 텍스트</td>
+                </tr>
+                <tr>
+                  <td><code>tags</code></td>
+                  <td><code class="col-type">TEXT</code></td>
+                  <td>-</td>
+                  <td>NULL</td>
+                  <td>태그 (JSON 배열 문자열, 예: '["AI","LLM"]')</td>
+                </tr>
+                <tr>
+                  <td><code>upvotes</code></td>
+                  <td><code class="col-type">INTEGER</code></td>
+                  <td>-</td>
+                  <td><code>0</code></td>
+                  <td>업보트 수 (HN/Reddit 전용)</td>
+                </tr>
+                <tr>
+                  <td><code>is_hot</code></td>
+                  <td><code class="col-type">INTEGER</code></td>
+                  <td>-</td>
+                  <td><code>0</code></td>
+                  <td>핫뉴스 여부 (0=일반, 1=핫)</td>
+                </tr>
+                <tr>
+                  <td><code>pipeline_path</code></td>
+                  <td><code class="col-type">TEXT</code></td>
+                  <td>-</td>
+                  <td>NULL</td>
+                  <td>파이프라인 경로 (apex/kanana/claude)</td>
+                </tr>
+                <tr>
+                  <td><code>processing_time_ms</code></td>
+                  <td><code class="col-type">INTEGER</code></td>
+                  <td>-</td>
+                  <td>NULL</td>
+                  <td>처리 소요시간 (밀리초)</td>
+                </tr>
+                <tr>
+                  <td><code>telegram_sent</code></td>
+                  <td><code class="col-type">INTEGER</code></td>
+                  <td>-</td>
+                  <td><code>0</code></td>
+                  <td>텔레그램 전송 여부 (0=미전송, 1=전송)</td>
+                </tr>
+                <tr>
+                  <td><code>created_at</code></td>
+                  <td><code class="col-type">TEXT</code></td>
+                  <td><span class="nn-badge">NOT NULL</span></td>
+                  <td><code>datetime('now','localtime')</code></td>
+                  <td>생성 시각</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="index-list">
+              <h4>인덱스</h4>
+              <div class="index-list-item">
+                <span class="index-name">idx_processed_url_hash</span>
+                <span class="index-cols">(url_hash)</span>
+                <span class="index-purpose">중복 체크 시 빠른 조회</span>
+              </div>
+              <div class="index-list-item">
+                <span class="index-name">idx_processed_created</span>
+                <span class="index-cols">(created_at)</span>
+                <span class="index-purpose">날짜별 뉴스 조회 + 30일 자동 정리</span>
+              </div>
+              <div class="index-list-item">
+                <span class="index-name">idx_processed_source</span>
+                <span class="index-cols">(source)</span>
+                <span class="index-purpose">소스별 통계 집계</span>
+              </div>
+            </div>
+
+            <div class="table-relations">
+              <span class="relation-label">관계:</span>
+              <span class="relation-tag">&#x2192; hot_news (1:1, processed_items.id = hot_news.processed_item_id)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- T2: hot_news -->
+        <div class="table-spec-block" data-spec-table="hot_news" id="spec-hot_news">
+          <div class="table-spec-header" onclick="toggleSpec(this)">
+            <span class="table-spec-toggle">&#9654;</span>
+            <h3 style="color: var(--f5)">hot_news</h3>
+            <span class="retention-badge retention-permanent">영구 보관</span>
+            <span class="table-spec-desc">핫뉴스 영구 아카이브</span>
+          </div>
+          <div class="table-spec-body">
+            <table class="spec-table">
+              <thead>
+                <tr><th>컬럼명</th><th>타입</th><th>제약조건</th><th>기본값</th><th>설명</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>id</code></td>
+                  <td><code class="col-type">INTEGER</code></td>
+                  <td><span class="pk-badge">PK</span> AUTOINCREMENT</td>
+                  <td>-</td>
+                  <td>고유 식별자</td>
+                </tr>
+                <tr>
+                  <td><code>processed_item_id</code></td>
+                  <td><code class="col-type">INTEGER</code></td>
+                  <td><span class="fk-badge">FK</span> <span class="nn-badge">NOT NULL</span></td>
+                  <td>-</td>
+                  <td>원본 뉴스 참조 (processed_items.id)</td>
+                </tr>
+                <tr>
+                  <td><code>url</code></td>
+                  <td><code class="col-type">TEXT</code></td>
+                  <td><span class="nn-badge">NOT NULL</span></td>
+                  <td>-</td>
+                  <td>원문 URL (비정규화, 독립 조회용)</td>
+                </tr>
+                <tr>
+                  <td><code>title</code></td>
+                  <td><code class="col-type">TEXT</code></td>
+                  <td><span class="nn-badge">NOT NULL</span></td>
+                  <td>-</td>
+                  <td>기사 제목</td>
+                </tr>
+                <tr>
+                  <td><code>source</code></td>
+                  <td><code class="col-type">TEXT</code></td>
+                  <td><span class="nn-badge">NOT NULL</span></td>
+                  <td>-</td>
+                  <td>소스명</td>
+                </tr>
+                <tr>
+                  <td><code>summary_ko</code></td>
+                  <td><code class="col-type">TEXT</code></td>
+                  <td><span class="nn-badge">NOT NULL</span></td>
+                  <td>-</td>
+                  <td>한국어 요약 (비정규화, 영구 보관 보장)</td>
+                </tr>
+                <tr>
+                  <td><code>tags</code></td>
+                  <td><code class="col-type">TEXT</code></td>
+                  <td>-</td>
+                  <td>NULL</td>
+                  <td>태그 (JSON 배열 문자열)</td>
+                </tr>
+                <tr>
+                  <td><code>upvotes</code></td>
+                  <td><code class="col-type">INTEGER</code></td>
+                  <td>-</td>
+                  <td><code>0</code></td>
+                  <td>업보트 수</td>
+                </tr>
+                <tr>
+                  <td><code>hot_reason</code></td>
+                  <td><code class="col-type">TEXT</code></td>
+                  <td><span class="nn-badge">NOT NULL</span></td>
+                  <td>-</td>
+                  <td>핫뉴스 판단 이유 (upvote_auto / source_auto / manual)</td>
+                </tr>
+                <tr>
+                  <td><code>created_at</code></td>
+                  <td><code class="col-type">TEXT</code></td>
+                  <td><span class="nn-badge">NOT NULL</span></td>
+                  <td><code>datetime('now','localtime')</code></td>
+                  <td>생성 시각</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="index-list">
+              <h4>인덱스</h4>
+              <div class="index-list-item">
+                <span class="index-name">idx_hot_created</span>
+                <span class="index-cols">(created_at)</span>
+                <span class="index-purpose">핫뉴스 날짜별 조회</span>
+              </div>
+            </div>
+
+            <div class="table-relations">
+              <span class="relation-label">관계:</span>
+              <span class="relation-tag">&#x2190; processed_items (1:1, hot_news.processed_item_id = processed_items.id)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- T3: subscribers -->
+        <div class="table-spec-block" data-spec-table="subscribers" id="spec-subscribers">
+          <div class="table-spec-header" onclick="toggleSpec(this)">
+            <span class="table-spec-toggle">&#9654;</span>
+            <h3 style="color: var(--f4)">subscribers</h3>
+            <span class="retention-badge retention-permanent">영구 보관</span>
+            <span class="table-spec-desc">텔레그램 구독자 관리</span>
+          </div>
+          <div class="table-spec-body">
+            <table class="spec-table">
+              <thead>
+                <tr><th>컬럼명</th><th>타입</th><th>제약조건</th><th>기본값</th><th>설명</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>id</code></td>
+                  <td><code class="col-type">INTEGER</code></td>
+                  <td><span class="pk-badge">PK</span> AUTOINCREMENT</td>
+                  <td>-</td>
+                  <td>고유 식별자</td>
+                </tr>
+                <tr>
+                  <td><code>chat_id</code></td>
+                  <td><code class="col-type">INTEGER</code></td>
+                  <td><span class="unique-badge">UNIQUE</span> <span class="nn-badge">NOT NULL</span></td>
+                  <td>-</td>
+                  <td>텔레그램 chat_id</td>
+                </tr>
+                <tr>
+                  <td><code>username</code></td>
+                  <td><code class="col-type">TEXT</code></td>
+                  <td>-</td>
+                  <td>NULL</td>
+                  <td>텔레그램 username</td>
+                </tr>
+                <tr>
+                  <td><code>first_name</code></td>
+                  <td><code class="col-type">TEXT</code></td>
+                  <td>-</td>
+                  <td>NULL</td>
+                  <td>텔레그램 이름</td>
+                </tr>
+                <tr>
+                  <td><code>status</code></td>
+                  <td><code class="col-type">TEXT</code></td>
+                  <td><span class="nn-badge">NOT NULL</span></td>
+                  <td><code>'pending'</code></td>
+                  <td>구독 상태 (pending / approved / rejected)</td>
+                </tr>
+                <tr>
+                  <td><code>requested_at</code></td>
+                  <td><code class="col-type">TEXT</code></td>
+                  <td><span class="nn-badge">NOT NULL</span></td>
+                  <td><code>datetime('now','localtime')</code></td>
+                  <td>구독 신청 시각</td>
+                </tr>
+                <tr>
+                  <td><code>approved_at</code></td>
+                  <td><code class="col-type">TEXT</code></td>
+                  <td>-</td>
+                  <td>NULL</td>
+                  <td>승인 시각</td>
+                </tr>
+                <tr>
+                  <td><code>rejected_at</code></td>
+                  <td><code class="col-type">TEXT</code></td>
+                  <td>-</td>
+                  <td>NULL</td>
+                  <td>거부 시각</td>
+                </tr>
+                <tr>
+                  <td><code>is_admin</code></td>
+                  <td><code class="col-type">INTEGER</code></td>
+                  <td>-</td>
+                  <td><code>0</code></td>
+                  <td>관리자 여부 (0=일반, 1=관리자)</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="index-list">
+              <h4>인덱스</h4>
+              <div class="index-list-item">
+                <span class="index-name">idx_subs_chat_id</span>
+                <span class="index-cols">(chat_id)</span>
+                <span class="index-purpose">chat_id로 빠른 구독자 조회</span>
+              </div>
+              <div class="index-list-item">
+                <span class="index-name">idx_subs_status</span>
+                <span class="index-cols">(status)</span>
+                <span class="index-purpose">상태별 구독자 목록 조회 (pending/approved)</span>
+              </div>
+            </div>
+
+            <div class="table-relations">
+              <span class="relation-label">관계:</span>
+              <span class="relation-tag">독립 테이블 (FK 없음)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- T4: run_history -->
+        <div class="table-spec-block" data-spec-table="run_history" id="spec-run_history">
+          <div class="table-spec-header" onclick="toggleSpec(this)">
+            <span class="table-spec-toggle">&#9654;</span>
+            <h3 style="color: var(--f3)">run_history</h3>
+            <span class="retention-badge retention-90d">90일 보관</span>
+            <span class="table-spec-desc">매시 실행 결과 기록</span>
+          </div>
+          <div class="table-spec-body">
+            <table class="spec-table">
+              <thead>
+                <tr><th>컬럼명</th><th>타입</th><th>제약조건</th><th>기본값</th><th>설명</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>id</code></td>
+                  <td><code class="col-type">INTEGER</code></td>
+                  <td><span class="pk-badge">PK</span> AUTOINCREMENT</td>
+                  <td>-</td>
+                  <td>고유 식별자</td>
+                </tr>
+                <tr>
+                  <td><code>started_at</code></td>
+                  <td><code class="col-type">TEXT</code></td>
+                  <td><span class="nn-badge">NOT NULL</span></td>
+                  <td>-</td>
+                  <td>실행 시작 시각</td>
+                </tr>
+                <tr>
+                  <td><code>finished_at</code></td>
+                  <td><code class="col-type">TEXT</code></td>
+                  <td>-</td>
+                  <td>NULL</td>
+                  <td>실행 종료 시각</td>
+                </tr>
+                <tr>
+                  <td><code>status</code></td>
+                  <td><code class="col-type">TEXT</code></td>
+                  <td><span class="nn-badge">NOT NULL</span></td>
+                  <td><code>'running'</code></td>
+                  <td>실행 상태 (running / success / partial_failure / failure)</td>
+                </tr>
+                <tr>
+                  <td><code>fetched_count</code></td>
+                  <td><code class="col-type">INTEGER</code></td>
+                  <td>-</td>
+                  <td><code>0</code></td>
+                  <td>수집 건수</td>
+                </tr>
+                <tr>
+                  <td><code>filtered_count</code></td>
+                  <td><code class="col-type">INTEGER</code></td>
+                  <td>-</td>
+                  <td><code>0</code></td>
+                  <td>필터 통과 건수</td>
+                </tr>
+                <tr>
+                  <td><code>summarized_count</code></td>
+                  <td><code class="col-type">INTEGER</code></td>
+                  <td>-</td>
+                  <td><code>0</code></td>
+                  <td>요약 완료 건수</td>
+                </tr>
+                <tr>
+                  <td><code>sent_count</code></td>
+                  <td><code class="col-type">INTEGER</code></td>
+                  <td>-</td>
+                  <td><code>0</code></td>
+                  <td>텔레그램 전송 건수</td>
+                </tr>
+                <tr>
+                  <td><code>total_duration_ms</code></td>
+                  <td><code class="col-type">INTEGER</code></td>
+                  <td>-</td>
+                  <td>NULL</td>
+                  <td>총 소요 시간 (밀리초)</td>
+                </tr>
+                <tr>
+                  <td><code>model_load_ms</code></td>
+                  <td><code class="col-type">INTEGER</code></td>
+                  <td>-</td>
+                  <td>NULL</td>
+                  <td>모델 로드 시간 (밀리초)</td>
+                </tr>
+                <tr>
+                  <td><code>inference_ms</code></td>
+                  <td><code class="col-type">INTEGER</code></td>
+                  <td>-</td>
+                  <td>NULL</td>
+                  <td>추론 시간 (밀리초)</td>
+                </tr>
+                <tr>
+                  <td><code>memory_mode</code></td>
+                  <td><code class="col-type">TEXT</code></td>
+                  <td>-</td>
+                  <td>NULL</td>
+                  <td>메모리 모드 (local_llm / claude_fallback)</td>
+                </tr>
+                <tr>
+                  <td><code>error_message</code></td>
+                  <td><code class="col-type">TEXT</code></td>
+                  <td>-</td>
+                  <td>NULL</td>
+                  <td>에러 메시지 (실패 시)</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="index-list">
+              <h4>인덱스</h4>
+              <div class="index-list-item">
+                <span class="index-name">idx_run_started</span>
+                <span class="index-cols">(started_at)</span>
+                <span class="index-purpose">실행 이력 시간순 조회 + 90일 자동 정리</span>
+              </div>
+            </div>
+
+            <div class="table-relations">
+              <span class="relation-label">관계:</span>
+              <span class="relation-tag">&#x2192; error_log (1:N, run_history.id = error_log.run_id)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- T5: error_log -->
+        <div class="table-spec-block" data-spec-table="error_log" id="spec-error_log">
+          <div class="table-spec-header" onclick="toggleSpec(this)">
+            <span class="table-spec-toggle">&#9654;</span>
+            <h3 style="color: var(--f6)">error_log</h3>
+            <span class="retention-badge retention-30d">30일 보관</span>
+            <span class="table-spec-desc">에러 상세 기록</span>
+          </div>
+          <div class="table-spec-body">
+            <table class="spec-table">
+              <thead>
+                <tr><th>컬럼명</th><th>타입</th><th>제약조건</th><th>기본값</th><th>설명</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>id</code></td>
+                  <td><code class="col-type">INTEGER</code></td>
+                  <td><span class="pk-badge">PK</span> AUTOINCREMENT</td>
+                  <td>-</td>
+                  <td>고유 식별자</td>
+                </tr>
+                <tr>
+                  <td><code>run_id</code></td>
+                  <td><code class="col-type">INTEGER</code></td>
+                  <td><span class="fk-badge">FK</span> (nullable)</td>
+                  <td>NULL</td>
+                  <td>실행 참조 (run_history.id). 실행 외 에러는 NULL</td>
+                </tr>
+                <tr>
+                  <td><code>severity</code></td>
+                  <td><code class="col-type">TEXT</code></td>
+                  <td><span class="nn-badge">NOT NULL</span></td>
+                  <td><code>'error'</code></td>
+                  <td>심각도 (info / warning / error / critical)</td>
+                </tr>
+                <tr>
+                  <td><code>module</code></td>
+                  <td><code class="col-type">TEXT</code></td>
+                  <td><span class="nn-badge">NOT NULL</span></td>
+                  <td>-</td>
+                  <td>에러 발생 모듈명 (fetcher, summarizer 등)</td>
+                </tr>
+                <tr>
+                  <td><code>message</code></td>
+                  <td><code class="col-type">TEXT</code></td>
+                  <td><span class="nn-badge">NOT NULL</span></td>
+                  <td>-</td>
+                  <td>에러 메시지</td>
+                </tr>
+                <tr>
+                  <td><code>traceback</code></td>
+                  <td><code class="col-type">TEXT</code></td>
+                  <td>-</td>
+                  <td>NULL</td>
+                  <td>Python 스택 트레이스</td>
+                </tr>
+                <tr>
+                  <td><code>created_at</code></td>
+                  <td><code class="col-type">TEXT</code></td>
+                  <td><span class="nn-badge">NOT NULL</span></td>
+                  <td><code>datetime('now','localtime')</code></td>
+                  <td>에러 발생 시각</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="index-list">
+              <h4>인덱스</h4>
+              <div class="index-list-item">
+                <span class="index-name">idx_error_created</span>
+                <span class="index-cols">(created_at)</span>
+                <span class="index-purpose">에러 시간순 조회 + 30일 자동 정리</span>
+              </div>
+              <div class="index-list-item">
+                <span class="index-name">idx_error_severity</span>
+                <span class="index-cols">(severity)</span>
+                <span class="index-purpose">심각도별 필터링 (critical 우선 조회)</span>
+              </div>
+            </div>
+
+            <div class="table-relations">
+              <span class="relation-label">관계:</span>
+              <span class="relation-tag">&#x2190; run_history (N:1, error_log.run_id = run_history.id)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- T6: filter_config -->
+        <div class="table-spec-block" data-spec-table="filter_config" id="spec-filter_config">
+          <div class="table-spec-header" onclick="toggleSpec(this)">
+            <span class="table-spec-toggle">&#9654;</span>
+            <h3 style="color: var(--f7)">filter_config</h3>
+            <span class="retention-badge retention-permanent">영구 보관</span>
+            <span class="table-spec-desc">소스 ON/OFF + 필터 임계값 저장</span>
+          </div>
+          <div class="table-spec-body">
+            <table class="spec-table">
+              <thead>
+                <tr><th>컬럼명</th><th>타입</th><th>제약조건</th><th>기본값</th><th>설명</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>id</code></td>
+                  <td><code class="col-type">INTEGER</code></td>
+                  <td><span class="pk-badge">PK</span> AUTOINCREMENT</td>
+                  <td>-</td>
+                  <td>고유 식별자</td>
+                </tr>
+                <tr>
+                  <td><code>key</code></td>
+                  <td><code class="col-type">TEXT</code></td>
+                  <td><span class="unique-badge">UNIQUE</span> <span class="nn-badge">NOT NULL</span></td>
+                  <td>-</td>
+                  <td>설정 키 (예: source_geeknews_enabled)</td>
+                </tr>
+                <tr>
+                  <td><code>value</code></td>
+                  <td><code class="col-type">TEXT</code></td>
+                  <td><span class="nn-badge">NOT NULL</span></td>
+                  <td>-</td>
+                  <td>설정 값 (문자열로 저장)</td>
+                </tr>
+                <tr>
+                  <td><code>description</code></td>
+                  <td><code class="col-type">TEXT</code></td>
+                  <td>-</td>
+                  <td>NULL</td>
+                  <td>설정 설명 (관리자 참고용)</td>
+                </tr>
+                <tr>
+                  <td><code>updated_at</code></td>
+                  <td><code class="col-type">TEXT</code></td>
+                  <td><span class="nn-badge">NOT NULL</span></td>
+                  <td><code>datetime('now','localtime')</code></td>
+                  <td>마지막 수정 시각</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="index-list">
+              <h4>인덱스</h4>
+              <div class="index-list-item">
+                <span class="index-name">idx_config_key</span>
+                <span class="index-cols">(key)</span>
+                <span class="index-purpose">설정 키로 빠른 조회</span>
+              </div>
+            </div>
+
+            <div class="table-relations">
+              <span class="relation-label">관계:</span>
+              <span class="relation-tag">독립 테이블 (FK 없음)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- T7: health_check_results -->
+        <div class="table-spec-block" data-spec-table="health_check_results" id="spec-health_check_results">
+          <div class="table-spec-header" onclick="toggleSpec(this)">
+            <span class="table-spec-toggle">&#9654;</span>
+            <h3 style="color: var(--f8)">health_check_results</h3>
+            <span class="retention-badge retention-7d">7일 보관</span>
+            <span class="table-spec-desc">시스템 상태 점검 결과</span>
+          </div>
+          <div class="table-spec-body">
+            <table class="spec-table">
+              <thead>
+                <tr><th>컬럼명</th><th>타입</th><th>제약조건</th><th>기본값</th><th>설명</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>id</code></td>
+                  <td><code class="col-type">INTEGER</code></td>
+                  <td><span class="pk-badge">PK</span> AUTOINCREMENT</td>
+                  <td>-</td>
+                  <td>고유 식별자</td>
+                </tr>
+                <tr>
+                  <td><code>check_type</code></td>
+                  <td><code class="col-type">TEXT</code></td>
+                  <td><span class="nn-badge">NOT NULL</span></td>
+                  <td>-</td>
+                  <td>체크 유형 (ollama / source / telegram / db / disk)</td>
+                </tr>
+                <tr>
+                  <td><code>target</code></td>
+                  <td><code class="col-type">TEXT</code></td>
+                  <td><span class="nn-badge">NOT NULL</span></td>
+                  <td>-</td>
+                  <td>체크 대상 (모델명, 소스 URL 등)</td>
+                </tr>
+                <tr>
+                  <td><code>status</code></td>
+                  <td><code class="col-type">TEXT</code></td>
+                  <td><span class="nn-badge">NOT NULL</span></td>
+                  <td>-</td>
+                  <td>상태 (ok / warning / error)</td>
+                </tr>
+                <tr>
+                  <td><code>message</code></td>
+                  <td><code class="col-type">TEXT</code></td>
+                  <td>-</td>
+                  <td>NULL</td>
+                  <td>상태 메시지</td>
+                </tr>
+                <tr>
+                  <td><code>response_time_ms</code></td>
+                  <td><code class="col-type">INTEGER</code></td>
+                  <td>-</td>
+                  <td>NULL</td>
+                  <td>응답 시간 (밀리초)</td>
+                </tr>
+                <tr>
+                  <td><code>created_at</code></td>
+                  <td><code class="col-type">TEXT</code></td>
+                  <td><span class="nn-badge">NOT NULL</span></td>
+                  <td><code>datetime('now','localtime')</code></td>
+                  <td>체크 시각</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="index-list">
+              <h4>인덱스</h4>
+              <div class="index-list-item">
+                <span class="index-name">idx_health_created</span>
+                <span class="index-cols">(created_at)</span>
+                <span class="index-purpose">헬스체크 시간순 조회 + 7일 자동 정리</span>
+              </div>
+            </div>
+
+            <div class="table-relations">
+              <span class="relation-label">관계:</span>
+              <span class="relation-tag">독립 테이블 (FK 없음)</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 6. SEED DATA -->
+    <section id="seed-data" class="card">
+      <div class="card-header"><h2>4. 시드 데이터</h2></div>
+      <div class="card-body">
+
+        <p class="seed-label" style="color: var(--f7)">filter_config (19건 — 소스 ON/OFF 12 + 필터 설정 7)</p>
+        <div style="overflow-x: auto;">
+          <table class="seed-table">
+            <thead>
+              <tr><th>id</th><th>key</th><th>value</th><th>description</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>1</td><td>source_geeknews_enabled</td><td>true</td><td>GeekNews RSS 활성화</td></tr>
+              <tr><td>2</td><td>source_hackernews_enabled</td><td>true</td><td>Hacker News Algolia API 활성화</td></tr>
+              <tr><td>3</td><td>source_reddit_localllama_enabled</td><td>true</td><td>r/LocalLLaMA 활성화</td></tr>
+              <tr><td>4</td><td>source_reddit_claudeai_enabled</td><td>true</td><td>r/ClaudeAI 활성화</td></tr>
+              <tr><td>5</td><td>source_reddit_cursor_enabled</td><td>true</td><td>r/Cursor 활성화</td></tr>
+              <tr><td>6</td><td>source_anthropic_enabled</td><td>true</td><td>Anthropic News RSS 활성화</td></tr>
+              <tr><td>7</td><td>source_openai_enabled</td><td>true</td><td>OpenAI News RSS 활성화</td></tr>
+              <tr><td>8</td><td>source_deepmind_enabled</td><td>true</td><td>DeepMind Blog RSS 활성화</td></tr>
+              <tr><td>9</td><td>source_huggingface_enabled</td><td>true</td><td>HuggingFace Blog RSS 활성화</td></tr>
+              <tr><td>10</td><td>source_claude_code_enabled</td><td>true</td><td>Claude Code GitHub Atom 활성화</td></tr>
+              <tr><td>11</td><td>source_cline_enabled</td><td>true</td><td>Cline GitHub Atom 활성화</td></tr>
+              <tr><td>12</td><td>source_cursor_changelog_enabled</td><td>true</td><td>Cursor Changelog RSS 활성화</td></tr>
+              <tr><td>13</td><td>hn_min_points</td><td>50</td><td>HN 최소 업보트 (기본 필터)</td></tr>
+              <tr><td>14</td><td>hn_young_min_points</td><td>20</td><td>HN 최소 업보트 (2시간 미만 완화)</td></tr>
+              <tr><td>15</td><td>reddit_localllama_min_upvotes</td><td>25</td><td>r/LocalLLaMA 최소 업보트</td></tr>
+              <tr><td>16</td><td>reddit_claudeai_min_upvotes</td><td>10</td><td>r/ClaudeAI 최소 업보트</td></tr>
+              <tr><td>17</td><td>reddit_cursor_min_upvotes</td><td>10</td><td>r/Cursor 최소 업보트</td></tr>
+              <tr><td>18</td><td>max_items_per_run</td><td>8</td><td>시간당 최대 전송 건수</td></tr>
+              <tr><td>19</td><td>allow_tier1_overflow</td><td>true</td><td>Tier 1+2 초과 시 허용 여부</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="seed-label" style="color: var(--f4)">subscribers (1건 — 관리자)</p>
+        <div style="overflow-x: auto;">
+          <table class="seed-table">
+            <thead>
+              <tr><th>id</th><th>chat_id</th><th>username</th><th>first_name</th><th>status</th><th>is_admin</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>1</td><td>123456789</td><td>admin_user</td><td>Admin</td><td>approved</td><td>1</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="seed-label" style="color: var(--f1)">processed_items (3건 — 예시)</p>
+        <div style="overflow-x: auto;">
+          <table class="seed-table">
+            <thead>
+              <tr><th>id</th><th>url_hash</th><th>title</th><th>source</th><th>lang</th><th>is_hot</th><th>pipeline</th><th>sent</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>1</td><td>a1b2c3...</td><td>Claude Code 1.2 MCP 통합 강화</td><td>claude_code_releases</td><td>en</td><td>1</td><td>apex+kanana</td><td>1</td></tr>
+              <tr><td>2</td><td>d4e5f6...</td><td>Llama 4 Scout 오픈소스 공개</td><td>hackernews</td><td>en</td><td>1</td><td>apex+kanana</td><td>1</td></tr>
+              <tr><td>3</td><td>g7h8i9...</td><td>GeekNews 주간 인기 요약</td><td>geeknews</td><td>ko</td><td>0</td><td>apex</td><td>1</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="seed-label" style="color: var(--f5)">hot_news (2건 — 예시)</p>
+        <div style="overflow-x: auto;">
+          <table class="seed-table">
+            <thead>
+              <tr><th>id</th><th>processed_item_id</th><th>title</th><th>source</th><th>hot_reason</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>1</td><td>1</td><td>Claude Code 1.2 MCP 통합 강화</td><td>claude_code_releases</td><td>source_auto</td></tr>
+              <tr><td>2</td><td>2</td><td>Llama 4 Scout 오픈소스 공개</td><td>hackernews</td><td>upvote_auto</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="seed-label" style="color: var(--f3)">run_history (3건 — 예시)</p>
+        <div style="overflow-x: auto;">
+          <table class="seed-table">
+            <thead>
+              <tr><th>id</th><th>started_at</th><th>status</th><th>fetched</th><th>filtered</th><th>summarized</th><th>sent</th><th>duration_ms</th><th>memory_mode</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>1</td><td>2026-04-08 09:00:00</td><td>success</td><td>42</td><td>6</td><td>6</td><td>6</td><td>185000</td><td>local_llm</td></tr>
+              <tr><td>2</td><td>2026-04-08 10:00:00</td><td>success</td><td>38</td><td>3</td><td>3</td><td>3</td><td>95000</td><td>local_llm</td></tr>
+              <tr><td>3</td><td>2026-04-08 11:00:00</td><td>partial_failure</td><td>40</td><td>5</td><td>4</td><td>4</td><td>210000</td><td>claude_fallback</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="seed-label" style="color: var(--f6)">error_log (3건 — 예시)</p>
+        <div style="overflow-x: auto;">
+          <table class="seed-table">
+            <thead>
+              <tr><th>id</th><th>run_id</th><th>severity</th><th>module</th><th>message</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>1</td><td>3</td><td>error</td><td>summarizer</td><td>Ollama timeout: APEX 응답 없음 (300s 초과)</td></tr>
+              <tr><td>2</td><td>3</td><td>warning</td><td>memory_guard</td><td>가용 메모리 24GB, 폴백 모드 전환</td></tr>
+              <tr><td>3</td><td>NULL</td><td>info</td><td>data_cleaner</td><td>30일 지난 processed_items 127건 삭제 완료</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="seed-label" style="color: var(--f8)">health_check_results (5건 — 예시)</p>
+        <div style="overflow-x: auto;">
+          <table class="seed-table">
+            <thead>
+              <tr><th>id</th><th>check_type</th><th>target</th><th>status</th><th>message</th><th>response_ms</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>1</td><td>ollama</td><td>apex-i-compact</td><td>ok</td><td>모델 로드 가능</td><td>1200</td></tr>
+              <tr><td>2</td><td>ollama</td><td>kanana-2-30b</td><td>ok</td><td>모델 로드 가능</td><td>980</td></tr>
+              <tr><td>3</td><td>source</td><td>https://news.hada.io/rss</td><td>ok</td><td>RSS 피드 유효</td><td>320</td></tr>
+              <tr><td>4</td><td>telegram</td><td>bot_token</td><td>ok</td><td>sendMessage 테스트 성공</td><td>450</td></tr>
+              <tr><td>5</td><td>disk</td><td>/Users/kimtaekyu/.news-pulse</td><td>warning</td><td>디스크 사용량 85%</td><td>5</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 7. MIGRATION CHECKLIST -->
+    <section id="migration" class="card">
+      <div class="card-header"><h2>5. 마이그레이션 체크리스트</h2></div>
+      <div class="card-body">
+        <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 16px;">
+          FK 의존성을 고려한 테이블 생성 순서. 의존 대상이 먼저 생성되어야 한다.
+        </p>
+
+        <div class="migration-step">
+          <div class="migration-order">1</div>
+          <div class="migration-tables">
+            <span class="migration-table-tag" style="color: var(--f7)">filter_config</span>
+            <span class="migration-table-tag" style="color: var(--f4)">subscribers</span>
+          </div>
+          <span class="migration-reason">독립 테이블, FK 없음</span>
+        </div>
+
+        <div class="migration-arrow">&#9660;</div>
+
+        <div class="migration-step">
+          <div class="migration-order">2</div>
+          <div class="migration-tables">
+            <span class="migration-table-tag" style="color: var(--f1)">processed_items</span>
+          </div>
+          <span class="migration-reason">독립 테이블, hot_news의 FK 대상</span>
+        </div>
+
+        <div class="migration-arrow">&#9660;</div>
+
+        <div class="migration-step">
+          <div class="migration-order">3</div>
+          <div class="migration-tables">
+            <span class="migration-table-tag" style="color: var(--f5)">hot_news</span>
+          </div>
+          <span class="migration-reason">FK: processed_item_id &#x2192; processed_items.id</span>
+        </div>
+
+        <div class="migration-arrow">&#9660;</div>
+
+        <div class="migration-step">
+          <div class="migration-order">4</div>
+          <div class="migration-tables">
+            <span class="migration-table-tag" style="color: var(--f3)">run_history</span>
+          </div>
+          <span class="migration-reason">독립 테이블, error_log의 FK 대상</span>
+        </div>
+
+        <div class="migration-arrow">&#9660;</div>
+
+        <div class="migration-step">
+          <div class="migration-order">5</div>
+          <div class="migration-tables">
+            <span class="migration-table-tag" style="color: var(--f6)">error_log</span>
+          </div>
+          <span class="migration-reason">FK: run_id &#x2192; run_history.id (nullable)</span>
+        </div>
+
+        <div class="migration-arrow">&#9660;</div>
+
+        <div class="migration-step">
+          <div class="migration-order">6</div>
+          <div class="migration-tables">
+            <span class="migration-table-tag" style="color: var(--f8)">health_check_results</span>
+          </div>
+          <span class="migration-reason">독립 테이블, FK 없음</span>
+        </div>
+
+        <div style="margin-top: 24px; padding: 16px; background: var(--bg-base); border-radius: 8px; border: 1px solid var(--border-1);">
+          <h4 style="font-size: 12px; margin-bottom: 8px; color: var(--text-secondary);">SQLite 초기화 PRAGMA (모든 테이블 생성 전 실행)</h4>
+          <pre style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-primary); line-height: 1.8;"><code>PRAGMA journal_mode=WAL;          -- WAL 모드 활성화
+PRAGMA busy_timeout=5000;         -- 잠금 대기 5초
+PRAGMA foreign_keys=ON;           -- FK 제약조건 활성화
+PRAGMA synchronous=NORMAL;        -- WAL 모드 권장 동기화 수준</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. RETENTION POLICY -->
+    <section id="retention" class="card">
+      <div class="card-header"><h2>6. 데이터 보관 정책</h2></div>
+      <div class="card-body">
+        <table class="spec-table">
+          <thead>
+            <tr><th>테이블</th><th>보관 기간</th><th>정리 주기</th><th>정리 기준 컬럼</th><th>비고</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code style="color: var(--f1)">processed_items</code></td>
+              <td><span class="retention-badge retention-30d">30일</span></td>
+              <td>매 실행 시</td>
+              <td><code>created_at</code></td>
+              <td>is_hot=1 이어도 30일 후 삭제 (hot_news에 복사됨)</td>
+            </tr>
+            <tr>
+              <td><code style="color: var(--f5)">hot_news</code></td>
+              <td><span class="retention-badge retention-permanent">영구</span></td>
+              <td>-</td>
+              <td>-</td>
+              <td>핫뉴스 영구 아카이브, 삭제하지 않음</td>
+            </tr>
+            <tr>
+              <td><code style="color: var(--f4)">subscribers</code></td>
+              <td><span class="retention-badge retention-permanent">영구</span></td>
+              <td>-</td>
+              <td>-</td>
+              <td>구독자 정보 영구 보관</td>
+            </tr>
+            <tr>
+              <td><code style="color: var(--f3)">run_history</code></td>
+              <td><span class="retention-badge retention-90d">90일</span></td>
+              <td>매 실행 시</td>
+              <td><code>started_at</code></td>
+              <td>실행 이력 3개월 보관</td>
+            </tr>
+            <tr>
+              <td><code style="color: var(--f6)">error_log</code></td>
+              <td><span class="retention-badge retention-30d">30일</span></td>
+              <td>매 실행 시</td>
+              <td><code>created_at</code></td>
+              <td>에러 로그 1개월 보관</td>
+            </tr>
+            <tr>
+              <td><code style="color: var(--f7)">filter_config</code></td>
+              <td><span class="retention-badge retention-permanent">영구</span></td>
+              <td>-</td>
+              <td>-</td>
+              <td>설정 데이터, 삭제 대상 아님</td>
+            </tr>
+            <tr>
+              <td><code style="color: var(--f8)">health_check_results</code></td>
+              <td><span class="retention-badge retention-7d">7일</span></td>
+              <td>매 실행 시</td>
+              <td><code>created_at</code></td>
+              <td>헬스체크 결과 1주일 보관</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="info-box" style="margin-top: 16px; background: #fef3c7; border-color: #fcd34d;">
+          <strong style="color: var(--f3)">자동 정리 로직 (DataCleaner 모듈)</strong><br>
+          매 파이프라인 실행 완료 후 <code>DataCleaner</code> 모듈이 다음 SQL을 실행한다:<br><br>
+          <code>DELETE FROM processed_items WHERE created_at &lt; datetime('now', '-30 days', 'localtime');</code><br>
+          <code>DELETE FROM run_history WHERE started_at &lt; datetime('now', '-90 days', 'localtime');</code><br>
+          <code>DELETE FROM error_log WHERE created_at &lt; datetime('now', '-30 days', 'localtime');</code><br>
+          <code>DELETE FROM health_check_results WHERE created_at &lt; datetime('now', '-7 days', 'localtime');</code><br><br>
+          삭제 후 <code>VACUUM;</code> 은 주 1회만 실행 (성능 고려). 일반적으로는 SQLite가 자동으로 공간을 재사용한다.
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      news-pulse ERD Design v1.0 — 생성일 2026-04-08 — SQLite WAL 모드 — 7 테이블, 2 관계
+    </footer>
+
+  </div>
+
+  <script>
+    function toggleSpec(header) {
+      var block = header.parentElement;
+      block.classList.toggle('open');
+    }
+
+    function toggleAllSpecs(open) {
+      var blocks = document.querySelectorAll('.table-spec-block');
+      for (var i = 0; i < blocks.length; i++) {
+        if (open) {
+          blocks[i].classList.add('open');
+        } else {
+          blocks[i].classList.remove('open');
+        }
+      }
+    }
+
+    function scrollToSpec(tableName) {
+      var target = document.getElementById('spec-' + tableName);
+      if (target) {
+        target.classList.add('open');
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        target.classList.add('highlight-anim');
+        setTimeout(function() { target.classList.remove('highlight-anim'); }, 3000);
+      }
+    }
+
+    function filterTables(query) {
+      var q = query.toLowerCase().trim();
+      var blocks = document.querySelectorAll('.table-spec-block');
+      for (var i = 0; i < blocks.length; i++) {
+        var block = blocks[i];
+        if (!q) {
+          block.classList.remove('hidden');
+          continue;
+        }
+        var text = block.textContent.toLowerCase();
+        var tableName = block.getAttribute('data-spec-table') || '';
+        if (text.indexOf(q) !== -1 || tableName.indexOf(q) !== -1) {
+          block.classList.remove('hidden');
+        } else {
+          block.classList.add('hidden');
+        }
+      }
+    }
+
+    function drawRelationships() {
+      var svg = document.getElementById('erdSvg');
+      var canvas = document.getElementById('erdCanvas');
+      if (!svg || !canvas) return;
+
+      svg.setAttribute('viewBox', '0 0 ' + canvas.scrollWidth + ' ' + canvas.scrollHeight);
+      svg.style.width = canvas.scrollWidth + 'px';
+      svg.style.height = canvas.scrollHeight + 'px';
+
+      while (svg.firstChild) {
+        svg.removeChild(svg.firstChild);
+      }
+
+      var defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+
+      var marker11 = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+      marker11.setAttribute('id', 'diamond');
+      marker11.setAttribute('viewBox', '0 0 12 12');
+      marker11.setAttribute('refX', '6');
+      marker11.setAttribute('refY', '6');
+      marker11.setAttribute('markerWidth', '10');
+      marker11.setAttribute('markerHeight', '10');
+      marker11.setAttribute('orient', 'auto');
+      var diamondPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      diamondPath.setAttribute('d', 'M 0 6 L 6 0 L 12 6 L 6 12 Z');
+      diamondPath.setAttribute('fill', '#2563eb');
+      marker11.appendChild(diamondPath);
+      defs.appendChild(marker11);
+
+      var marker1N = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+      marker1N.setAttribute('id', 'arrow');
+      marker1N.setAttribute('viewBox', '0 0 10 10');
+      marker1N.setAttribute('refX', '9');
+      marker1N.setAttribute('refY', '5');
+      marker1N.setAttribute('markerWidth', '8');
+      marker1N.setAttribute('markerHeight', '8');
+      marker1N.setAttribute('orient', 'auto');
+      var arrowPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      arrowPath.setAttribute('d', 'M 0 0 L 10 5 L 0 10 Z');
+      arrowPath.setAttribute('fill', '#d97706');
+      marker1N.appendChild(arrowPath);
+      defs.appendChild(marker1N);
+
+      svg.appendChild(defs);
+
+      drawLine(svg, canvas, 'erd-card-processed_items', 'erd-card-hot_news', 'one-to-one', '1:1');
+      drawLine(svg, canvas, 'erd-card-run_history', 'erd-card-error_log', 'one-to-many', '1:N');
+    }
+
+    function drawLine(svg, canvas, fromId, toId, relClass, label) {
+      var fromEl = document.getElementById(fromId);
+      var toEl = document.getElementById(toId);
+      if (!fromEl || !toEl) return;
+
+      var canvasRect = canvas.getBoundingClientRect();
+      var fromRect = fromEl.getBoundingClientRect();
+      var toRect = toEl.getBoundingClientRect();
+
+      var fromCx = fromRect.left - canvasRect.left + fromRect.width / 2;
+      var fromCy = fromRect.top - canvasRect.top + fromRect.height / 2;
+      var toCx = toRect.left - canvasRect.left + toRect.width / 2;
+      var toCy = toRect.top - canvasRect.top + toRect.height / 2;
+
+      var fromPt = getEdgePoint(fromRect, canvasRect, toCx, toCy);
+      var toPt = getEdgePoint(toRect, canvasRect, fromCx, fromCy);
+
+      var midX = (fromPt.x + toPt.x) / 2;
+      var midY = (fromPt.y + toPt.y) / 2;
+
+      var dx = Math.abs(toPt.x - fromPt.x);
+      var dy = Math.abs(toPt.y - fromPt.y);
+
+      var d;
+      if (dx > dy) {
+        var cx1 = fromPt.x + (toPt.x - fromPt.x) * 0.4;
+        var cx2 = fromPt.x + (toPt.x - fromPt.x) * 0.6;
+        d = 'M ' + fromPt.x + ' ' + fromPt.y + ' C ' + cx1 + ' ' + fromPt.y + ', ' + cx2 + ' ' + toPt.y + ', ' + toPt.x + ' ' + toPt.y;
+      } else {
+        var cy1 = fromPt.y + (toPt.y - fromPt.y) * 0.4;
+        var cy2 = fromPt.y + (toPt.y - fromPt.y) * 0.6;
+        d = 'M ' + fromPt.x + ' ' + fromPt.y + ' C ' + fromPt.x + ' ' + cy1 + ', ' + toPt.x + ' ' + cy2 + ', ' + toPt.x + ' ' + toPt.y;
+      }
+
+      var line = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      line.setAttribute('d', d);
+      line.setAttribute('class', 'rel-line ' + relClass);
+      line.setAttribute('fill', 'none');
+
+      if (relClass === 'one-to-one') {
+        line.setAttribute('marker-end', 'url(#diamond)');
+        line.setAttribute('marker-start', 'url(#diamond)');
+      } else if (relClass === 'one-to-many') {
+        line.setAttribute('marker-end', 'url(#arrow)');
+      }
+
+      svg.appendChild(line);
+
+      var text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      text.setAttribute('x', String(midX));
+      text.setAttribute('y', String(midY - 8));
+      text.setAttribute('class', 'rel-label');
+      text.setAttribute('text-anchor', 'middle');
+      text.textContent = label;
+      svg.appendChild(text);
+    }
+
+    function getEdgePoint(rect, canvasRect, targetX, targetY) {
+      var cx = rect.left - canvasRect.left + rect.width / 2;
+      var cy = rect.top - canvasRect.top + rect.height / 2;
+      var hw = rect.width / 2;
+      var hh = rect.height / 2;
+
+      var ddx = targetX - cx;
+      var ddy = targetY - cy;
+      var angle = Math.atan2(ddy, ddx);
+
+      var tanAngle = Math.abs(Math.tan(angle));
+      var ex, ey;
+
+      if (tanAngle <= hh / hw) {
+        ex = ddx > 0 ? cx + hw : cx - hw;
+        ey = cy + hw * Math.tan(angle) * (ddx > 0 ? 1 : -1);
+      } else {
+        ey = ddy > 0 ? cy + hh : cy - hh;
+        ex = cx + hh / Math.tan(angle) * (ddy > 0 ? 1 : -1);
+      }
+
+      return { x: ex, y: ey };
+    }
+
+    window.addEventListener('load', function() {
+      setTimeout(drawRelationships, 100);
+    });
+
+    window.addEventListener('resize', function() {
+      clearTimeout(window._resizeTimer);
+      window._resizeTimer = setTimeout(drawRelationships, 200);
+    });
+
+    var erdTables = document.querySelectorAll('.erd-table');
+    var relations = {
+      'processed_items': ['hot_news'],
+      'hot_news': ['processed_items'],
+      'run_history': ['error_log'],
+      'error_log': ['run_history']
+    };
+
+    for (var t = 0; t < erdTables.length; t++) {
+      (function(table) {
+        var name = table.getAttribute('data-table');
+
+        table.addEventListener('mouseenter', function() {
+          var related = relations[name] || [];
+          for (var r = 0; r < related.length; r++) {
+            var el = document.getElementById('erd-card-' + related[r]);
+            if (el) el.classList.add('highlighted');
+          }
+        });
+
+        table.addEventListener('mouseleave', function() {
+          var highlighted = document.querySelectorAll('.erd-table.highlighted');
+          for (var h = 0; h < highlighted.length; h++) {
+            highlighted[h].classList.remove('highlighted');
+          }
+        });
+      })(erdTables[t]);
+    }
+  </script>
+</body>
+</html>

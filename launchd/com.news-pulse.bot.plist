@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+    news-pulse LaunchAgent 설정 파일
+    스케줄: 매일 09:00 ~ 00:00 (매시 정각, 16회/일)
+    제외 시간: 01:00 ~ 08:00 (수면 시간)
+
+    주의: install_launchd.sh가 아래 placeholder를 실제 경로로 치환한다.
+      /path/to/uv          → 실제 uv 실행 파일 경로
+      /path/to/news-pulse  → 실제 프로젝트 루트 경로
+-->
+<plist version="1.0">
+<dict>
+
+    <!-- LaunchAgent 고유 레이블 -->
+    <key>Label</key>
+    <string>com.news-pulse.bot</string>
+
+    <!--
+        실행 명령: uv run python -m news_pulse
+        install_launchd.sh에서 /path/to/uv와 WorkingDirectory를 실제 경로로 치환한다.
+    -->
+    <key>ProgramArguments</key>
+    <array>
+        <string>/path/to/uv</string>
+        <string>run</string>
+        <string>python</string>
+        <string>-m</string>
+        <string>news_pulse</string>
+    </array>
+
+    <!-- 프로젝트 루트 디렉토리 (uv가 pyproject.toml을 찾는 기준) -->
+    <key>WorkingDirectory</key>
+    <string>/path/to/news-pulse</string>
+
+    <!--
+        스케줄: 09:00 ~ 00:00 매시 정각 (16회/일)
+        01:00 ~ 08:00은 수면 시간으로 제외한다.
+        자정(00:00)은 Hour=0으로 표기한다.
+    -->
+    <key>StartCalendarInterval</key>
+    <array>
+        <!-- 09:00 -->
+        <dict>
+            <key>Hour</key><integer>9</integer>
+            <key>Minute</key><integer>0</integer>
+        </dict>
+        <!-- 10:00 -->
+        <dict>
+            <key>Hour</key><integer>10</integer>
+            <key>Minute</key><integer>0</integer>
+        </dict>
+        <!-- 11:00 -->
+        <dict>
+            <key>Hour</key><integer>11</integer>
+            <key>Minute</key><integer>0</integer>
+        </dict>
+        <!-- 12:00 -->
+        <dict>
+            <key>Hour</key><integer>12</integer>
+            <key>Minute</key><integer>0</integer>
+        </dict>
+        <!-- 13:00 -->
+        <dict>
+            <key>Hour</key><integer>13</integer>
+            <key>Minute</key><integer>0</integer>
+        </dict>
+        <!-- 14:00 -->
+        <dict>
+            <key>Hour</key><integer>14</integer>
+            <key>Minute</key><integer>0</integer>
+        </dict>
+        <!-- 15:00 -->
+        <dict>
+            <key>Hour</key><integer>15</integer>
+            <key>Minute</key><integer>0</integer>
+        </dict>
+        <!-- 16:00 -->
+        <dict>
+            <key>Hour</key><integer>16</integer>
+            <key>Minute</key><integer>0</integer>
+        </dict>
+        <!-- 17:00 -->
+        <dict>
+            <key>Hour</key><integer>17</integer>
+            <key>Minute</key><integer>0</integer>
+        </dict>
+        <!-- 18:00 -->
+        <dict>
+            <key>Hour</key><integer>18</integer>
+            <key>Minute</key><integer>0</integer>
+        </dict>
+        <!-- 19:00 -->
+        <dict>
+            <key>Hour</key><integer>19</integer>
+            <key>Minute</key><integer>0</integer>
+        </dict>
+        <!-- 20:00 -->
+        <dict>
+            <key>Hour</key><integer>20</integer>
+            <key>Minute</key><integer>0</integer>
+        </dict>
+        <!-- 21:00 -->
+        <dict>
+            <key>Hour</key><integer>21</integer>
+            <key>Minute</key><integer>0</integer>
+        </dict>
+        <!-- 22:00 -->
+        <dict>
+            <key>Hour</key><integer>22</integer>
+            <key>Minute</key><integer>0</integer>
+        </dict>
+        <!-- 23:00 -->
+        <dict>
+            <key>Hour</key><integer>23</integer>
+            <key>Minute</key><integer>0</integer>
+        </dict>
+        <!-- 00:00 (자정) -->
+        <dict>
+            <key>Hour</key><integer>0</integer>
+            <key>Minute</key><integer>0</integer>
+        </dict>
+    </array>
+
+    <!--
+        환경변수 설정
+        TZ 이중 고정:
+          1) 여기서 launchd 프로세스 레벨로 설정
+          2) Python 코드에서 os.environ['TZ'] = 'Asia/Seoul' 로 재고정
+        PATH에 Homebrew와 uv 설치 경로를 포함한다.
+    -->
+    <key>EnvironmentVariables</key>
+    <dict>
+        <!-- 한국 표준시 고정 (KST = UTC+9) -->
+        <key>TZ</key>
+        <string>Asia/Seoul</string>
+        <!-- Homebrew 및 시스템 기본 경로 포함 -->
+        <key>PATH</key>
+        <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    </dict>
+
+    <!--
+        로그 파일 경로
+        install_launchd.sh에서 실제 ~/.news-pulse/logs/ 경로로 치환된다.
+    -->
+    <key>StandardOutPath</key>
+    <string>/tmp/news-pulse-stdout.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/tmp/news-pulse-stderr.log</string>
+
+    <!--
+        프로세스 제한 설정
+        ExitTimeOut: 300초(5분) 후 강제 종료 (LLM 추론 타임아웃 대응)
+    -->
+    <key>ExitTimeOut</key>
+    <integer>300</integer>
+
+    <!-- 백그라운드 프로세스로 실행 (GUI 없음, 저우선순위) -->
+    <key>ProcessType</key>
+    <string>Background</string>
+
+    <!-- 시스템 부팅 또는 launchd 로드 시 자동 실행 안 함 (스케줄에만 실행) -->
+    <key>RunAtLoad</key>
+    <false/>
+
+    <!--
+        AbandonProcessGroup=false: 프로세스 그룹 전체를 종료한다.
+        subprocess로 spawning된 자식 프로세스도 함께 정리된다.
+    -->
+    <key>AbandonProcessGroup</key>
+    <false/>
+
+    <!--
+        KeepAlive는 설정하지 않는다.
+        상시 프로세스가 아니라 스케줄 기반 1회성 실행이다.
+    -->
+
+</dict>
+</plist>

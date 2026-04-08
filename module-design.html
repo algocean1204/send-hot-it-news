@@ -1,0 +1,2952 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>news-pulse — 계층적 모듈 설계서</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-base: #F4F3EE;
+      --bg-surface-1: #FFFFFF;
+      --bg-surface-2: #EBE9E2;
+      --bg-surface-3: #E2E0D8;
+      --border-1: #D6D3C8;
+      --border-2: #C4C0B3;
+      --text-primary: #1a1a1a;
+      --text-secondary: #5c5c5c;
+      --text-muted: #8c8c8c;
+      --color-in: #0d9488;
+      --color-out: #d97706;
+      --color-api: #0891b2;
+      --color-event: #ca8a04;
+      --color-type: #2563eb;
+      --color-warning: #dc2626;
+      --color-deprecated: #8c8c8c;
+      --f-common: #0891b2;
+      --f1: #2563eb;
+      --f2: #7c3aed;
+      --f3: #d97706;
+      --f4: #0d9488;
+      --f5: #db2777;
+      --f6: #dc2626;
+      --f7: #ca8a04;
+      --f8: #65a30d;
+      --f9: #3b82f6;
+      --f10: #a855f7;
+      --f-pipeline: #2563eb;
+      --f-infra: #7c3aed;
+      --shadow-card: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+      --shadow-card-hover: 0 4px 6px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.06);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      line-height: 1.7;
+      background: var(--bg-base);
+      color: var(--text-primary);
+    }
+
+    code, .mono, .type, .param, .module-id {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 24px;
+    }
+
+    /* ===== 헤더 ===== */
+    .project-header {
+      text-align: center;
+      padding: 48px 24px 36px;
+      margin-bottom: 32px;
+    }
+
+    .version-badge {
+      display: inline-block;
+      padding: 4px 16px;
+      background: var(--bg-surface-2);
+      border: 1px solid var(--border-1);
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      letter-spacing: 0.5px;
+      margin-bottom: 16px;
+    }
+
+    .project-title {
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .project-desc {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+
+    .meta-info {
+      display: flex;
+      gap: 24px;
+      justify-content: center;
+      flex-wrap: wrap;
+      font-size: 11.5px;
+      color: var(--text-muted);
+    }
+
+    .meta-info span {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* ===== 카드 ===== */
+    .card {
+      background: var(--bg-surface-1);
+      border: 1px solid var(--border-1);
+      border-radius: 12px;
+      box-shadow: var(--shadow-card);
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+
+    .card:hover {
+      box-shadow: var(--shadow-card-hover);
+    }
+
+    .card-header {
+      padding: 16px 24px;
+      background: var(--bg-surface-2);
+      border-bottom: 1px solid var(--border-1);
+    }
+
+    .card-header h2 {
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .card-body {
+      padding: 24px;
+    }
+
+    /* ===== 목차 ===== */
+    .toc-nav {
+      margin-bottom: 32px;
+    }
+
+    .toc-nav h2 {
+      font-size: 16px;
+      font-weight: 800;
+      margin-bottom: 16px;
+      padding-left: 4px;
+    }
+
+    .toc-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 8px;
+    }
+
+    .toc-item {
+      display: block;
+      padding: 10px 16px;
+      background: var(--bg-surface-1);
+      border: 1px solid var(--border-1);
+      border-left: 4px solid var(--border-2);
+      border-radius: 8px;
+      text-decoration: none;
+      color: var(--text-primary);
+      font-size: 12px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .toc-item:hover {
+      background: var(--bg-surface-2);
+      border-left-color: var(--f1);
+      transform: translateX(4px);
+    }
+
+    /* ===== 기술스택 테이블 ===== */
+    .tech-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    .tech-table th {
+      padding: 10px 12px;
+      text-align: left;
+      background: var(--bg-surface-2);
+      border-bottom: 2px solid var(--border-2);
+      font-weight: 700;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-secondary);
+    }
+
+    .tech-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border-1);
+      vertical-align: top;
+    }
+
+    .tech-tag {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+      margin: 2px 4px 2px 0;
+    }
+
+    .tech-tag.backend { background: rgba(37,99,235,0.1); color: var(--f1); }
+    .tech-tag.frontend { background: rgba(13,148,136,0.1); color: var(--f4); }
+    .tech-tag.infra { background: rgba(124,58,237,0.1); color: var(--f2); }
+    .tech-tag.db { background: rgba(217,119,6,0.1); color: var(--f3); }
+    .tech-tag.ai { background: rgba(219,39,119,0.1); color: var(--f5); }
+
+    /* ===== 폴더 구조 ===== */
+    .folder-tree {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      line-height: 1.8;
+      padding: 20px 24px;
+      background: var(--bg-base);
+      border-radius: 8px;
+      border: 1px solid var(--border-1);
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .folder { color: var(--f1); font-weight: 700; }
+    .comment { color: var(--text-muted); font-style: italic; }
+
+    /* ===== 파이프라인 ===== */
+    .pipeline-flow {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 24px 12px;
+      overflow-x: auto;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .pipeline-node {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 8px 12px;
+      background: var(--bg-surface-1);
+      border: 2px solid var(--node-color, var(--f1));
+      border-radius: 8px;
+      min-width: 70px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .pipeline-node:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-card-hover);
+    }
+
+    .pipeline-node.highlight {
+      animation: pulse 0.5s ease-in-out 3;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); box-shadow: 0 0 12px rgba(37,99,235,0.3); }
+    }
+
+    .node-id {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--node-color, var(--f1));
+    }
+
+    .node-name {
+      font-size: 9.5px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .pipeline-arrow {
+      font-size: 16px;
+      color: var(--border-2);
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .pipeline-io-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11.5px;
+      margin-top: 16px;
+    }
+
+    .pipeline-io-table th {
+      padding: 8px 12px;
+      text-align: left;
+      background: var(--bg-surface-2);
+      border-bottom: 2px solid var(--border-2);
+      font-weight: 700;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-secondary);
+    }
+
+    .pipeline-io-table td {
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border-1);
+      vertical-align: top;
+    }
+
+    .in-type { color: var(--color-in); font-family: 'JetBrains Mono', monospace; font-size: 10.5px; }
+    .out-type { color: var(--color-out); font-family: 'JetBrains Mono', monospace; font-size: 10.5px; }
+
+    /* ===== Feature 카드 ===== */
+    .feature-card {
+      border-left: 4px solid var(--feature-color, var(--f1));
+    }
+
+    .feature-card .card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .feature-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: var(--feature-color, var(--f1));
+      color: white;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .feature-desc {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+
+    .feature-desc code {
+      background: var(--bg-surface-2);
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-size: 11px;
+    }
+
+    .feature-controls {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .feature-controls button {
+      padding: 6px 14px;
+      background: var(--bg-surface-2);
+      border: 1px solid var(--border-1);
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--text-secondary);
+      transition: all 0.2s;
+    }
+
+    .feature-controls button:hover {
+      background: var(--bg-surface-3);
+    }
+
+    /* ===== 모듈 블록 ===== */
+    .module-block {
+      border: 1px solid var(--border-1);
+      border-radius: 8px;
+      margin-bottom: 8px;
+      overflow: hidden;
+      transition: all 0.2s;
+    }
+
+    .module-block:hover {
+      border-color: var(--border-2);
+    }
+
+    .module-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      background: var(--bg-surface-2);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .module-header:hover {
+      background: var(--bg-surface-3);
+    }
+
+    .module-id {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .module-name {
+      font-size: 13px;
+      font-weight: 700;
+      flex: 1;
+    }
+
+    .module-toggle {
+      font-size: 11px;
+      color: var(--text-muted);
+      transition: transform 0.2s;
+      flex-shrink: 0;
+    }
+
+    .module-block.open .module-toggle {
+      transform: rotate(90deg);
+    }
+
+    .module-body {
+      display: none;
+      padding: 16px 20px;
+      border-top: 1px solid var(--border-1);
+    }
+
+    .module-block.open .module-body {
+      display: block;
+    }
+
+    /* ===== IO 블록 ===== */
+    .io-block {
+      margin-bottom: 16px;
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border-1);
+    }
+
+    .io-in { background: rgba(13,148,136,0.04); border-left: 3px solid var(--color-in); }
+    .io-in-aux { background: rgba(13,148,136,0.02); border-left: 3px solid rgba(13,148,136,0.4); }
+    .io-out { background: rgba(217,119,6,0.04); border-left: 3px solid var(--color-out); }
+
+    .io-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .in-label { color: var(--color-in); }
+    .in-aux-label { color: rgba(13,148,136,0.7); }
+    .out-label { color: var(--color-out); }
+    .logic-label { color: var(--f2); }
+    .protocol-label { color: var(--color-api); }
+
+    .io-spec {
+      margin-bottom: 8px;
+    }
+
+    .param-name {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .param-type {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--color-type);
+    }
+
+    .param-source {
+      font-size: 10px;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    .param-desc {
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    .type-detail {
+      margin-top: 8px;
+      padding: 10px 14px;
+      background: var(--bg-base);
+      border-radius: 6px;
+      border: 1px solid var(--border-1);
+      overflow-x: auto;
+    }
+
+    .type-detail code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      line-height: 1.8;
+      white-space: pre;
+      display: block;
+      color: var(--text-primary);
+    }
+
+    .type-detail .comment {
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    /* ===== 로직 블록 ===== */
+    .logic-block {
+      margin-bottom: 16px;
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border-1);
+      background: rgba(124,58,237,0.03);
+      border-left: 3px solid var(--f2);
+    }
+
+    .logic-steps {
+      padding-left: 20px;
+      font-size: 11.5px;
+      color: var(--text-secondary);
+    }
+
+    .logic-steps li {
+      margin-bottom: 4px;
+    }
+
+    /* ===== Protocol 블록 ===== */
+    .protocol-block {
+      margin-bottom: 16px;
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border-1);
+      background: rgba(8,145,178,0.04);
+      border-left: 3px solid var(--color-api);
+    }
+
+    .protocol-code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      line-height: 1.8;
+      white-space: pre;
+      display: block;
+      color: var(--text-primary);
+    }
+
+    /* ===== 의존성 ===== */
+    .deps-block {
+      margin-bottom: 12px;
+      font-size: 11px;
+    }
+
+    .dep-label {
+      font-weight: 700;
+      color: var(--text-secondary);
+      margin-right: 8px;
+    }
+
+    .dep-tag {
+      display: inline-block;
+      padding: 2px 8px;
+      margin: 2px 4px 2px 0;
+      background: var(--bg-surface-2);
+      border: 1px solid var(--border-1);
+      border-radius: 4px;
+      font-size: 10.5px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* ===== 구현체 ===== */
+    .impl-block {
+      margin-bottom: 16px;
+    }
+
+    .impl-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--f3);
+      margin-bottom: 8px;
+    }
+
+    .impl-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+    }
+
+    .impl-table th {
+      padding: 6px 10px;
+      text-align: left;
+      background: var(--bg-surface-2);
+      border-bottom: 1px solid var(--border-2);
+      font-weight: 600;
+      font-size: 10px;
+      color: var(--text-secondary);
+    }
+
+    .impl-table td {
+      padding: 6px 10px;
+      border-bottom: 1px solid var(--border-1);
+    }
+
+    /* ===== 에러 처리 ===== */
+    .error-block {
+      margin-bottom: 12px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      background: rgba(220,38,38,0.04);
+      border-left: 3px solid var(--color-warning);
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+
+    .error-block strong {
+      color: var(--color-warning);
+    }
+
+    /* ===== 노트/경고 ===== */
+    .note-block {
+      margin-top: 12px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 11px;
+    }
+
+    .note-block.warning {
+      background: rgba(220,38,38,0.04);
+      border-left: 3px solid var(--color-warning);
+    }
+
+    .note-block.info {
+      background: rgba(37,99,235,0.04);
+      border-left: 3px solid var(--f1);
+    }
+
+    /* ===== 의존성 매트릭스 ===== */
+    .dep-matrix {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      text-align: center;
+      overflow-x: auto;
+      display: block;
+    }
+
+    .dep-matrix th {
+      padding: 6px 8px;
+      background: var(--bg-surface-2);
+      border: 1px solid var(--border-1);
+      font-weight: 700;
+      font-size: 9px;
+      white-space: nowrap;
+      position: sticky;
+      top: 0;
+    }
+
+    .dep-matrix td {
+      padding: 6px 8px;
+      border: 1px solid var(--border-1);
+      min-width: 32px;
+    }
+
+    .dep-matrix td b {
+      font-size: 9.5px;
+      white-space: nowrap;
+    }
+
+    .dep-matrix .dot {
+      color: var(--f1);
+      font-size: 14px;
+    }
+
+    /* ===== 데이터 모델 ===== */
+    .data-model-card {
+      margin-bottom: 12px;
+      border: 1px solid var(--border-1);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .data-model-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: var(--bg-surface-2);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .data-model-header:hover {
+      background: var(--bg-surface-3);
+    }
+
+    .data-model-name {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--color-type);
+    }
+
+    .data-model-desc {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .data-model-body {
+      display: none;
+      padding: 12px 16px;
+      border-top: 1px solid var(--border-1);
+    }
+
+    .data-model-card.open .data-model-body {
+      display: block;
+    }
+
+    .data-model-toggle {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-left: auto;
+      transition: transform 0.2s;
+    }
+
+    .data-model-card.open .data-model-toggle {
+      transform: rotate(90deg);
+    }
+
+    /* ===== 폴백 체인 ===== */
+    .fallback-chain {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 16px 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .fallback-node {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .fallback-node.primary {
+      background: rgba(37,99,235,0.1);
+      border: 2px solid var(--f1);
+      color: var(--f1);
+    }
+
+    .fallback-node.secondary {
+      background: rgba(124,58,237,0.1);
+      border: 2px solid var(--f2);
+      color: var(--f2);
+    }
+
+    .fallback-node.fallback {
+      background: rgba(217,119,6,0.1);
+      border: 2px solid var(--f3);
+      color: var(--f3);
+    }
+
+    .fallback-arrow {
+      font-size: 12px;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .fallback-condition {
+      font-size: 10px;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    /* ===== 체크리스트 ===== */
+    .checklist-group {
+      margin-bottom: 20px;
+    }
+
+    .checklist-group h3 {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .checklist {
+      list-style: none;
+      padding: 0;
+    }
+
+    .checklist li {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 0;
+      font-size: 12px;
+      border-bottom: 1px solid var(--border-1);
+    }
+
+    .checklist li:last-child {
+      border-bottom: none;
+    }
+
+    .checklist input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--f4);
+      flex-shrink: 0;
+    }
+
+    /* ===== ModelEngine 트리 ===== */
+    .engine-tree {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      line-height: 2;
+      padding: 16px 20px;
+      background: var(--bg-base);
+      border-radius: 8px;
+      border: 1px solid var(--border-1);
+      white-space: pre;
+      overflow-x: auto;
+    }
+
+    .engine-protocol { color: var(--color-api); font-weight: 700; }
+    .engine-impl { color: var(--f1); font-weight: 600; }
+    .engine-method { color: var(--text-primary); }
+    .engine-comment { color: var(--text-muted); }
+
+    /* ===== 글로벌 컨트롤 ===== */
+    .global-controls {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      justify-content: flex-end;
+    }
+
+    .global-controls button {
+      padding: 8px 16px;
+      background: var(--bg-surface-1);
+      border: 1px solid var(--border-1);
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--text-secondary);
+      transition: all 0.2s;
+    }
+
+    .global-controls button:hover {
+      background: var(--bg-surface-2);
+    }
+
+    /* ===== 푸터 ===== */
+    .project-footer {
+      text-align: center;
+      padding: 32px 24px;
+      color: var(--text-muted);
+      font-size: 11px;
+    }
+
+    /* ===== 하이라이트 ===== */
+    .module-block.highlight {
+      border-color: var(--f1);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+    }
+
+    /* ===== 반응형 ===== */
+    @media (max-width: 768px) {
+      .container { padding: 12px 8px; }
+      .pipeline-flow { flex-wrap: wrap; }
+      .tech-table { font-size: 10px; }
+      .dep-matrix { font-size: 9px; }
+      .module-header h3 { font-size: 11.5px; }
+      .toc-grid { grid-template-columns: 1fr; }
+      .meta-info { flex-direction: column; gap: 8px; }
+    }
+
+    /* ===== 스크롤바 ===== */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-base); }
+    ::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+    /* 섹션 간격 */
+    section + section { margin-top: 8px; }
+
+    /* 언어별 처리 흐름 */
+    .lang-flow {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    .lang-flow-card {
+      flex: 1;
+      min-width: 280px;
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border-1);
+    }
+
+    .lang-flow-card h4 {
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .lang-flow-card .flow-steps {
+      font-size: 11px;
+      color: var(--text-secondary);
+      font-family: 'JetBrains Mono', monospace;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- ===== 1. 헤더 ===== -->
+    <header class="project-header">
+      <span class="version-badge">Hierarchical Module Design v1.0</span>
+      <h1 class="project-title">news-pulse 계층적 모듈 설계서</h1>
+      <p class="project-desc">12개 IT/AI 소스 → 로컬 LLM 요약/번역 → 텔레그램 푸시 봇 (시간당 1회)</p>
+      <div class="meta-info">
+        <span>생성일: 2026-04-08</span>
+        <span>총 블럭 수: 17개 (파이프라인 13 + 인프라 4)</span>
+        <span>기술스택: Python 3.12 · Ollama · LangChain · Flutter macOS · SQLite</span>
+      </div>
+    </header>
+
+    <!-- ===== 2. 목차 ===== -->
+    <nav class="toc-nav">
+      <h2>목차</h2>
+      <div class="toc-grid">
+        <a href="#tech-stack" class="toc-item" style="border-left-color: var(--f-common)">1. 기술스택</a>
+        <a href="#folder-structure" class="toc-item" style="border-left-color: var(--f1)">2. 프로젝트 폴더 구조</a>
+        <a href="#main-pipeline" class="toc-item" style="border-left-color: var(--f4)">3. 전체 메인 파이프라인</a>
+        <a href="#pipeline-blocks" class="toc-item" style="border-left-color: var(--f1)">4. 파이프라인 블럭 (13개)</a>
+        <a href="#infra-blocks" class="toc-item" style="border-left-color: var(--f2)">5. 인프라 블럭 (4개)</a>
+        <a href="#model-engine" class="toc-item" style="border-left-color: var(--f5)">6. ModelEngine 상세 구조</a>
+        <a href="#fallback" class="toc-item" style="border-left-color: var(--f3)">7. 폴백 체인</a>
+        <a href="#data-models" class="toc-item" style="border-left-color: var(--color-type)">8. 공유 데이터 모델</a>
+        <a href="#dependencies" class="toc-item" style="border-left-color: var(--f6)">9. 의존성 매트릭스</a>
+        <a href="#checklist" class="toc-item" style="border-left-color: var(--f8)">10. 구현 체크리스트</a>
+      </div>
+    </nav>
+
+    <!-- ===== 글로벌 컨트롤 ===== -->
+    <div class="global-controls">
+      <button onclick="toggleAll(true)">모두 펼치기</button>
+      <button onclick="toggleAll(false)">모두 접기</button>
+    </div>
+
+    <!-- ===== 3. 기술스택 ===== -->
+    <section id="tech-stack" class="card">
+      <div class="card-header"><h2>1. 기술스택</h2></div>
+      <div class="card-body">
+        <table class="tech-table">
+          <thead>
+            <tr><th>영역</th><th>기술</th><th>역할</th><th>비고</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><b style="color: var(--f1)">런타임</b></td>
+              <td><span class="tech-tag backend">Python 3.12</span></td>
+              <td>파이프라인 실행, 비즈니스 로직</td>
+              <td>LTS 고정</td>
+            </tr>
+            <tr>
+              <td><b style="color: var(--f1)">패키지</b></td>
+              <td><span class="tech-tag backend">uv</span></td>
+              <td>의존성 관리, 가상환경</td>
+              <td>pyproject.toml</td>
+            </tr>
+            <tr>
+              <td><b style="color: var(--f5)">AI 추론</b></td>
+              <td><span class="tech-tag ai">Ollama (GGUF)</span></td>
+              <td>로컬 LLM 서빙 (APEX, Kanana)</td>
+              <td>llama.cpp 백엔드</td>
+            </tr>
+            <tr>
+              <td><b style="color: var(--f5)">AI 프레임워크</b></td>
+              <td><span class="tech-tag ai">LangChain</span></td>
+              <td>프롬프트 관리, 체인 구성</td>
+              <td>커스텀 래퍼 포함</td>
+            </tr>
+            <tr>
+              <td><b style="color: var(--f4)">프론트엔드</b></td>
+              <td><span class="tech-tag frontend">Flutter macOS</span> <span class="tech-tag frontend">Riverpod</span></td>
+              <td>관리 대시보드 (7개 화면)</td>
+              <td>SQLite 직접 읽기/쓰기</td>
+            </tr>
+            <tr>
+              <td><b style="color: var(--f3)">데이터베이스</b></td>
+              <td><span class="tech-tag db">SQLite</span></td>
+              <td>뉴스 저장, 구독자 관리, 실행 이력</td>
+              <td>WAL 모드, Python/Flutter 공유</td>
+            </tr>
+            <tr>
+              <td><b style="color: var(--f2)">스케줄러</b></td>
+              <td><span class="tech-tag infra">macOS launchd</span></td>
+              <td>매시 정각 트리거 (09:00~00:00, 16회/일)</td>
+              <td>상시 프로세스 없음</td>
+            </tr>
+            <tr>
+              <td><b style="color: var(--f2)">테스트</b></td>
+              <td><span class="tech-tag infra">pytest</span></td>
+              <td>단위/통합 테스트</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td><b style="color: var(--f2)">실행 환경</b></td>
+              <td><span class="tech-tag infra">MacBook Pro M4 Pro</span></td>
+              <td>48GB Unified Memory</td>
+              <td>본인 맥만 사용</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===== 4. 폴더 구조 ===== -->
+    <section id="folder-structure" class="card">
+      <div class="card-header"><h2>2. 프로젝트 폴더 구조</h2></div>
+      <div class="card-body">
+        <pre class="folder-tree"><span class="folder">news-pulse/</span>
+│
+├── <span class="folder">src/</span>
+│   ├── <span class="folder">config/</span>              <span class="comment">── 블럭 1  ConfigLoader</span>
+│   ├── <span class="folder">guard/</span>               <span class="comment">── 블럭 2  MemoryGuard</span>
+│   ├── <span class="folder">subscriber/</span>          <span class="comment">── 블럭 3  SubscriberPoller</span>
+│   ├── <span class="folder">fetcher/</span>             <span class="comment">── 블럭 4  RssFetcher, AlgoliaFetcher, RedditFetcher, GithubAtomFetcher</span>
+│   ├── <span class="folder">dedup/</span>               <span class="comment">── 블럭 5  SqliteDedup</span>
+│   ├── <span class="folder">detector/</span>            <span class="comment">── 블럭 6  SourceFirstDetector, LinguaDetector</span>
+│   ├── <span class="folder">filter/</span>              <span class="comment">── 블럭 7  BlacklistFilter, TierRouter, PrioritySelector</span>
+│   ├── <span class="folder">engine/</span>              <span class="comment">── 블럭 8  OllamaEngine, ClaudeCliEngine</span>
+│   ├── <span class="folder">summarizer/</span>          <span class="comment">── 블럭 9  ApexSummarizer, KananaSummarizer, ClaudeCliSummarizer</span>
+│   ├── <span class="folder">translator/</span>          <span class="comment">── 블럭 10 KananaTranslator, ClaudeCliTranslator</span>
+│   ├── <span class="folder">hot_news/</span>            <span class="comment">── 블럭 11 HotNewsDetector</span>
+│   ├── <span class="folder">formatter/</span>           <span class="comment">── 블럭 12 MessageFormatter</span>
+│   ├── <span class="folder">telegram/</span>            <span class="comment">── 블럭 13 TelegramSender</span>
+│   ├── <span class="folder">infra/</span>               <span class="comment">── 블럭 14-17 RunLogger, ErrorNotifier, DataCleaner, HealthChecker</span>
+│   ├── <span class="folder">models/</span>              <span class="comment">── 공유 데이터 모델 (dataclass)</span>
+│   └── orchestrator.py          <span class="comment">── 메인 오케스트레이터 (블럭 조립 + 실행)</span>
+│
+├── <span class="folder">tests/</span>                   <span class="comment">── 테스트 코드</span>
+├── .env                         <span class="comment">── 시크릿 (gitignore)</span>
+└── pyproject.toml               <span class="comment">── 패키지 설정 (uv)</span></pre>
+      </div>
+    </section>
+
+    <!-- ===== 5. 전체 메인 파이프라인 ===== -->
+    <section id="main-pipeline" class="card">
+      <div class="card-header"><h2>3. 전체 메인 파이프라인</h2></div>
+      <div class="card-body">
+        <!-- 파이프라인 플로우 -->
+        <div class="pipeline-flow">
+          <div class="pipeline-node" style="--node-color: var(--text-muted)" data-module-id="launchd">
+            <span class="node-id">launchd</span>
+            <span class="node-name">매시 트리거</span>
+          </div>
+          <div class="pipeline-arrow">→</div>
+          <div class="pipeline-node" style="--node-color: var(--f1)" data-module-id="B1">
+            <span class="node-id">B1</span>
+            <span class="node-name">ConfigLoader</span>
+          </div>
+          <div class="pipeline-arrow">→</div>
+          <div class="pipeline-node" style="--node-color: var(--f1)" data-module-id="B2">
+            <span class="node-id">B2</span>
+            <span class="node-name">MemoryGuard</span>
+          </div>
+          <div class="pipeline-arrow">→</div>
+          <div class="pipeline-node" style="--node-color: var(--f4)" data-module-id="B3">
+            <span class="node-id">B3</span>
+            <span class="node-name">Subscriber</span>
+          </div>
+          <div class="pipeline-arrow">→</div>
+          <div class="pipeline-node" style="--node-color: var(--f4)" data-module-id="B4">
+            <span class="node-id">B4</span>
+            <span class="node-name">Fetcher</span>
+          </div>
+          <div class="pipeline-arrow">→</div>
+          <div class="pipeline-node" style="--node-color: var(--f3)" data-module-id="B5">
+            <span class="node-id">B5</span>
+            <span class="node-name">Dedup</span>
+          </div>
+          <div class="pipeline-arrow">→</div>
+          <div class="pipeline-node" style="--node-color: var(--f3)" data-module-id="B6">
+            <span class="node-id">B6</span>
+            <span class="node-name">LangDetect</span>
+          </div>
+          <div class="pipeline-arrow">→</div>
+          <div class="pipeline-node" style="--node-color: var(--f3)" data-module-id="B7">
+            <span class="node-id">B7</span>
+            <span class="node-name">Filter</span>
+          </div>
+          <div class="pipeline-arrow">→</div>
+          <div class="pipeline-node" style="--node-color: var(--f5)" data-module-id="B8">
+            <span class="node-id">B8+B9</span>
+            <span class="node-name">Summarizer</span>
+          </div>
+          <div class="pipeline-arrow">→</div>
+          <div class="pipeline-node" style="--node-color: var(--f5)" data-module-id="B10">
+            <span class="node-id">B8+B10</span>
+            <span class="node-name">Translator</span>
+          </div>
+          <div class="pipeline-arrow">→</div>
+          <div class="pipeline-node" style="--node-color: var(--f6)" data-module-id="B11">
+            <span class="node-id">B11</span>
+            <span class="node-name">HotNews</span>
+          </div>
+          <div class="pipeline-arrow">→</div>
+          <div class="pipeline-node" style="--node-color: var(--f6)" data-module-id="B12">
+            <span class="node-id">B12</span>
+            <span class="node-name">Formatter</span>
+          </div>
+          <div class="pipeline-arrow">→</div>
+          <div class="pipeline-node" style="--node-color: var(--f6)" data-module-id="B13">
+            <span class="node-id">B13</span>
+            <span class="node-name">TgSender</span>
+          </div>
+          <div class="pipeline-arrow">→</div>
+          <div class="pipeline-node" style="--node-color: var(--f2)" data-module-id="B14">
+            <span class="node-id">B14</span>
+            <span class="node-name">RunLogger</span>
+          </div>
+          <div class="pipeline-arrow">→</div>
+          <div class="pipeline-node" style="--node-color: var(--f2)" data-module-id="B16">
+            <span class="node-id">B16</span>
+            <span class="node-name">Cleaner</span>
+          </div>
+        </div>
+
+        <!-- 파이프라인 상세 IN/OUT 테이블 -->
+        <table class="pipeline-io-table">
+          <thead>
+            <tr>
+              <th>단계</th>
+              <th>IN (이전 단계의 OUT)</th>
+              <th>OUT (다음 단계의 IN)</th>
+              <th>설명</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>launchd → B1</code></td>
+              <td><code class="in-type">.env 파일 경로</code></td>
+              <td><code class="out-type">Config</code></td>
+              <td>환경변수 로드, TZ 이중 고정</td>
+            </tr>
+            <tr>
+              <td><code>B1 → B2</code></td>
+              <td><code class="in-type">Config</code></td>
+              <td><code class="out-type">MemoryStatus ("local_llm" | "claude_fallback")</code></td>
+              <td>가용 RAM 확인, 26GB 기준 판단</td>
+            </tr>
+            <tr>
+              <td><code>B2 → B3</code></td>
+              <td><code class="in-type">Config (봇 토큰)</code></td>
+              <td><code class="out-type">List[SubscriberEvent] → DB 저장</code></td>
+              <td>getUpdates로 /start 명령어 처리</td>
+            </tr>
+            <tr>
+              <td><code>B3 → B4</code></td>
+              <td><code class="in-type">Config (소스 목록, ON/OFF)</code></td>
+              <td><code class="out-type">List[RawItem]</code></td>
+              <td>12개 소스 병렬 수집, 정규화</td>
+            </tr>
+            <tr>
+              <td><code>B4 → B5</code></td>
+              <td><code class="in-type">List[RawItem]</code></td>
+              <td><code class="out-type">List[NewsItem] (신규만)</code></td>
+              <td>URL 해시 기반 중복 제거</td>
+            </tr>
+            <tr>
+              <td><code>B5 → B6</code></td>
+              <td><code class="in-type">NewsItem</code></td>
+              <td><code class="out-type">NewsItem (+lang 필드)</code></td>
+              <td>소스 기반 1차 + lingua 폴백</td>
+            </tr>
+            <tr>
+              <td><code>B6 → B7</code></td>
+              <td><code class="in-type">List[NewsItem], Config</code></td>
+              <td><code class="out-type">List[NewsItem] (최대 8건)</code></td>
+              <td>Tier별 필터 + 블랙리스트 + 우선순위 큐</td>
+            </tr>
+            <tr>
+              <td><code>B7 → B8+B9</code></td>
+              <td><code class="in-type">NewsItem, ModelEngine</code></td>
+              <td><code class="out-type">SummaryResult</code></td>
+              <td>APEX 로드 → 요약 → 언로드</td>
+            </tr>
+            <tr>
+              <td><code>B9 → B8+B10</code></td>
+              <td><code class="in-type">SummaryResult, ModelEngine</code></td>
+              <td><code class="out-type">SummaryResult (한국어)</code></td>
+              <td>Kanana 로드 → EN→KO 번역 → 언로드 (영어만)</td>
+            </tr>
+            <tr>
+              <td><code>B10 → B11</code></td>
+              <td><code class="in-type">NewsItem + SummaryResult</code></td>
+              <td><code class="out-type">bool (is_hot)</code></td>
+              <td>업보트/소스/키워드 기반 핫뉴스 판단</td>
+            </tr>
+            <tr>
+              <td><code>B11 → B12</code></td>
+              <td><code class="in-type">NewsItem + SummaryResult + is_hot</code></td>
+              <td><code class="out-type">str (MarkdownV2)</code></td>
+              <td>텔레그램 메시지 포맷 생성</td>
+            </tr>
+            <tr>
+              <td><code>B12 → B13</code></td>
+              <td><code class="in-type">str, List[chat_id]</code></td>
+              <td><code class="out-type">SendResult</code></td>
+              <td>관리자 + 승인 구독자에게 전송</td>
+            </tr>
+            <tr>
+              <td><code>B13 → B14</code></td>
+              <td><code class="in-type">PipelineResult</code></td>
+              <td><code class="out-type">() → run_history DB</code></td>
+              <td>실행 결과 기록 (90일 보관)</td>
+            </tr>
+            <tr>
+              <td><code>B14 → B16</code></td>
+              <td><code class="in-type">Config (보관 기간)</code></td>
+              <td><code class="out-type">CleanupResult</code></td>
+              <td>만료 데이터 자동 정리</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- 언어별 처리 흐름 -->
+        <h3 style="margin-top: 24px; font-size: 13px; font-weight: 700; margin-bottom: 12px;">언어별 처리 흐름</h3>
+        <div class="lang-flow">
+          <div class="lang-flow-card" style="background: rgba(13,148,136,0.04);">
+            <h4 style="color: var(--f4);">한국어 소스 (GeekNews)</h4>
+            <div class="flow-steps">APEX → 한국어 직접 요약 → 완료<br><span class="comment"># 번역 스킵, Translator 통과</span></div>
+          </div>
+          <div class="lang-flow-card" style="background: rgba(37,99,235,0.04);">
+            <h4 style="color: var(--f1);">영어 소스 (11개)</h4>
+            <div class="flow-steps">APEX → 영어 요약 → Kanana → 한국어 번역 → 완료<br><span class="comment"># 순차 로드: APEX 언로드 후 Kanana 로드</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 6. 파이프라인 블럭 (13개) ===== -->
+    <section id="pipeline-blocks" class="card feature-card" style="--feature-color: var(--f1)">
+      <div class="card-header">
+        <div class="feature-icon" style="background: var(--f1);">B</div>
+        <h2>4. 파이프라인 블럭 — 13개</h2>
+      </div>
+      <div class="card-body">
+        <p class="feature-desc">
+          위치: <code>src/</code> 각 하위 폴더 · 설계 원칙: 1블럭 = 1 Protocol, Strategy + DI, 공유 dataclass 통신
+        </p>
+
+        <div class="feature-controls">
+          <button onclick="toggleFeatureModules(this, true)">모두 펼치기</button>
+          <button onclick="toggleFeatureModules(this, false)">모두 접기</button>
+        </div>
+
+        <!-- ===== 블럭 1: ConfigLoader ===== -->
+        <div class="module-block" data-module-id="B1">
+          <div class="module-header" onclick="toggleModule(this)">
+            <span class="module-id" style="background: rgba(37,99,235,0.1); color: var(--f1)">B1</span>
+            <h3 class="module-name">ConfigLoader — 환경 설정 로더</h3>
+            <span class="module-toggle">▶</span>
+          </div>
+          <div class="module-body">
+            <div class="protocol-block">
+              <div class="io-label protocol-label">PROTOCOL</div>
+              <code class="protocol-code"><span class="engine-protocol">class ConfigLoader(Protocol):</span>
+    <span class="engine-method">def load(self) -> Config: ...</span></code>
+            </div>
+            <div class="io-block io-in">
+              <div class="io-label in-label">IN (메인)</div>
+              <div class="io-spec">
+                <code class="param-name">env_path</code>:
+                <code class="param-type">str</code>
+                <span class="param-source">← 실행 인자 또는 기본값</span>
+                <p class="param-desc">.env 파일 경로 (기본: 프로젝트 루트)</p>
+              </div>
+            </div>
+            <div class="io-block io-out">
+              <div class="io-label out-label">OUT</div>
+              <div class="io-spec">
+                <code class="param-name">반환</code>:
+                <code class="param-type">Config</code>
+                <p class="param-desc">봇 토큰, DB 경로, 소스 설정, 모델 설정 등 전체 설정 객체</p>
+                <div class="type-detail">
+                  <code>Config {
+  bot_token: str,             <span class="comment"># 텔레그램 봇 토큰</span>
+  admin_chat_id: str,         <span class="comment"># 관리자 chat_id</span>
+  db_path: str,               <span class="comment"># SQLite 파일 경로</span>
+  ollama_endpoint: str,       <span class="comment"># Ollama REST API 주소</span>
+  apex_model_name: str,       <span class="comment"># APEX 모델 식별자</span>
+  kanana_model_name: str,     <span class="comment"># Kanana 모델 식별자</span>
+  memory_threshold_gb: float, <span class="comment"># 메모리 임계값 (기본 26.0)</span>
+  sources: list[SourceConfig],<span class="comment"># 12개 소스 설정</span>
+  ...                         <span class="comment"># 필터/보관 기간/핫뉴스 설정</span>
+}</code>
+                </div>
+              </div>
+            </div>
+            <div class="logic-block">
+              <div class="io-label logic-label">내부 로직</div>
+              <ol class="logic-steps">
+                <li>dotenv로 .env 파일 파싱</li>
+                <li>TZ 이중 고정: <code>os.environ['TZ'] = 'Asia/Seoul'</code> + <code>time.tzset()</code></li>
+                <li>필수 키 유효성 검증 (빈 문자열도 누락으로 처리)</li>
+                <li>Config dataclass 생성 후 반환</li>
+              </ol>
+            </div>
+            <div class="deps-block">
+              <span class="dep-label">의존 블럭:</span>
+              <span style="font-size: 11px; color: var(--text-muted);">없음 (파이프라인 첫 번째 블럭)</span>
+            </div>
+            <div class="error-block">
+              <strong>에러 처리:</strong> 필수 환경 변수 누락 → ValueError 발생, 파이프라인 즉시 중단
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== 블럭 2: MemoryGuard ===== -->
+        <div class="module-block" data-module-id="B2">
+          <div class="module-header" onclick="toggleModule(this)">
+            <span class="module-id" style="background: rgba(37,99,235,0.1); color: var(--f1)">B2</span>
+            <h3 class="module-name">MemoryGuard — 메모리 상태 확인</h3>
+            <span class="module-toggle">▶</span>
+          </div>
+          <div class="module-body">
+            <div class="protocol-block">
+              <div class="io-label protocol-label">PROTOCOL</div>
+              <code class="protocol-code"><span class="engine-protocol">class MemoryGuard(Protocol):</span>
+    <span class="engine-method">def check(self, config: Config) -> MemoryStatus: ...</span></code>
+            </div>
+            <div class="io-block io-in">
+              <div class="io-label in-label">IN (메인)</div>
+              <div class="io-spec">
+                <code class="param-name">config</code>:
+                <code class="param-type">Config</code>
+                <span class="param-source">← B1.load()</span>
+                <p class="param-desc">메모리 임계값 설정 포함 (memory_threshold_gb: 26.0)</p>
+              </div>
+            </div>
+            <div class="io-block io-out">
+              <div class="io-label out-label">OUT</div>
+              <div class="io-spec">
+                <code class="param-name">반환</code>:
+                <code class="param-type">MemoryStatus</code>
+                <p class="param-desc">Literal["local_llm", "claude_fallback"]</p>
+                <div class="type-detail">
+                  <code>"local_llm"       <span class="comment"># 가용 RAM >= 26GB → 로컬 LLM 사용</span>
+"claude_fallback"  <span class="comment"># 가용 RAM < 26GB → Claude CLI 폴백</span></code>
+                </div>
+              </div>
+            </div>
+            <div class="logic-block">
+              <div class="io-label logic-label">내부 로직</div>
+              <ol class="logic-steps">
+                <li><code>psutil.virtual_memory().available</code>로 가용 메모리 측정</li>
+                <li>임계값(26GB)과 비교하여 MemoryStatus 반환</li>
+              </ol>
+            </div>
+            <div class="deps-block">
+              <span class="dep-label">의존 블럭:</span>
+              <span class="dep-tag">B1 ConfigLoader</span>
+            </div>
+            <div class="error-block">
+              <strong>에러 처리:</strong> psutil 호출 실패 → 안전하게 "claude_fallback" 반환 (로컬 LLM 시도 안 함)
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== 블럭 3: SubscriberPoller ===== -->
+        <div class="module-block" data-module-id="B3">
+          <div class="module-header" onclick="toggleModule(this)">
+            <span class="module-id" style="background: rgba(13,148,136,0.1); color: var(--f4)">B3</span>
+            <h3 class="module-name">SubscriberPoller — 구독자 관리</h3>
+            <span class="module-toggle">▶</span>
+          </div>
+          <div class="module-body">
+            <div class="protocol-block">
+              <div class="io-label protocol-label">PROTOCOL</div>
+              <code class="protocol-code"><span class="engine-protocol">class SubscriberPoller(Protocol):</span>
+    <span class="engine-method">def poll(self, config: Config) -> list[SubscriberEvent]: ...</span></code>
+            </div>
+            <div class="io-block io-in">
+              <div class="io-label in-label">IN (메인)</div>
+              <div class="io-spec">
+                <code class="param-name">config</code>:
+                <code class="param-type">Config</code>
+                <span class="param-source">← B1.load()</span>
+                <p class="param-desc">봇 토큰 포함</p>
+              </div>
+            </div>
+            <div class="io-block io-out">
+              <div class="io-label out-label">OUT</div>
+              <div class="io-spec">
+                <code class="param-name">반환</code>:
+                <code class="param-type">List[SubscriberEvent]</code>
+                <p class="param-desc">이번 실행에서 감지된 구독 이벤트 목록. subscribers 테이블에 저장됨</p>
+                <div class="type-detail">
+                  <code>SubscriberEvent {
+  chat_id: str,         <span class="comment"># 텔레그램 chat_id</span>
+  username: str | None, <span class="comment"># 사용자명 (없을 수 있음)</span>
+  event_type: str,      <span class="comment"># "subscribe" | "unsubscribe"</span>
+  occurred_at: datetime, <span class="comment"># 이벤트 발생 시각</span>
+  update_id: int        <span class="comment"># Telegram update_id (중복 방지)</span>
+}</code>
+                </div>
+              </div>
+            </div>
+            <div class="logic-block">
+              <div class="io-label logic-label">내부 로직</div>
+              <ol class="logic-steps">
+                <li>Telegram Bot API <code>getUpdates</code> 호출 (offset으로 이미 처리된 건 건너뜀)</li>
+                <li>/start 명령어 감지 → SubscriberEvent 생성</li>
+                <li>subscribers 테이블에 pending 상태로 저장</li>
+              </ol>
+            </div>
+            <div class="deps-block">
+              <span class="dep-label">의존 블럭:</span>
+              <span class="dep-tag">B1 ConfigLoader</span>
+            </div>
+            <div class="error-block">
+              <strong>에러 처리:</strong> API 호출 실패 → 빈 리스트 반환, 파이프라인 계속 진행
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== 블럭 4: Fetcher ===== -->
+        <div class="module-block" data-module-id="B4">
+          <div class="module-header" onclick="toggleModule(this)">
+            <span class="module-id" style="background: rgba(13,148,136,0.1); color: var(--f4)">B4</span>
+            <h3 class="module-name">Fetcher — 뉴스 수집기</h3>
+            <span class="module-toggle">▶</span>
+          </div>
+          <div class="module-body">
+            <div class="protocol-block">
+              <div class="io-label protocol-label">PROTOCOL</div>
+              <code class="protocol-code"><span class="engine-protocol">class Fetcher(Protocol):</span>
+    <span class="engine-method">def fetch(self, config: Config) -> list[RawItem]: ...</span></code>
+            </div>
+            <div class="io-block io-in">
+              <div class="io-label in-label">IN (메인)</div>
+              <div class="io-spec">
+                <code class="param-name">config</code>:
+                <code class="param-type">Config</code>
+                <span class="param-source">← B1.load()</span>
+                <p class="param-desc">소스 목록, ON/OFF 설정, 타임아웃 설정</p>
+              </div>
+            </div>
+            <div class="io-block io-out">
+              <div class="io-label out-label">OUT</div>
+              <div class="io-spec">
+                <code class="param-name">반환</code>:
+                <code class="param-type">List[RawItem]</code>
+                <p class="param-desc">수집된 원시 뉴스 아이템. 중복 포함, 필터링 전 상태</p>
+                <div class="type-detail">
+                  <code>RawItem {
+  url: str,                   <span class="comment"># 원문 URL</span>
+  title: str,                 <span class="comment"># 기사 제목</span>
+  content: str | None,        <span class="comment"># 기사 본문 (없을 수 있음)</span>
+  source_id: str,             <span class="comment"># 소스 식별자 ("hackernews", "geeknews"...)</span>
+  fetched_at: datetime,       <span class="comment"># 수집 시각</span>
+  upvotes: int | None,        <span class="comment"># 업보트 수 (Reddit/HN만)</span>
+  published_at: datetime | None, <span class="comment"># 발행일시</span>
+  url_hash: str               <span class="comment"># SHA256(url)</span>
+}</code>
+                </div>
+              </div>
+            </div>
+            <div class="impl-block">
+              <div class="impl-label">구현체 (4개)</div>
+              <table class="impl-table">
+                <thead><tr><th>구현체</th><th>담당 소스</th><th>수집 방식</th></tr></thead>
+                <tbody>
+                  <tr><td><code>RssFetcher</code></td><td>GeekNews, AI랩 블로그, Cursor Changelog</td><td>RSS/Atom 피드 파싱</td></tr>
+                  <tr><td><code>AlgoliaFetcher</code></td><td>Hacker News</td><td>Algolia API (JSON)</td></tr>
+                  <tr><td><code>RedditFetcher</code></td><td>r/LocalLLaMA, r/ClaudeAI, r/Cursor</td><td>.json 엔드포인트 (비인증)</td></tr>
+                  <tr><td><code>GithubAtomFetcher</code></td><td>Claude Code Releases, Cline Releases</td><td>GitHub Atom 피드</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="logic-block">
+              <div class="io-label logic-label">내부 로직</div>
+              <ol class="logic-steps">
+                <li>활성화된 소스만 수집 대상으로 선별</li>
+                <li>asyncio / ThreadPoolExecutor로 12개 소스 병렬 수집</li>
+                <li>각 소스별 Fetcher 구현체가 RawItem으로 정규화</li>
+                <li>모든 결과 합쳐서 List[RawItem] 반환</li>
+              </ol>
+            </div>
+            <div class="deps-block">
+              <span class="dep-label">의존 블럭:</span>
+              <span class="dep-tag">B1 ConfigLoader</span>
+            </div>
+            <div class="error-block">
+              <strong>에러 처리:</strong> 개별 소스 실패 → 해당 소스 건너뜀, 나머지 수집 계속. 전체 타임아웃 초과 → 수집된 것만 반환
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== 블럭 5: Dedup ===== -->
+        <div class="module-block" data-module-id="B5">
+          <div class="module-header" onclick="toggleModule(this)">
+            <span class="module-id" style="background: rgba(217,119,6,0.1); color: var(--f3)">B5</span>
+            <h3 class="module-name">Dedup — 중복 제거</h3>
+            <span class="module-toggle">▶</span>
+          </div>
+          <div class="module-body">
+            <div class="protocol-block">
+              <div class="io-label protocol-label">PROTOCOL</div>
+              <code class="protocol-code"><span class="engine-protocol">class Dedup(Protocol):</span>
+    <span class="engine-method">def filter_new(self, items: list[RawItem]) -> list[NewsItem]: ...</span></code>
+            </div>
+            <div class="io-block io-in">
+              <div class="io-label in-label">IN (메인)</div>
+              <div class="io-spec">
+                <code class="param-name">items</code>:
+                <code class="param-type">List[RawItem]</code>
+                <span class="param-source">← B4.fetch()</span>
+                <p class="param-desc">Fetcher 출력 원시 아이템 (중복 포함)</p>
+              </div>
+            </div>
+            <div class="io-block io-out">
+              <div class="io-label out-label">OUT</div>
+              <div class="io-spec">
+                <code class="param-name">반환</code>:
+                <code class="param-type">List[NewsItem]</code>
+                <p class="param-desc">중복 제거된 신규 아이템만. RawItem → NewsItem 변환 포함</p>
+                <div class="type-detail">
+                  <code>NewsItem {
+  url: str,
+  title: str,
+  content: str | None,
+  source_id: str,
+  fetched_at: datetime,
+  upvotes: int | None,
+  published_at: datetime | None,
+  url_hash: str,
+  lang: str             <span class="comment"># 아직 비어있음, LanguageDetector가 추가</span>
+}</code>
+                </div>
+              </div>
+            </div>
+            <div class="impl-block">
+              <div class="impl-label">구현체 (1개)</div>
+              <table class="impl-table">
+                <thead><tr><th>구현체</th><th>설명</th></tr></thead>
+                <tbody>
+                  <tr><td><code>SqliteDedup</code></td><td>processed_items 테이블에서 URL 해시(SHA256) 비교. 신규 항목은 즉시 삽입</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="deps-block">
+              <span class="dep-label">의존 블럭:</span>
+              <span class="dep-tag">B1 ConfigLoader</span>
+              <span style="font-size: 10px; color: var(--text-muted);">(DB 경로)</span>
+            </div>
+            <div class="error-block">
+              <strong>에러 처리:</strong> DB 접근 실패 → 전체 아이템을 신규로 간주 (중복 허용, 안전한 방향)
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== 블럭 6: LanguageDetector ===== -->
+        <div class="module-block" data-module-id="B6">
+          <div class="module-header" onclick="toggleModule(this)">
+            <span class="module-id" style="background: rgba(217,119,6,0.1); color: var(--f3)">B6</span>
+            <h3 class="module-name">LanguageDetector — 언어 감지</h3>
+            <span class="module-toggle">▶</span>
+          </div>
+          <div class="module-body">
+            <div class="protocol-block">
+              <div class="io-label protocol-label">PROTOCOL</div>
+              <code class="protocol-code"><span class="engine-protocol">class LanguageDetector(Protocol):</span>
+    <span class="engine-method">def detect(self, item: NewsItem) -> NewsItem: ...</span></code>
+            </div>
+            <div class="io-block io-in">
+              <div class="io-label in-label">IN (메인)</div>
+              <div class="io-spec">
+                <code class="param-name">item</code>:
+                <code class="param-type">NewsItem</code>
+                <span class="param-source">← B5.filter_new()</span>
+                <p class="param-desc">lang 필드 미설정 뉴스 아이템</p>
+              </div>
+            </div>
+            <div class="io-block io-out">
+              <div class="io-label out-label">OUT</div>
+              <div class="io-spec">
+                <code class="param-name">반환</code>:
+                <code class="param-type">NewsItem</code>
+                <p class="param-desc">lang 필드 추가됨 ("ko" | "en")</p>
+              </div>
+            </div>
+            <div class="impl-block">
+              <div class="impl-label">구현체 (2개, 체인)</div>
+              <table class="impl-table">
+                <thead><tr><th>구현체</th><th>전략</th><th>실행 조건</th></tr></thead>
+                <tbody>
+                  <tr><td><code>SourceFirstDetector</code></td><td>소스 출처 기반 판단. GeekNews → "ko", 나머지 → "en"</td><td>항상 1차 실행</td></tr>
+                  <tr><td><code>LinguaDetector</code></td><td>lingua 라이브러리 기반 텍스트 분석</td><td>SourceFirst 불확실 시 폴백</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="deps-block">
+              <span class="dep-label">의존 블럭:</span>
+              <span style="font-size: 11px; color: var(--text-muted);">없음</span>
+            </div>
+            <div class="error-block">
+              <strong>에러 처리:</strong> lingua 감지 실패 → "en" 기본값 사용
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== 블럭 7: Filter ===== -->
+        <div class="module-block" data-module-id="B7">
+          <div class="module-header" onclick="toggleModule(this)">
+            <span class="module-id" style="background: rgba(217,119,6,0.1); color: var(--f3)">B7</span>
+            <h3 class="module-name">Filter — 계층화된 필터링</h3>
+            <span class="module-toggle">▶</span>
+          </div>
+          <div class="module-body">
+            <div class="protocol-block">
+              <div class="io-label protocol-label">PROTOCOL</div>
+              <code class="protocol-code"><span class="engine-protocol">class Filter(Protocol):</span>
+    <span class="engine-method">def apply(self, items: list[NewsItem], config: Config) -> list[NewsItem]: ...</span></code>
+            </div>
+            <div class="io-block io-in">
+              <div class="io-label in-label">IN (메인)</div>
+              <div class="io-spec">
+                <code class="param-name">items</code>:
+                <code class="param-type">List[NewsItem]</code>
+                <span class="param-source">← B6.detect()</span>
+                <p class="param-desc">언어 감지 완료된 뉴스 아이템</p>
+              </div>
+            </div>
+            <div class="io-block io-in-aux">
+              <div class="io-label in-aux-label">IN (보조)</div>
+              <div class="io-spec">
+                <code class="param-name">config</code>:
+                <code class="param-type">Config</code>
+                <span class="param-source">← B1.load()</span>
+                <p class="param-desc">Tier별 임계값, 블랙리스트 키워드, MAX_ITEMS_PER_RUN(8) 설정</p>
+              </div>
+            </div>
+            <div class="io-block io-out">
+              <div class="io-label out-label">OUT</div>
+              <div class="io-spec">
+                <code class="param-name">반환</code>:
+                <code class="param-type">List[NewsItem]</code>
+                <p class="param-desc">필터 통과 아이템. 최대 8건</p>
+              </div>
+            </div>
+            <div class="impl-block">
+              <div class="impl-label">구현체 (3개, 체인 순서대로)</div>
+              <table class="impl-table">
+                <thead><tr><th>순서</th><th>구현체</th><th>역할</th></tr></thead>
+                <tbody>
+                  <tr><td>1</td><td><code>BlacklistFilter</code></td><td>키워드 블랙리스트 전체 적용. 매칭 아이템 즉시 제거</td></tr>
+                  <tr><td>2</td><td><code>TierRouter</code></td><td>소스별 Tier 분류 (1: AI랩+GitHub, 2: GeekNews, 3: Reddit+HN)</td></tr>
+                  <tr><td>3</td><td><code>PrioritySelector</code></td><td>Tier별 우선순위 정렬 후 최종 8건 선택</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="logic-block">
+              <div class="io-label logic-label">Tier 정책</div>
+              <ol class="logic-steps">
+                <li><b>Tier 1</b> (AI랩 블로그 + GitHub releases) — 무조건 통과</li>
+                <li><b>Tier 2</b> (GeekNews) — 큐레이션 신뢰, 무조건 통과</li>
+                <li><b>Tier 3</b> (Reddit + HN) — 업보트 임계값 + 연령 보정 (2시간 미만 = 완화)</li>
+                <li><b>Tier 4</b> (전역) — 키워드 블랙리스트 (채용/광고/메타/밈)</li>
+                <li>Tier 1+2가 8건 초과 시 그대로 허용 (ALLOW_TIER1_OVERFLOW)</li>
+              </ol>
+            </div>
+            <div class="deps-block">
+              <span class="dep-label">의존 블럭:</span>
+              <span class="dep-tag">B1 ConfigLoader</span>
+            </div>
+            <div class="error-block">
+              <strong>에러 처리:</strong> 필터 체인 중 예외 → 해당 필터 건너뜀, 다음 필터 계속 적용
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== 블럭 8: ModelEngine ===== -->
+        <div class="module-block" data-module-id="B8">
+          <div class="module-header" onclick="toggleModule(this)">
+            <span class="module-id" style="background: rgba(219,39,119,0.1); color: var(--f5)">B8</span>
+            <h3 class="module-name">ModelEngine — AI 모델 엔진</h3>
+            <span class="module-toggle">▶</span>
+          </div>
+          <div class="module-body">
+            <div class="protocol-block">
+              <div class="io-label protocol-label">PROTOCOL</div>
+              <code class="protocol-code"><span class="engine-protocol">class ModelEngine(Protocol):</span>
+    <span class="engine-method">def load(self, model_name: str, keep_alive: int = 0) -> None: ...</span>
+    <span class="engine-method">def generate(self, prompt: str, options: dict) -> str: ...</span>
+    <span class="engine-method">def unload(self, model_name: str) -> None: ...</span>
+    <span class="engine-method">def is_available(self) -> bool: ...</span></code>
+            </div>
+            <div class="io-block io-in">
+              <div class="io-label in-label">IN (메인)</div>
+              <div class="io-spec">
+                <code class="param-name">model_name</code>:
+                <code class="param-type">str</code>
+                <span class="param-source">← Config 또는 Summarizer/Translator</span>
+                <p class="param-desc">모델 식별자 (예: "APEX-4B", "kanana-1.5-8b")</p>
+              </div>
+              <div class="io-spec" style="margin-top: 8px;">
+                <code class="param-name">prompt</code>:
+                <code class="param-type">str</code>
+                <span class="param-source">← B9/B10 (Summarizer/Translator)</span>
+                <p class="param-desc">완성된 프롬프트 문자열</p>
+              </div>
+              <div class="io-spec" style="margin-top: 8px;">
+                <code class="param-name">options</code>:
+                <code class="param-type">dict</code>
+                <span class="param-source">← B9/B10</span>
+                <p class="param-desc">temperature, max_tokens 등 생성 옵션</p>
+              </div>
+            </div>
+            <div class="io-block io-out">
+              <div class="io-label out-label">OUT</div>
+              <div class="io-spec">
+                <code class="param-name">반환</code>:
+                <code class="param-type">str</code>
+                <p class="param-desc">모델 응답 텍스트</p>
+              </div>
+            </div>
+            <div class="impl-block">
+              <div class="impl-label">구현체 (2개)</div>
+              <table class="impl-table">
+                <thead><tr><th>구현체</th><th>방식</th><th>특이사항</th></tr></thead>
+                <tbody>
+                  <tr><td><code>OllamaEngine</code></td><td>Ollama REST API</td><td>keep_alive=0, load/generate/unload 순서 엄격 준수. 동시 적재 금지</td></tr>
+                  <tr><td><code>ClaudeCliEngine</code></td><td><code>claude -p --bare</code> subprocess</td><td>load/unload 불필요, generate만 구현. is_available()은 which claude 확인</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="note-block warning">
+              <strong>순차 로드 원칙:</strong> APEX 사용 완료 후 언로드 확인 → Kanana 로드. 동시에 두 모델 메모리 적재 금지
+            </div>
+            <div class="deps-block" style="margin-top: 12px;">
+              <span class="dep-label">의존 블럭:</span>
+              <span class="dep-tag">B1 ConfigLoader</span>
+            </div>
+            <div class="error-block">
+              <strong>에러 처리:</strong> Ollama 연결 실패 → is_available() False 반환, Summarizer가 폴백 체인으로 처리. subprocess 실패 → CalledProcessError 발생
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== 블럭 9: Summarizer ===== -->
+        <div class="module-block" data-module-id="B9">
+          <div class="module-header" onclick="toggleModule(this)">
+            <span class="module-id" style="background: rgba(219,39,119,0.1); color: var(--f5)">B9</span>
+            <h3 class="module-name">Summarizer — 뉴스 요약기</h3>
+            <span class="module-toggle">▶</span>
+          </div>
+          <div class="module-body">
+            <div class="protocol-block">
+              <div class="io-label protocol-label">PROTOCOL</div>
+              <code class="protocol-code"><span class="engine-protocol">class Summarizer(Protocol):</span>
+    <span class="engine-method">def summarize(self, item: NewsItem, engine: ModelEngine) -> SummaryResult: ...</span></code>
+            </div>
+            <div class="io-block io-in">
+              <div class="io-label in-label">IN (메인)</div>
+              <div class="io-spec">
+                <code class="param-name">item</code>:
+                <code class="param-type">NewsItem</code>
+                <span class="param-source">← B7.apply()</span>
+                <p class="param-desc">요약할 뉴스 아이템 (필터 통과)</p>
+              </div>
+            </div>
+            <div class="io-block io-in-aux">
+              <div class="io-label in-aux-label">IN (보조)</div>
+              <div class="io-spec">
+                <code class="param-name">engine</code>:
+                <code class="param-type">ModelEngine</code>
+                <span class="param-source">← 주입 (DI)</span>
+                <p class="param-desc">주입된 모델 엔진 (OllamaEngine 또는 ClaudeCliEngine)</p>
+              </div>
+            </div>
+            <div class="io-block io-out">
+              <div class="io-label out-label">OUT</div>
+              <div class="io-spec">
+                <code class="param-name">반환</code>:
+                <code class="param-type">SummaryResult</code>
+                <p class="param-desc">요약 텍스트 + 메타 정보</p>
+                <div class="type-detail">
+                  <code>SummaryResult {
+  item_url: str,              <span class="comment"># 원문 URL</span>
+  summary_text: str,          <span class="comment"># 요약 텍스트</span>
+  original_lang: str,         <span class="comment"># 원본 언어 ("ko" | "en")</span>
+  summarizer_used: str,       <span class="comment"># 사용된 Summarizer 구현체명</span>
+  translator_used: str | None,<span class="comment"># 번역기 (한국어 소스는 None)</span>
+  error: str | None           <span class="comment"># 에러 발생 시 메시지</span>
+}</code>
+                </div>
+              </div>
+            </div>
+            <div class="impl-block">
+              <div class="impl-label">구현체 (3개, FallbackChain)</div>
+              <table class="impl-table">
+                <thead><tr><th>순서</th><th>구현체</th><th>사용 모델</th><th>특이사항</th></tr></thead>
+                <tbody>
+                  <tr><td>1</td><td><code>ApexSummarizer</code></td><td>APEX-4B (OllamaEngine)</td><td>한국어/영어 모두 요약. 한국어는 직접 한국어 요약</td></tr>
+                  <tr><td>2</td><td><code>KananaSummarizer</code></td><td>kanana-1.5-8b (OllamaEngine)</td><td>APEX 폴백. 단독 요약 시 사용</td></tr>
+                  <tr><td>3</td><td><code>ClaudeCliSummarizer</code></td><td>claude CLI (ClaudeCliEngine)</td><td>최종 폴백. subprocess 실행</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="deps-block">
+              <span class="dep-label">의존 블럭:</span>
+              <span class="dep-tag">B8 ModelEngine</span>
+              <span style="font-size: 10px; color: var(--text-muted);">(주입)</span>
+            </div>
+            <div class="error-block">
+              <strong>에러 처리:</strong> 요약 실패 (타임아웃/파싱 오류) → FallbackChain이 다음 구현체 시도. 전체 폴백 실패 → error 필드 표시, 해당 아이템 전송 스킵
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== 블럭 10: Translator ===== -->
+        <div class="module-block" data-module-id="B10">
+          <div class="module-header" onclick="toggleModule(this)">
+            <span class="module-id" style="background: rgba(219,39,119,0.1); color: var(--f5)">B10</span>
+            <h3 class="module-name">Translator — 번역기 (EN → KO)</h3>
+            <span class="module-toggle">▶</span>
+          </div>
+          <div class="module-body">
+            <div class="protocol-block">
+              <div class="io-label protocol-label">PROTOCOL</div>
+              <code class="protocol-code"><span class="engine-protocol">class Translator(Protocol):</span>
+    <span class="engine-method">def translate(self, result: SummaryResult, engine: ModelEngine) -> SummaryResult: ...</span></code>
+            </div>
+            <div class="io-block io-in">
+              <div class="io-label in-label">IN (메인)</div>
+              <div class="io-spec">
+                <code class="param-name">result</code>:
+                <code class="param-type">SummaryResult</code>
+                <span class="param-source">← B9.summarize()</span>
+                <p class="param-desc">요약 완료 결과 (영어 또는 한국어)</p>
+              </div>
+            </div>
+            <div class="io-block io-in-aux">
+              <div class="io-label in-aux-label">IN (보조)</div>
+              <div class="io-spec">
+                <code class="param-name">engine</code>:
+                <code class="param-type">ModelEngine</code>
+                <span class="param-source">← 주입 (DI)</span>
+                <p class="param-desc">주입된 모델 엔진</p>
+              </div>
+            </div>
+            <div class="io-block io-out">
+              <div class="io-label out-label">OUT</div>
+              <div class="io-spec">
+                <code class="param-name">반환</code>:
+                <code class="param-type">SummaryResult</code>
+                <p class="param-desc">한국어 번역이 적용된 요약 결과. 한국어 소스인 경우 원본 그대로 반환</p>
+              </div>
+            </div>
+            <div class="impl-block">
+              <div class="impl-label">구현체 (2개, FallbackChain)</div>
+              <table class="impl-table">
+                <thead><tr><th>순서</th><th>구현체</th><th>사용 모델</th></tr></thead>
+                <tbody>
+                  <tr><td>1</td><td><code>KananaTranslator</code></td><td>kanana-1.5-8b (OllamaEngine). 한국어 특화</td></tr>
+                  <tr><td>2</td><td><code>ClaudeCliTranslator</code></td><td>claude CLI (ClaudeCliEngine). 폴백</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="note-block info">
+              <strong>조건부 실행:</strong> <code>item.lang == "ko"</code>이면 번역 스킵, 원본 SummaryResult 그대로 반환
+            </div>
+            <div class="deps-block" style="margin-top: 12px;">
+              <span class="dep-label">의존 블럭:</span>
+              <span class="dep-tag">B8 ModelEngine</span>
+              <span style="font-size: 10px; color: var(--text-muted);">(주입)</span>
+            </div>
+            <div class="error-block">
+              <strong>에러 처리:</strong> 번역 실패 → 영어 요약 원본 유지, error 플래그 표시
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== 블럭 11: HotNewsDetector ===== -->
+        <div class="module-block" data-module-id="B11">
+          <div class="module-header" onclick="toggleModule(this)">
+            <span class="module-id" style="background: rgba(220,38,38,0.1); color: var(--f6)">B11</span>
+            <h3 class="module-name">HotNewsDetector — 핫뉴스 감지</h3>
+            <span class="module-toggle">▶</span>
+          </div>
+          <div class="module-body">
+            <div class="protocol-block">
+              <div class="io-label protocol-label">PROTOCOL</div>
+              <code class="protocol-code"><span class="engine-protocol">class HotNewsDetector(Protocol):</span>
+    <span class="engine-method">def detect(self, item: NewsItem, result: SummaryResult) -> bool: ...</span></code>
+            </div>
+            <div class="io-block io-in">
+              <div class="io-label in-label">IN (메인)</div>
+              <div class="io-spec">
+                <code class="param-name">item</code>:
+                <code class="param-type">NewsItem</code>
+                <span class="param-source">← B7.apply()</span>
+                <p class="param-desc">뉴스 아이템 (업보트 수 포함)</p>
+              </div>
+              <div class="io-spec" style="margin-top: 8px;">
+                <code class="param-name">result</code>:
+                <code class="param-type">SummaryResult</code>
+                <span class="param-source">← B10.translate()</span>
+                <p class="param-desc">요약/번역 완료된 결과</p>
+              </div>
+            </div>
+            <div class="io-block io-out">
+              <div class="io-label out-label">OUT</div>
+              <div class="io-spec">
+                <code class="param-name">반환</code>:
+                <code class="param-type">bool</code>
+                <p class="param-desc">True면 핫뉴스 → hot_news 테이블에 영구 저장</p>
+              </div>
+            </div>
+            <div class="logic-block">
+              <div class="io-label logic-label">판단 기준</div>
+              <ol class="logic-steps">
+                <li><b>업보트 자동:</b> HN >= 200 OR Reddit >= 80</li>
+                <li><b>소스 자동:</b> AI랩 공식 발표 + 핵심 키워드 매칭 (신모델, 버전 릴리즈)</li>
+                <li><b>수동 지정:</b> Flutter 앱에서 관리자가 직접 핫뉴스 토글</li>
+              </ol>
+            </div>
+            <div class="deps-block">
+              <span class="dep-label">의존 블럭:</span>
+              <span class="dep-tag">B1 ConfigLoader</span>
+              <span class="dep-tag">DB</span>
+            </div>
+            <div class="error-block">
+              <strong>에러 처리:</strong> DB 저장 실패 → is_hot 판단 결과는 반환, 저장만 재시도
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== 블럭 12: MessageFormatter ===== -->
+        <div class="module-block" data-module-id="B12">
+          <div class="module-header" onclick="toggleModule(this)">
+            <span class="module-id" style="background: rgba(220,38,38,0.1); color: var(--f6)">B12</span>
+            <h3 class="module-name">MessageFormatter — 메시지 포맷터</h3>
+            <span class="module-toggle">▶</span>
+          </div>
+          <div class="module-body">
+            <div class="protocol-block">
+              <div class="io-label protocol-label">PROTOCOL</div>
+              <code class="protocol-code"><span class="engine-protocol">class MessageFormatter(Protocol):</span>
+    <span class="engine-method">def format(self, item: NewsItem, result: SummaryResult, is_hot: bool) -> str: ...</span></code>
+            </div>
+            <div class="io-block io-in">
+              <div class="io-label in-label">IN (메인)</div>
+              <div class="io-spec">
+                <code class="param-name">item</code>:
+                <code class="param-type">NewsItem</code>
+                <span class="param-source">← B7.apply()</span>
+                <p class="param-desc">뉴스 아이템</p>
+              </div>
+              <div class="io-spec" style="margin-top: 8px;">
+                <code class="param-name">result</code>:
+                <code class="param-type">SummaryResult</code>
+                <span class="param-source">← B10.translate()</span>
+                <p class="param-desc">한국어 요약 결과</p>
+              </div>
+              <div class="io-spec" style="margin-top: 8px;">
+                <code class="param-name">is_hot</code>:
+                <code class="param-type">bool</code>
+                <span class="param-source">← B11.detect()</span>
+                <p class="param-desc">핫뉴스 여부</p>
+              </div>
+            </div>
+            <div class="io-block io-out">
+              <div class="io-label out-label">OUT</div>
+              <div class="io-spec">
+                <code class="param-name">반환</code>:
+                <code class="param-type">str</code>
+                <p class="param-desc">텔레그램 MarkdownV2 포맷 문자열</p>
+              </div>
+            </div>
+            <div class="logic-block">
+              <div class="io-label logic-label">포맷 정책</div>
+              <ol class="logic-steps">
+                <li><b>일반 뉴스:</b> 제목 + 한줄 요약 + 링크. 간결 기술체</li>
+                <li><b>핫뉴스:</b> 제목 + 상세 요약 + 주요 내용 + 링크. 더 많은 맥락</li>
+                <li>이모지 + 구분선 + 뉴스 간 2줄 공백</li>
+                <li>MarkdownV2 특수문자 이스케이프 처리 필수</li>
+              </ol>
+            </div>
+            <div class="deps-block">
+              <span class="dep-label">의존 블럭:</span>
+              <span style="font-size: 11px; color: var(--text-muted);">없음</span>
+            </div>
+            <div class="error-block">
+              <strong>에러 처리:</strong> 포맷 실패 → 플레인 텍스트 폴백 (이스케이프 없이 제목 + 링크만)
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== 블럭 13: TelegramSender ===== -->
+        <div class="module-block" data-module-id="B13">
+          <div class="module-header" onclick="toggleModule(this)">
+            <span class="module-id" style="background: rgba(220,38,38,0.1); color: var(--f6)">B13</span>
+            <h3 class="module-name">TelegramSender — 텔레그램 전송</h3>
+            <span class="module-toggle">▶</span>
+          </div>
+          <div class="module-body">
+            <div class="protocol-block">
+              <div class="io-label protocol-label">PROTOCOL</div>
+              <code class="protocol-code"><span class="engine-protocol">class TelegramSender(Protocol):</span>
+    <span class="engine-method">def send(self, message: str, chat_ids: list[str]) -> SendResult: ...</span></code>
+            </div>
+            <div class="io-block io-in">
+              <div class="io-label in-label">IN (메인)</div>
+              <div class="io-spec">
+                <code class="param-name">message</code>:
+                <code class="param-type">str</code>
+                <span class="param-source">← B12.format()</span>
+                <p class="param-desc">텔레그램 MarkdownV2 메시지</p>
+              </div>
+              <div class="io-spec" style="margin-top: 8px;">
+                <code class="param-name">chat_ids</code>:
+                <code class="param-type">List[str]</code>
+                <span class="param-source">← DB (subscribers 테이블, 승인 상태)</span>
+                <p class="param-desc">전송 대상 chat_id 목록 (관리자 + 승인된 구독자)</p>
+              </div>
+            </div>
+            <div class="io-block io-out">
+              <div class="io-label out-label">OUT</div>
+              <div class="io-spec">
+                <code class="param-name">반환</code>:
+                <code class="param-type">SendResult</code>
+                <p class="param-desc">전송 성공/실패 목록 + 에러 상세</p>
+                <div class="type-detail">
+                  <code>SendResult {
+  total: int,               <span class="comment"># 전체 전송 대상 수</span>
+  success_count: int,       <span class="comment"># 성공 건수</span>
+  failed_chat_ids: list[str],<span class="comment"># 실패한 chat_id 목록</span>
+  errors: dict[str, str]    <span class="comment"># chat_id -> 에러 메시지</span>
+}</code>
+                </div>
+              </div>
+            </div>
+            <div class="logic-block">
+              <div class="io-label logic-label">전송 정책</div>
+              <ol class="logic-steps">
+                <li>관리자 + 승인된 구독자에게 개별 전송</li>
+                <li>429 Too Many Requests → 지수 백오프 retry (최대 3회)</li>
+                <li>Telegram Bot API <code>sendMessage</code> 엔드포인트 사용</li>
+              </ol>
+            </div>
+            <div class="deps-block">
+              <span class="dep-label">의존 블럭:</span>
+              <span class="dep-tag">B1 ConfigLoader</span>
+              <span style="font-size: 10px; color: var(--text-muted);">(봇 토큰, 관리자 chat_id)</span>
+            </div>
+            <div class="error-block">
+              <strong>에러 처리:</strong> 개별 수신자 실패 → SendResult에 기록, 나머지 계속 전송. 전체 실패 → ErrorNotifier로 에스컬레이션
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ===== 7. 인프라 블럭 (4개) ===== -->
+    <section id="infra-blocks" class="card feature-card" style="--feature-color: var(--f2)">
+      <div class="card-header">
+        <div class="feature-icon" style="background: var(--f2);">I</div>
+        <h2>5. 인프라 블럭 — 4개</h2>
+      </div>
+      <div class="card-body">
+        <p class="feature-desc">
+          위치: <code>src/infra/</code> · 파이프라인 실행 후 기록, 에러 관리, 데이터 정리, 상태 점검
+        </p>
+
+        <div class="feature-controls">
+          <button onclick="toggleFeatureModules(this, true)">모두 펼치기</button>
+          <button onclick="toggleFeatureModules(this, false)">모두 접기</button>
+        </div>
+
+        <!-- ===== 블럭 14: RunLogger ===== -->
+        <div class="module-block" data-module-id="B14">
+          <div class="module-header" onclick="toggleModule(this)">
+            <span class="module-id" style="background: rgba(124,58,237,0.1); color: var(--f2)">B14</span>
+            <h3 class="module-name">RunLogger — 실행 이력 기록</h3>
+            <span class="module-toggle">▶</span>
+          </div>
+          <div class="module-body">
+            <div class="protocol-block">
+              <div class="io-label protocol-label">PROTOCOL</div>
+              <code class="protocol-code"><span class="engine-protocol">class RunLogger(Protocol):</span>
+    <span class="engine-method">def log(self, result: PipelineResult) -> None: ...</span></code>
+            </div>
+            <div class="io-block io-in">
+              <div class="io-label in-label">IN (메인)</div>
+              <div class="io-spec">
+                <code class="param-name">result</code>:
+                <code class="param-type">PipelineResult</code>
+                <span class="param-source">← Orchestrator</span>
+                <p class="param-desc">수집/필터/요약/전송 건수, 소요 시간, 에러 여부</p>
+                <div class="type-detail">
+                  <code>PipelineResult {
+  run_at: datetime,           <span class="comment"># 실행 시각</span>
+  fetched_count: int,         <span class="comment"># 수집 건수</span>
+  dedup_count: int,           <span class="comment"># 신규 아이템 수</span>
+  filtered_count: int,        <span class="comment"># 필터 통과 수</span>
+  summarized_count: int,      <span class="comment"># 요약 완료 수</span>
+  sent_count: int,            <span class="comment"># 전송 성공 수</span>
+  elapsed_seconds: float,     <span class="comment"># 총 소요 시간</span>
+  memory_status: MemoryStatus,<span class="comment"># 메모리 상태</span>
+  has_error: bool,            <span class="comment"># 에러 발생 여부</span>
+  error_summary: str | None   <span class="comment"># 에러 요약</span>
+}</code>
+                </div>
+              </div>
+            </div>
+            <div class="io-block io-out">
+              <div class="io-label out-label">OUT</div>
+              <div class="io-spec">
+                <code class="param-name">반환</code>:
+                <code class="param-type">None</code>
+                <p class="param-desc">run_history 테이블에 저장. 보관 기간 90일</p>
+              </div>
+            </div>
+            <div class="deps-block">
+              <span class="dep-label">의존 블럭:</span>
+              <span class="dep-tag">DB</span>
+            </div>
+            <div class="error-block">
+              <strong>에러 처리:</strong> DB 저장 실패 → 로컬 파일 로그로 폴백 (stderr)
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== 블럭 15: ErrorNotifier ===== -->
+        <div class="module-block" data-module-id="B15">
+          <div class="module-header" onclick="toggleModule(this)">
+            <span class="module-id" style="background: rgba(124,58,237,0.1); color: var(--f2)">B15</span>
+            <h3 class="module-name">ErrorNotifier — 에러 알림</h3>
+            <span class="module-toggle">▶</span>
+          </div>
+          <div class="module-body">
+            <div class="protocol-block">
+              <div class="io-label protocol-label">PROTOCOL</div>
+              <code class="protocol-code"><span class="engine-protocol">class ErrorNotifier(Protocol):</span>
+    <span class="engine-method">def notify(self, exc: Exception, context: dict) -> None: ...</span></code>
+            </div>
+            <div class="io-block io-in">
+              <div class="io-label in-label">IN (메인)</div>
+              <div class="io-spec">
+                <code class="param-name">exc</code>:
+                <code class="param-type">Exception</code>
+                <span class="param-source">← 파이프라인 어디서든</span>
+                <p class="param-desc">발생한 예외 객체</p>
+              </div>
+              <div class="io-spec" style="margin-top: 8px;">
+                <code class="param-name">context</code>:
+                <code class="param-type">dict</code>
+                <span class="param-source">← 예외 발생 블럭</span>
+                <p class="param-desc">발생 위치, 처리 중이던 아이템 등 컨텍스트</p>
+              </div>
+            </div>
+            <div class="io-block io-out">
+              <div class="io-label out-label">OUT</div>
+              <div class="io-spec">
+                <code class="param-name">반환</code>:
+                <code class="param-type">None</code>
+                <p class="param-desc">텔레그램 에러 알림 전송 + error_log 테이블 저장. 보관 기간 30일</p>
+              </div>
+            </div>
+            <div class="deps-block">
+              <span class="dep-label">의존 블럭:</span>
+              <span class="dep-tag">B1 ConfigLoader</span>
+              <span class="dep-tag">DB</span>
+            </div>
+            <div class="error-block">
+              <strong>에러 처리:</strong> 알림 전송 실패 → stderr만 출력. 무한 재귀 방지 (ErrorNotifier 내부 예외는 무시)
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== 블럭 16: DataCleaner ===== -->
+        <div class="module-block" data-module-id="B16">
+          <div class="module-header" onclick="toggleModule(this)">
+            <span class="module-id" style="background: rgba(124,58,237,0.1); color: var(--f2)">B16</span>
+            <h3 class="module-name">DataCleaner — 데이터 정리</h3>
+            <span class="module-toggle">▶</span>
+          </div>
+          <div class="module-body">
+            <div class="protocol-block">
+              <div class="io-label protocol-label">PROTOCOL</div>
+              <code class="protocol-code"><span class="engine-protocol">class DataCleaner(Protocol):</span>
+    <span class="engine-method">def clean(self, config: Config) -> CleanupResult: ...</span></code>
+            </div>
+            <div class="io-block io-in">
+              <div class="io-label in-label">IN (메인)</div>
+              <div class="io-spec">
+                <code class="param-name">config</code>:
+                <code class="param-type">Config</code>
+                <span class="param-source">← B1.load()</span>
+                <p class="param-desc">테이블별 보관 기간 설정</p>
+              </div>
+            </div>
+            <div class="io-block io-out">
+              <div class="io-label out-label">OUT</div>
+              <div class="io-spec">
+                <code class="param-name">반환</code>:
+                <code class="param-type">CleanupResult</code>
+                <p class="param-desc">테이블별 삭제 건수</p>
+                <div class="type-detail">
+                  <code>CleanupResult {
+  processed_items_deleted: int, <span class="comment"># 30일 초과 삭제</span>
+  run_history_deleted: int,     <span class="comment"># 90일 초과 삭제</span>
+  error_log_deleted: int,       <span class="comment"># 30일 초과 삭제</span>
+  health_check_deleted: int,    <span class="comment"># 7일 초과 삭제</span>
+  cleaned_at: datetime          <span class="comment"># 정리 시각</span>
+}</code>
+                </div>
+              </div>
+            </div>
+            <div class="logic-block">
+              <div class="io-label logic-label">정리 정책</div>
+              <ol class="logic-steps">
+                <li><code>processed_items</code> — 30일</li>
+                <li><code>run_history</code> — 90일</li>
+                <li><code>error_log</code> — 30일</li>
+                <li><code>health_check_results</code> — 7일</li>
+                <li><code>hot_news</code> — <b>영구 보관</b> (정리 대상 아님)</li>
+              </ol>
+            </div>
+            <div class="deps-block">
+              <span class="dep-label">의존 블럭:</span>
+              <span class="dep-tag">B1 ConfigLoader</span>
+              <span class="dep-tag">DB</span>
+            </div>
+            <div class="error-block">
+              <strong>에러 처리:</strong> DB 삭제 실패 → CleanupResult에 에러 기록, 다음 테이블 계속 처리
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== 블럭 17: HealthChecker ===== -->
+        <div class="module-block" data-module-id="B17">
+          <div class="module-header" onclick="toggleModule(this)">
+            <span class="module-id" style="background: rgba(124,58,237,0.1); color: var(--f2)">B17</span>
+            <h3 class="module-name">HealthChecker — 시스템 상태 점검</h3>
+            <span class="module-toggle">▶</span>
+          </div>
+          <div class="module-body">
+            <div class="protocol-block">
+              <div class="io-label protocol-label">PROTOCOL</div>
+              <code class="protocol-code"><span class="engine-protocol">class HealthChecker(Protocol):</span>
+    <span class="engine-method">def check(self, config: Config) -> HealthReport: ...</span></code>
+            </div>
+            <div class="io-block io-in">
+              <div class="io-label in-label">IN (메인)</div>
+              <div class="io-spec">
+                <code class="param-name">config</code>:
+                <code class="param-type">Config</code>
+                <span class="param-source">← B1.load()</span>
+                <p class="param-desc">점검 대상 설정 (소스 URL, Ollama 엔드포인트 등)</p>
+              </div>
+            </div>
+            <div class="io-block io-out">
+              <div class="io-label out-label">OUT</div>
+              <div class="io-spec">
+                <code class="param-name">반환</code>:
+                <code class="param-type">HealthReport</code>
+                <p class="param-desc">항목별 상태 (OK / WARN / ERROR) + 상세 메시지</p>
+                <div class="type-detail">
+                  <code>HealthReport {
+  checked_at: datetime,       <span class="comment"># 점검 시각</span>
+  overall: str,               <span class="comment"># "OK" | "WARN" | "ERROR"</span>
+  items: list[HealthStatus]   <span class="comment"># 항목별 상태 목록</span>
+}
+
+HealthStatus {
+  name: str,                  <span class="comment"># 점검 항목명</span>
+  status: str,                <span class="comment"># "OK" | "WARN" | "ERROR"</span>
+  message: str                <span class="comment"># 상세 메시지</span>
+}</code>
+                </div>
+              </div>
+            </div>
+            <div class="logic-block">
+              <div class="io-label logic-label">점검 항목</div>
+              <ol class="logic-steps">
+                <li><b>Ollama:</b> REST API 연결 + APEX/Kanana 모델 등록 여부</li>
+                <li><b>소스 URL:</b> 12개 소스 HTTP 응답 확인</li>
+                <li><b>Telegram API:</b> Bot API getMe 호출 확인</li>
+                <li><b>SQLite:</b> DB 파일 무결성 (PRAGMA integrity_check) + 디스크 여유 공간</li>
+              </ol>
+            </div>
+            <div class="deps-block">
+              <span class="dep-label">의존 블럭:</span>
+              <span class="dep-tag">B1 ConfigLoader</span>
+            </div>
+            <div class="note-block info">
+              <strong>저장:</strong> health_check_results 테이블. 7일 보관. Flutter 앱에서 수동 트리거 가능
+            </div>
+            <div class="error-block" style="margin-top: 8px;">
+              <strong>에러 처리:</strong> 개별 점검 항목 실패 → HealthReport에 ERROR 기록, 나머지 항목 계속 점검
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ===== 8. ModelEngine 상세 구조 ===== -->
+    <section id="model-engine" class="card">
+      <div class="card-header"><h2>6. ModelEngine 상세 구조</h2></div>
+      <div class="card-body">
+        <div class="engine-tree"><span class="engine-protocol">ModelEngine (Protocol)</span>
+├── <span class="engine-impl">OllamaEngine</span>
+│   ├─ <span class="engine-method">load(model_name, keep_alive=0)</span>   <span class="engine-comment">→ 모델 메모리 적재</span>
+│   ├─ <span class="engine-method">generate(prompt, options) → str</span>  <span class="engine-comment">→ Ollama REST API 추론</span>
+│   ├─ <span class="engine-method">unload(model_name)</span>               <span class="engine-comment">→ 즉시 메모리 해제 (keep_alive=0)</span>
+│   └─ <span class="engine-method">is_available() → bool</span>            <span class="engine-comment">→ Ollama 서버 상태 확인</span>
+│
+└── <span class="engine-impl">ClaudeCliEngine</span>
+    ├─ <span class="engine-method">generate(prompt, options) → str</span>  <span class="engine-comment">→ subprocess: claude -p --bare</span>
+    └─ <span class="engine-method">is_available() → bool</span>            <span class="engine-comment">→ which claude 확인</span>
+    <span class="engine-comment">(load/unload 불필요 — 매 호출마다 subprocess 생성)</span></div>
+
+        <div class="note-block info" style="margin-top: 16px;">
+          <strong>설계 핵심:</strong> Summarizer/Translator는 프롬프트 구성 + 응답 파싱만 담당한다. 실제 추론은 주입받은 ModelEngine에 위임한다. 엔진 교체 시 (OllamaEngine → vLLM 등) ModelEngine 구현체만 추가하면 된다.
+        </div>
+
+        <!-- AI 모델 체인 -->
+        <h3 style="margin-top: 24px; font-size: 13px; font-weight: 700; margin-bottom: 12px;">AI 모델 체인 (순차 로드, 동시 적재 금지)</h3>
+        <table class="impl-table">
+          <thead><tr><th>순서</th><th>모델</th><th>역할</th><th>RAM</th></tr></thead>
+          <tbody>
+            <tr><td>1순위</td><td><code>APEX I-Compact (Qwen3.5-35B-A3B)</code></td><td>요약 (KO/EN 모두)</td><td>~20GB</td></tr>
+            <tr><td>조건부</td><td><code>Kanana-2-30B-A3B (Q4_K_M)</code></td><td>번역 (EN→KO, 영어 소스만)</td><td>~20GB</td></tr>
+            <tr><td>최후</td><td><code>Claude Code CLI (claude -p --bare)</code></td><td>폴백 (메모리 0GB)</td><td>0GB (외부)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===== 9. 폴백 체인 시각화 ===== -->
+    <section id="fallback" class="card">
+      <div class="card-header"><h2>7. 폴백 체인</h2></div>
+      <div class="card-body">
+        <h3 style="font-size: 13px; font-weight: 700; margin-bottom: 12px;">요약 폴백 체인 (Summarizer)</h3>
+        <div class="fallback-chain">
+          <div class="fallback-node primary">
+            APEX<br><span style="font-size: 9px; opacity: 0.7;">ApexSummarizer</span>
+          </div>
+          <div>
+            <div class="fallback-arrow">→ 실패 →</div>
+            <div class="fallback-condition">타임아웃 / 파싱 오류<br>RAM &lt; 26GB</div>
+          </div>
+          <div class="fallback-node secondary">
+            Kanana<br><span style="font-size: 9px; opacity: 0.7;">KananaSummarizer</span>
+          </div>
+          <div>
+            <div class="fallback-arrow">→ 실패 →</div>
+            <div class="fallback-condition">모델 오류</div>
+          </div>
+          <div class="fallback-node fallback">
+            Claude CLI<br><span style="font-size: 9px; opacity: 0.7;">ClaudeCliSummarizer</span>
+          </div>
+        </div>
+
+        <h3 style="font-size: 13px; font-weight: 700; margin: 24px 0 12px;">번역 폴백 체인 (Translator)</h3>
+        <div class="fallback-chain">
+          <div class="fallback-node secondary">
+            Kanana<br><span style="font-size: 9px; opacity: 0.7;">KananaTranslator</span>
+          </div>
+          <div>
+            <div class="fallback-arrow">→ 실패 →</div>
+            <div class="fallback-condition">모델 오류</div>
+          </div>
+          <div class="fallback-node fallback">
+            Claude CLI<br><span style="font-size: 9px; opacity: 0.7;">ClaudeCliTranslator</span>
+          </div>
+        </div>
+
+        <div class="note-block info" style="margin-top: 16px;">
+          <strong>발동 조건:</strong> 메모리 부족 (RAM &lt; 26GB) OR 모델 오류/타임아웃. MemoryGuard가 "claude_fallback"을 반환하면 모든 로컬 LLM을 건너뛰고 Claude CLI로 직행한다.
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 10. 공유 데이터 모델 ===== -->
+    <section id="data-models" class="card">
+      <div class="card-header"><h2>8. 공유 데이터 모델 (dataclass)</h2></div>
+      <div class="card-body">
+        <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 16px;">블럭 간 통신은 이 dataclass 모델로만 이루어진다. 블럭은 서로를 모른다.</p>
+
+        <!-- Config -->
+        <div class="data-model-card" data-model>
+          <div class="data-model-header" onclick="toggleDataModel(this)">
+            <span class="data-model-name">Config</span>
+            <span class="data-model-desc">— 전체 설정 (봇 토큰, DB 경로, 소스, 모델, 필터 등)</span>
+            <span class="data-model-toggle">▶</span>
+          </div>
+          <div class="data-model-body">
+            <div class="type-detail">
+              <code>@dataclass
+class Config:
+    <span class="comment"># 텔레그램</span>
+    bot_token: str
+    admin_chat_id: str
+
+    <span class="comment"># DB</span>
+    db_path: str
+
+    <span class="comment"># 모델</span>
+    ollama_endpoint: str
+    apex_model_name: str
+    kanana_model_name: str
+    memory_threshold_gb: float  <span class="comment"># 기본 26.0</span>
+
+    <span class="comment"># 소스</span>
+    sources: list[SourceConfig]  <span class="comment"># 12개 소스 설정</span>
+
+    <span class="comment"># 필터</span>
+    tier1_quota: int
+    tier2_quota: int
+    tier3_quota: int
+    tier3_hn_threshold: int      <span class="comment"># HN 업보트 임계값</span>
+    tier3_reddit_threshold: int  <span class="comment"># Reddit 업보트 임계값</span>
+    blacklist_keywords: list[str]
+
+    <span class="comment"># 보관 기간</span>
+    processed_items_retention_days: int   <span class="comment"># 30</span>
+    run_history_retention_days: int       <span class="comment"># 90</span>
+    error_log_retention_days: int         <span class="comment"># 30</span>
+    health_check_retention_days: int      <span class="comment"># 7</span>
+
+    <span class="comment"># 핫뉴스</span>
+    hot_hn_threshold: int      <span class="comment"># 200</span>
+    hot_reddit_threshold: int  <span class="comment"># 80</span></code>
+            </div>
+          </div>
+        </div>
+
+        <!-- RawItem -->
+        <div class="data-model-card" data-model>
+          <div class="data-model-header" onclick="toggleDataModel(this)">
+            <span class="data-model-name">RawItem</span>
+            <span class="data-model-desc">— Fetcher 출력 (미가공 뉴스)</span>
+            <span class="data-model-toggle">▶</span>
+          </div>
+          <div class="data-model-body">
+            <div class="type-detail">
+              <code>@dataclass
+class RawItem:
+    url: str                      <span class="comment"># 원문 URL</span>
+    title: str                    <span class="comment"># 기사 제목</span>
+    content: str | None           <span class="comment"># 기사 본문 (없을 수 있음)</span>
+    source_id: str                <span class="comment"># 소스 식별자 ("hackernews", "geeknews")</span>
+    fetched_at: datetime          <span class="comment"># 수집 시각</span>
+    upvotes: int | None           <span class="comment"># Reddit/HN만</span>
+    published_at: datetime | None <span class="comment"># 발행일시</span>
+    url_hash: str                 <span class="comment"># SHA256(url)</span></code>
+            </div>
+          </div>
+        </div>
+
+        <!-- NewsItem -->
+        <div class="data-model-card" data-model>
+          <div class="data-model-header" onclick="toggleDataModel(this)">
+            <span class="data-model-name">NewsItem</span>
+            <span class="data-model-desc">— 중복 제거 + 언어 감지 완료 아이템</span>
+            <span class="data-model-toggle">▶</span>
+          </div>
+          <div class="data-model-body">
+            <div class="type-detail">
+              <code>@dataclass
+class NewsItem:
+    url: str
+    title: str
+    content: str | None
+    source_id: str
+    fetched_at: datetime
+    upvotes: int | None
+    published_at: datetime | None
+    url_hash: str
+    lang: str             <span class="comment"># "ko" | "en" — LanguageDetector가 추가</span></code>
+            </div>
+          </div>
+        </div>
+
+        <!-- SummaryResult -->
+        <div class="data-model-card" data-model>
+          <div class="data-model-header" onclick="toggleDataModel(this)">
+            <span class="data-model-name">SummaryResult</span>
+            <span class="data-model-desc">— 요약/번역 결과</span>
+            <span class="data-model-toggle">▶</span>
+          </div>
+          <div class="data-model-body">
+            <div class="type-detail">
+              <code>@dataclass
+class SummaryResult:
+    item_url: str                  <span class="comment"># 원문 URL</span>
+    summary_text: str              <span class="comment"># 요약 텍스트 (한국어)</span>
+    original_lang: str             <span class="comment"># 원본 언어 ("ko" | "en")</span>
+    summarizer_used: str           <span class="comment"># 사용된 Summarizer 구현체명</span>
+    translator_used: str | None    <span class="comment"># 한국어 소스는 None</span>
+    error: str | None              <span class="comment"># 에러 발생 시 메시지</span></code>
+            </div>
+          </div>
+        </div>
+
+        <!-- MemoryStatus -->
+        <div class="data-model-card" data-model>
+          <div class="data-model-header" onclick="toggleDataModel(this)">
+            <span class="data-model-name">MemoryStatus</span>
+            <span class="data-model-desc">— 메모리 상태 (Literal 타입)</span>
+            <span class="data-model-toggle">▶</span>
+          </div>
+          <div class="data-model-body">
+            <div class="type-detail">
+              <code>MemoryStatus = Literal["local_llm", "claude_fallback"]</code>
+            </div>
+          </div>
+        </div>
+
+        <!-- SubscriberEvent -->
+        <div class="data-model-card" data-model>
+          <div class="data-model-header" onclick="toggleDataModel(this)">
+            <span class="data-model-name">SubscriberEvent</span>
+            <span class="data-model-desc">— 구독 이벤트</span>
+            <span class="data-model-toggle">▶</span>
+          </div>
+          <div class="data-model-body">
+            <div class="type-detail">
+              <code>@dataclass
+class SubscriberEvent:
+    chat_id: str           <span class="comment"># 텔레그램 chat_id</span>
+    username: str | None   <span class="comment"># 사용자명</span>
+    event_type: str        <span class="comment"># "subscribe" | "unsubscribe"</span>
+    occurred_at: datetime  <span class="comment"># 이벤트 발생 시각</span>
+    update_id: int         <span class="comment"># Telegram update_id (중복 방지)</span></code>
+            </div>
+          </div>
+        </div>
+
+        <!-- SendResult -->
+        <div class="data-model-card" data-model>
+          <div class="data-model-header" onclick="toggleDataModel(this)">
+            <span class="data-model-name">SendResult</span>
+            <span class="data-model-desc">— 텔레그램 전송 결과</span>
+            <span class="data-model-toggle">▶</span>
+          </div>
+          <div class="data-model-body">
+            <div class="type-detail">
+              <code>@dataclass
+class SendResult:
+    total: int                 <span class="comment"># 전체 전송 대상 수</span>
+    success_count: int         <span class="comment"># 성공 건수</span>
+    failed_chat_ids: list[str] <span class="comment"># 실패한 chat_id 목록</span>
+    errors: dict[str, str]     <span class="comment"># chat_id -> 에러 메시지</span></code>
+            </div>
+          </div>
+        </div>
+
+        <!-- PipelineResult -->
+        <div class="data-model-card" data-model>
+          <div class="data-model-header" onclick="toggleDataModel(this)">
+            <span class="data-model-name">PipelineResult</span>
+            <span class="data-model-desc">— 파이프라인 실행 결과</span>
+            <span class="data-model-toggle">▶</span>
+          </div>
+          <div class="data-model-body">
+            <div class="type-detail">
+              <code>@dataclass
+class PipelineResult:
+    run_at: datetime            <span class="comment"># 실행 시각</span>
+    fetched_count: int          <span class="comment"># 수집 건수</span>
+    dedup_count: int            <span class="comment"># 신규 아이템 수</span>
+    filtered_count: int         <span class="comment"># 필터 통과 수</span>
+    summarized_count: int       <span class="comment"># 요약 완료 수</span>
+    sent_count: int             <span class="comment"># 전송 성공 수</span>
+    elapsed_seconds: float      <span class="comment"># 총 소요 시간</span>
+    memory_status: MemoryStatus <span class="comment"># 메모리 상태</span>
+    has_error: bool             <span class="comment"># 에러 발생 여부</span>
+    error_summary: str | None   <span class="comment"># 에러 요약</span></code>
+            </div>
+          </div>
+        </div>
+
+        <!-- CleanupResult -->
+        <div class="data-model-card" data-model>
+          <div class="data-model-header" onclick="toggleDataModel(this)">
+            <span class="data-model-name">CleanupResult</span>
+            <span class="data-model-desc">— 데이터 정리 결과</span>
+            <span class="data-model-toggle">▶</span>
+          </div>
+          <div class="data-model-body">
+            <div class="type-detail">
+              <code>@dataclass
+class CleanupResult:
+    processed_items_deleted: int <span class="comment"># 30일 초과 삭제</span>
+    run_history_deleted: int     <span class="comment"># 90일 초과 삭제</span>
+    error_log_deleted: int       <span class="comment"># 30일 초과 삭제</span>
+    health_check_deleted: int    <span class="comment"># 7일 초과 삭제</span>
+    cleaned_at: datetime         <span class="comment"># 정리 시각</span></code>
+            </div>
+          </div>
+        </div>
+
+        <!-- HealthReport -->
+        <div class="data-model-card" data-model>
+          <div class="data-model-header" onclick="toggleDataModel(this)">
+            <span class="data-model-name">HealthReport</span>
+            <span class="data-model-desc">— 헬스체크 결과</span>
+            <span class="data-model-toggle">▶</span>
+          </div>
+          <div class="data-model-body">
+            <div class="type-detail">
+              <code>@dataclass
+class HealthStatus:
+    name: str        <span class="comment"># 점검 항목명</span>
+    status: str      <span class="comment"># "OK" | "WARN" | "ERROR"</span>
+    message: str     <span class="comment"># 상세 메시지</span>
+
+@dataclass
+class HealthReport:
+    checked_at: datetime        <span class="comment"># 점검 시각</span>
+    overall: str                <span class="comment"># "OK" | "WARN" | "ERROR"</span>
+    items: list[HealthStatus]   <span class="comment"># 항목별 상태 목록</span></code>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ===== 11. 의존성 매트릭스 ===== -->
+    <section id="dependencies" class="card">
+      <div class="card-header"><h2>9. 의존성 매트릭스</h2></div>
+      <div class="card-body">
+        <p style="font-size: 11px; color: var(--text-secondary); margin-bottom: 12px;">행: 사용하는 블럭 → 열: 의존 대상 블럭. ● = 직접 의존</p>
+        <div style="overflow-x: auto;">
+          <table class="dep-matrix" style="display: table;">
+            <thead>
+              <tr>
+                <th></th>
+                <th>B1<br>Config</th>
+                <th>B2<br>Guard</th>
+                <th>B3<br>Subscriber</th>
+                <th>B4<br>Fetcher</th>
+                <th>B5<br>Dedup</th>
+                <th>B6<br>LangDet</th>
+                <th>B7<br>Filter</th>
+                <th>B8<br>Engine</th>
+                <th>B9<br>Summ</th>
+                <th>B10<br>Trans</th>
+                <th>B11<br>Hot</th>
+                <th>B12<br>Format</th>
+                <th>B13<br>Send</th>
+                <th>B14<br>Log</th>
+                <th>B15<br>Error</th>
+                <th>B16<br>Clean</th>
+                <th>B17<br>Health</th>
+                <th>DB</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><b>B1</b> ConfigLoader</td>
+                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+              </tr>
+              <tr>
+                <td><b>B2</b> MemoryGuard</td>
+                <td class="dot">●</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+              </tr>
+              <tr>
+                <td><b>B3</b> Subscriber</td>
+                <td class="dot">●</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="dot">●</td>
+              </tr>
+              <tr>
+                <td><b>B4</b> Fetcher</td>
+                <td class="dot">●</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+              </tr>
+              <tr>
+                <td><b>B5</b> Dedup</td>
+                <td class="dot">●</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="dot">●</td>
+              </tr>
+              <tr>
+                <td><b>B6</b> LangDetector</td>
+                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+              </tr>
+              <tr>
+                <td><b>B7</b> Filter</td>
+                <td class="dot">●</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+              </tr>
+              <tr>
+                <td><b>B8</b> ModelEngine</td>
+                <td class="dot">●</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+              </tr>
+              <tr>
+                <td><b>B9</b> Summarizer</td>
+                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="dot">●</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+              </tr>
+              <tr>
+                <td><b>B10</b> Translator</td>
+                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="dot">●</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+              </tr>
+              <tr>
+                <td><b>B11</b> HotNews</td>
+                <td class="dot">●</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="dot">●</td>
+              </tr>
+              <tr>
+                <td><b>B12</b> Formatter</td>
+                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+              </tr>
+              <tr>
+                <td><b>B13</b> TgSender</td>
+                <td class="dot">●</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+              </tr>
+              <tr>
+                <td><b>B14</b> RunLogger</td>
+                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="dot">●</td>
+              </tr>
+              <tr>
+                <td><b>B15</b> ErrorNotifier</td>
+                <td class="dot">●</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="dot">●</td>
+              </tr>
+              <tr>
+                <td><b>B16</b> DataCleaner</td>
+                <td class="dot">●</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="dot">●</td>
+              </tr>
+              <tr>
+                <td><b>B17</b> HealthChecker</td>
+                <td class="dot">●</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note-block info" style="margin-top: 16px;">
+          <strong>설계 원칙:</strong> 블럭끼리는 서로를 모른다. 모든 블럭은 B1(Config) 또는 DB에만 직접 의존한다. B9/B10은 B8(ModelEngine)에 의존하지만 DI(의존성 주입)로 결합도를 최소화한다.
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 12. 구현 체크리스트 ===== -->
+    <section id="checklist" class="card">
+      <div class="card-header"><h2>10. 구현 체크리스트</h2></div>
+      <div class="card-body">
+        <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 16px;">구현 순서: M0 → M1 → M3 → M3.5 → M2 → M5 → M4 → M6 → M7 → M8</p>
+
+        <div class="checklist-group">
+          <h3 style="color: var(--f2);">Phase 0: 환경 구축 (M0 Setup)</h3>
+          <ul class="checklist">
+            <li><input type="checkbox"> Ollama 설치 + APEX 모델 다운로드/등록</li>
+            <li><input type="checkbox"> Kanana GGUF 변환 + Ollama 등록</li>
+            <li><input type="checkbox"> 모델 품질 테스트 (한국어 요약/번역 검증)</li>
+            <li><input type="checkbox"> pyproject.toml + uv 가상환경 세팅</li>
+          </ul>
+        </div>
+
+        <div class="checklist-group">
+          <h3 style="color: var(--f1);">Phase 1: 설정 + 기반 (M1 Config)</h3>
+          <ul class="checklist">
+            <li><input type="checkbox"> B1 ConfigLoader — .env 파싱, Config dataclass</li>
+            <li><input type="checkbox"> B2 MemoryGuard — psutil 메모리 체크</li>
+            <li><input type="checkbox"> 공유 데이터 모델 (models/) — 전체 dataclass 정의</li>
+          </ul>
+        </div>
+
+        <div class="checklist-group">
+          <h3 style="color: var(--f3);">Phase 2: 데이터 파이프라인 (M3 Dedup → M3.5 Filter)</h3>
+          <ul class="checklist">
+            <li><input type="checkbox"> B5 Dedup (SqliteDedup) — URL 해시 중복 제거</li>
+            <li><input type="checkbox"> B6 LanguageDetector — SourceFirst + Lingua 체인</li>
+            <li><input type="checkbox"> B7 Filter — BlacklistFilter + TierRouter + PrioritySelector</li>
+          </ul>
+        </div>
+
+        <div class="checklist-group">
+          <h3 style="color: var(--f4);">Phase 3: 수집 (M2 Fetcher)</h3>
+          <ul class="checklist">
+            <li><input type="checkbox"> B4 RssFetcher — RSS/Atom 소스 수집</li>
+            <li><input type="checkbox"> B4 AlgoliaFetcher — Hacker News API</li>
+            <li><input type="checkbox"> B4 RedditFetcher — Reddit .json</li>
+            <li><input type="checkbox"> B4 GithubAtomFetcher — GitHub 릴리스</li>
+            <li><input type="checkbox"> B3 SubscriberPoller — getUpdates + DB 저장</li>
+          </ul>
+        </div>
+
+        <div class="checklist-group">
+          <h3 style="color: var(--f6);">Phase 4: 전송 (M5 Telegram)</h3>
+          <ul class="checklist">
+            <li><input type="checkbox"> B12 MessageFormatter — MarkdownV2 포맷팅</li>
+            <li><input type="checkbox"> B13 TelegramSender — 메시지 전송 + retry</li>
+            <li><input type="checkbox"> B15 ErrorNotifier — 에러 알림</li>
+          </ul>
+        </div>
+
+        <div class="checklist-group">
+          <h3 style="color: var(--f5);">Phase 5: AI 요약/번역 (M4 Summarizer)</h3>
+          <ul class="checklist">
+            <li><input type="checkbox"> B8 OllamaEngine — Ollama REST API 래퍼</li>
+            <li><input type="checkbox"> B8 ClaudeCliEngine — claude CLI subprocess</li>
+            <li><input type="checkbox"> B9 ApexSummarizer — APEX 요약</li>
+            <li><input type="checkbox"> B9 KananaSummarizer — Kanana 요약 (폴백)</li>
+            <li><input type="checkbox"> B9 ClaudeCliSummarizer — CLI 요약 (최종 폴백)</li>
+            <li><input type="checkbox"> B10 KananaTranslator — EN→KO 번역</li>
+            <li><input type="checkbox"> B10 ClaudeCliTranslator — CLI 번역 (폴백)</li>
+            <li><input type="checkbox"> B11 HotNewsDetector — 핫뉴스 판단 + DB 저장</li>
+            <li><input type="checkbox"> FallbackChain 구현 — 요약/번역 폴백 체인</li>
+          </ul>
+        </div>
+
+        <div class="checklist-group">
+          <h3 style="color: var(--f2);">Phase 6: 오케스트레이터 (M6)</h3>
+          <ul class="checklist">
+            <li><input type="checkbox"> orchestrator.py — 블럭 조립 + 파이프라인 실행</li>
+            <li><input type="checkbox"> B14 RunLogger — 실행 이력 기록</li>
+            <li><input type="checkbox"> B16 DataCleaner — 만료 데이터 정리</li>
+            <li><input type="checkbox"> B17 HealthChecker — 시스템 상태 점검</li>
+          </ul>
+        </div>
+
+        <div class="checklist-group">
+          <h3 style="color: var(--f-common);">Phase 7: 스케줄러 (M7 launchd)</h3>
+          <ul class="checklist">
+            <li><input type="checkbox"> LaunchAgent plist 템플릿 생성</li>
+            <li><input type="checkbox"> 16개 시간대 (09:00~00:00) 등록</li>
+            <li><input type="checkbox"> install/uninstall 스크립트</li>
+            <li><input type="checkbox"> 슬립 복귀 시간 검증 로직</li>
+          </ul>
+        </div>
+
+        <div class="checklist-group">
+          <h3 style="color: var(--f4);">Phase 8: Flutter 대시보드 (M8)</h3>
+          <ul class="checklist">
+            <li><input type="checkbox"> Flutter macOS 프로젝트 세팅 (Riverpod)</li>
+            <li><input type="checkbox"> SQLite 직접 연동 (Python과 동일 DB)</li>
+            <li><input type="checkbox"> 화면 1: 홈 (Overview)</li>
+            <li><input type="checkbox"> 화면 2: 날짜별 뉴스</li>
+            <li><input type="checkbox"> 화면 3: 구독자 관리</li>
+            <li><input type="checkbox"> 화면 4: 실행 이력</li>
+            <li><input type="checkbox"> 화면 5: 오류 로그 + 헬스체크</li>
+            <li><input type="checkbox"> 화면 6: 통계 대시보드</li>
+            <li><input type="checkbox"> 화면 7: 설정</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 푸터 ===== -->
+    <footer class="project-footer">
+      <p>news-pulse 계층적 모듈 설계서 v1.0 | 2026-04-08 | 총 17블럭 (파이프라인 13 + 인프라 4)</p>
+      <p style="margin-top: 4px;">Strategy Pattern + Dependency Injection | Python 3.12 + Ollama + Flutter macOS + SQLite</p>
+    </footer>
+
+  </div>
+
+  <script>
+    // 모듈 접기/펼치기
+    function toggleModule(header) {
+      const block = header.parentElement;
+      block.classList.toggle('open');
+    }
+
+    // Feature 내 모듈 전체 접기/펼치기
+    function toggleFeatureModules(btn, open) {
+      const card = btn.closest('.feature-card') || btn.closest('.card');
+      card.querySelectorAll('.module-block').forEach(m => {
+        m.classList.toggle('open', open);
+      });
+    }
+
+    // 전체 모듈 접기/펼치기
+    function toggleAll(open) {
+      document.querySelectorAll('.module-block').forEach(m => {
+        m.classList.toggle('open', open);
+      });
+      document.querySelectorAll('.data-model-card').forEach(m => {
+        m.classList.toggle('open', open);
+      });
+    }
+
+    // 데이터 모델 접기/펼치기
+    function toggleDataModel(header) {
+      const card = header.parentElement;
+      card.classList.toggle('open');
+    }
+
+    // 파이프라인 노드 클릭 → 해당 모듈로 스크롤
+    document.querySelectorAll('.pipeline-node').forEach(node => {
+      node.addEventListener('click', () => {
+        const moduleId = node.dataset.moduleId;
+        if (!moduleId || moduleId === 'launchd') return;
+        const target = document.querySelector(`[data-module-id="${moduleId}"]`);
+        if (target) {
+          target.classList.add('open');
+          target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          target.classList.add('highlight');
+          setTimeout(() => target.classList.remove('highlight'), 2000);
+        }
+      });
+    });
+
+    // 목차 스크롤 하이라이트 (IntersectionObserver)
+    const sections = document.querySelectorAll('section[id]');
+    const tocItems = document.querySelectorAll('.toc-item');
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const id = entry.target.id;
+          tocItems.forEach(item => {
+            item.style.fontWeight = item.getAttribute('href') === '#' + id ? '700' : '500';
+            item.style.background = item.getAttribute('href') === '#' + id ? 'var(--bg-surface-2)' : 'var(--bg-surface-1)';
+          });
+        }
+      });
+    }, { threshold: 0.3 });
+
+    sections.forEach(section => observer.observe(section));
+  </script>
+</body>
+</html>

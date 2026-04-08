@@ -1,0 +1,38 @@
+name: news_pulse_app
+description: "news-pulse macOS 대시보드 — SQLite 직접 접근 기반 모니터링 앱"
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.10.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # 상태 관리
+  flutter_riverpod: 2.6.1
+
+  # SQLite 직접 접근 (macOS FFI)
+  sqflite_common_ffi: 2.4.0+2
+
+  # 차트
+  fl_chart: 0.70.2
+
+  # URL 열기
+  url_launcher: 6.3.1
+
+  # 날짜/시간 포맷팅
+  intl: 0.20.2
+  flutter_secure_storage: ^10.0.0
+  http: ^1.6.0
+  tray_manager: ^0.5.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: 6.0.0
+
+flutter:
+  uses-material-design: true

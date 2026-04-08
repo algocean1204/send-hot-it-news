@@ -1,0 +1,1567 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>news-pulse — Page-Feature-Module-ERD 연결 맵</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-base: #F4F3EE;
+      --bg-surface-1: #FFFFFF;
+      --bg-surface-2: #EBE9E2;
+      --bg-surface-3: #E2E0D8;
+      --border-1: #D6D3C8;
+      --border-2: #C4C0B3;
+      --text-primary: #1a1a1a;
+      --text-secondary: #5c5c5c;
+      --text-muted: #8c8c8c;
+      --color-read: #0d9488;
+      --color-write: #d97706;
+      --color-rw: #2563eb;
+      --color-type: #2563eb;
+      --color-warning: #dc2626;
+
+      --screen-1: #2563eb;
+      --screen-2: #7c3aed;
+      --screen-3: #0d9488;
+      --screen-4: #d97706;
+      --screen-5: #dc2626;
+      --screen-6: #db2777;
+      --screen-7: #ca8a04;
+
+      --shadow-card: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+      --shadow-card-hover: 0 4px 6px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.06);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: var(--bg-base);
+      color: var(--text-primary);
+      line-height: 1.7;
+    }
+
+    code, .mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 24px;
+    }
+
+    /* 헤더 */
+    .project-header {
+      text-align: center;
+      margin-bottom: 40px;
+      padding: 40px 32px;
+      background: var(--bg-surface-1);
+      border-radius: 16px;
+      border: 1px solid var(--border-1);
+      box-shadow: var(--shadow-card);
+    }
+    .version-badge {
+      display: inline-block;
+      padding: 4px 14px;
+      background: var(--bg-surface-2);
+      border: 1px solid var(--border-1);
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+    .project-title {
+      font-size: 28px;
+      font-weight: 900;
+      margin-bottom: 8px;
+    }
+    .project-desc {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+    .meta-info {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+      font-size: 11.5px;
+      color: var(--text-muted);
+    }
+    .meta-info span {
+      padding: 4px 12px;
+      background: var(--bg-surface-2);
+      border-radius: 6px;
+    }
+
+    /* 카드 */
+    .card {
+      background: var(--bg-surface-1);
+      border: 1px solid var(--border-1);
+      border-radius: 12px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-card);
+      overflow: hidden;
+    }
+    .card-header {
+      padding: 16px 24px;
+      background: var(--bg-surface-2);
+      border-bottom: 1px solid var(--border-1);
+    }
+    .card-header h2 {
+      font-size: 16px;
+      font-weight: 800;
+    }
+    .card-body {
+      padding: 24px;
+    }
+
+    /* 목차 */
+    .toc-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 8px;
+    }
+    .toc-item {
+      display: block;
+      padding: 10px 14px;
+      background: var(--bg-base);
+      border: 1px solid var(--border-1);
+      border-left: 3px solid var(--border-2);
+      border-radius: 6px;
+      text-decoration: none;
+      color: var(--text-primary);
+      font-size: 12px;
+      font-weight: 500;
+      transition: all 0.15s;
+    }
+    .toc-item:hover {
+      background: var(--bg-surface-3);
+      box-shadow: var(--shadow-card-hover);
+      transform: translateY(-1px);
+    }
+
+    /* 시스템 개요도 */
+    .system-overview {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      padding: 32px 16px;
+      flex-wrap: wrap;
+    }
+    .sys-block {
+      padding: 24px 32px;
+      border-radius: 12px;
+      text-align: center;
+      min-width: 200px;
+    }
+    .sys-block h3 {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .sys-block p {
+      font-size: 10.5px;
+      color: var(--text-secondary);
+    }
+    .sys-flutter {
+      background: #e8f0fe;
+      border: 2px solid #4285f4;
+      color: #1a73e8;
+    }
+    .sys-sqlite {
+      background: #e6f4ea;
+      border: 2px solid #34a853;
+      color: #137333;
+    }
+    .sys-python {
+      background: #fef7e0;
+      border: 2px solid #f9ab00;
+      color: #b06000;
+    }
+    .sys-arrow {
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--text-muted);
+      padding: 0 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+    .sys-arrow small {
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    /* 화면 카드 */
+    .screen-card {
+      border-left: 4px solid var(--screen-color);
+      margin-bottom: 20px;
+      transition: box-shadow 0.2s;
+    }
+    .screen-card:hover {
+      box-shadow: var(--shadow-card-hover);
+    }
+    .screen-card .card-header {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      user-select: none;
+    }
+    .screen-card .card-header:hover {
+      background: var(--bg-surface-3);
+    }
+    .screen-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 900;
+      color: white;
+      flex-shrink: 0;
+    }
+    .screen-toggle {
+      margin-left: auto;
+      font-size: 12px;
+      color: var(--text-muted);
+      transition: transform 0.2s;
+    }
+    .screen-card.open .screen-toggle {
+      transform: rotate(90deg);
+    }
+    .screen-card .card-body {
+      display: none;
+    }
+    .screen-card.open .card-body {
+      display: block;
+    }
+
+    /* 화면 내부 그리드 */
+    .screen-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 768px) {
+      .screen-grid { grid-template-columns: 1fr; }
+    }
+    .screen-section {
+      background: var(--bg-base);
+      border: 1px solid var(--border-1);
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .screen-section h4 {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border-1);
+    }
+    .screen-section ul {
+      list-style: none;
+      padding: 0;
+    }
+    .screen-section li {
+      font-size: 11.5px;
+      padding: 4px 0;
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+    }
+    .screen-section li:last-child { border-bottom: none; }
+
+    /* 태그 */
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      margin: 2px;
+    }
+    .tag-module {
+      background: #fef3c7;
+      border: 1px solid #f59e0b;
+      color: #92400e;
+    }
+    .tag-table {
+      background: #dbeafe;
+      border: 1px solid #3b82f6;
+      color: #1e40af;
+    }
+    .tag-read {
+      background: #d1fae5;
+      border: 1px solid var(--color-read);
+      color: #065f46;
+    }
+    .tag-write {
+      background: #ffedd5;
+      border: 1px solid var(--color-write);
+      color: #9a3412;
+    }
+    .tag-rw {
+      background: #dbeafe;
+      border: 1px solid var(--color-rw);
+      color: #1e3a8a;
+    }
+
+    /* 데이터 흐름 방향 */
+    .flow-direction {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .flow-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10.5px;
+      padding: 3px 8px;
+      background: var(--bg-surface-1);
+      border: 1px solid var(--border-1);
+      border-radius: 4px;
+    }
+    .flow-arrow {
+      font-weight: 700;
+      font-size: 12px;
+    }
+    .flow-arrow.read { color: var(--color-read); }
+    .flow-arrow.write { color: var(--color-write); }
+    .flow-arrow.rw { color: var(--color-rw); }
+
+    /* 매트릭스 테이블 */
+    .matrix-wrapper {
+      overflow-x: auto;
+    }
+    .matrix-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+    }
+    .matrix-table th, .matrix-table td {
+      padding: 8px 10px;
+      border: 1px solid var(--border-1);
+      text-align: center;
+      font-size: 10.5px;
+    }
+    .matrix-table thead th {
+      background: var(--bg-surface-2);
+      font-weight: 700;
+      font-size: 10px;
+      letter-spacing: 0.3px;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    .matrix-table tbody th {
+      text-align: left;
+      font-weight: 600;
+      background: var(--bg-base);
+      white-space: nowrap;
+    }
+    .matrix-table td.cell-r {
+      background: #d1fae5;
+      color: #065f46;
+      font-weight: 700;
+      cursor: help;
+    }
+    .matrix-table td.cell-w {
+      background: #ffedd5;
+      color: #9a3412;
+      font-weight: 700;
+      cursor: help;
+    }
+    .matrix-table td.cell-rw {
+      background: #dbeafe;
+      color: #1e3a8a;
+      font-weight: 700;
+      cursor: help;
+    }
+    .matrix-table td.cell-none {
+      color: var(--text-muted);
+    }
+    .matrix-table tr:hover td {
+      background-color: rgba(0,0,0,0.03);
+    }
+    .matrix-table tr:hover td.cell-r { background: #a7f3d0; }
+    .matrix-table tr:hover td.cell-w { background: #fed7aa; }
+    .matrix-table tr:hover td.cell-rw { background: #bfdbfe; }
+
+    /* 범례 */
+    .legend {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+      padding: 12px 16px;
+      background: var(--bg-base);
+      border-radius: 8px;
+      border: 1px solid var(--border-1);
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+    }
+    .legend-swatch {
+      width: 16px;
+      height: 16px;
+      border-radius: 3px;
+      border: 1px solid var(--border-1);
+    }
+
+    /* 연결선 시각화 */
+    .connection-viz {
+      padding: 24px;
+      background: var(--bg-base);
+      border-radius: 12px;
+      border: 1px solid var(--border-1);
+      margin-bottom: 16px;
+    }
+    .connection-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .conn-screen {
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      color: white;
+      min-width: 100px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .conn-arrow {
+      color: var(--text-muted);
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .conn-targets {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    /* 누락 연결 점검 */
+    .check-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 768px) {
+      .check-grid { grid-template-columns: 1fr; }
+    }
+    .check-box {
+      background: var(--bg-base);
+      border: 1px solid var(--border-1);
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .check-box h4 {
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .check-item {
+      font-size: 11px;
+      padding: 4px 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .check-ok { color: var(--color-read); }
+    .check-warn { color: var(--color-write); }
+    .check-info { color: var(--color-type); }
+
+    /* 보관 정책 */
+    .retention-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11.5px;
+    }
+    .retention-table th, .retention-table td {
+      padding: 10px 14px;
+      border: 1px solid var(--border-1);
+      text-align: left;
+    }
+    .retention-table thead th {
+      background: var(--bg-surface-2);
+      font-weight: 700;
+      font-size: 10.5px;
+      letter-spacing: 0.3px;
+    }
+    .retention-table tbody tr:hover {
+      background: var(--bg-surface-3);
+    }
+    .retention-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 10px;
+      font-weight: 700;
+    }
+    .ret-permanent {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+    .ret-90d {
+      background: #d1fae5;
+      color: #065f46;
+    }
+    .ret-30d {
+      background: #fef3c7;
+      color: #92400e;
+    }
+    .ret-7d {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    /* 하이라이트 */
+    .highlight-pulse {
+      animation: pulse 0.6s ease-in-out 3;
+    }
+    @keyframes pulse {
+      0%, 100% { box-shadow: var(--shadow-card); }
+      50% { box-shadow: 0 0 0 3px rgba(37,99,235,0.3), var(--shadow-card-hover); }
+    }
+
+    /* 인터랙티브 하이라이트 */
+    .interactive-hint {
+      font-size: 10px;
+      color: var(--text-muted);
+      text-align: center;
+      padding: 8px;
+      font-style: italic;
+    }
+
+    /* 툴팁 */
+    [data-tooltip] {
+      position: relative;
+    }
+    [data-tooltip]:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 6px 10px;
+      background: var(--text-primary);
+      color: white;
+      font-size: 10px;
+      border-radius: 4px;
+      white-space: nowrap;
+      z-index: 100;
+      pointer-events: none;
+    }
+
+    /* 푸터 */
+    .footer {
+      text-align: center;
+      padding: 24px;
+      margin-top: 40px;
+      font-size: 10.5px;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border-1);
+    }
+
+    /* 반응형 */
+    @media (max-width: 768px) {
+      .container { padding: 12px 8px; }
+      .project-title { font-size: 22px; }
+      .system-overview { flex-direction: column; gap: 8px; }
+      .sys-arrow { transform: rotate(90deg); padding: 4px 0; }
+      .meta-info { flex-direction: column; align-items: center; }
+    }
+
+    /* 전체 연결 시각화 SVG 영역 */
+    .full-map-container {
+      position: relative;
+      overflow-x: auto;
+      padding: 24px;
+      background: var(--bg-base);
+      border-radius: 12px;
+      border: 1px solid var(--border-1);
+    }
+    .full-map-cols {
+      display: flex;
+      gap: 0;
+      min-width: 900px;
+      align-items: flex-start;
+    }
+    .map-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 0 8px;
+    }
+    .map-col-title {
+      text-align: center;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--border-1);
+      margin-bottom: 8px;
+    }
+    .map-item {
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 600;
+      text-align: center;
+      border: 1px solid var(--border-1);
+      background: var(--bg-surface-1);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .map-item:hover {
+      transform: scale(1.03);
+      box-shadow: var(--shadow-card-hover);
+    }
+    .map-item.dimmed {
+      opacity: 0.2;
+    }
+    .map-item.active {
+      opacity: 1;
+      box-shadow: 0 0 0 2px rgba(37,99,235,0.5);
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- 1. 헤더 -->
+    <header class="project-header">
+      <span class="version-badge">Page-Feature-Module-ERD Connection Map v1.0</span>
+      <h1 class="project-title">news-pulse 연결 맵</h1>
+      <p class="project-desc">Flutter macOS 대시보드 7개 화면 - Python 백엔드 17개 블럭 - SQLite 7개 테이블 연결 관계</p>
+      <div class="meta-info">
+        <span>생성일: 2026-04-08</span>
+        <span>화면: 7개</span>
+        <span>모듈: 17개 블럭</span>
+        <span>테이블: 7개</span>
+        <span>통신: SQLite WAL 직접 접근</span>
+      </div>
+    </header>
+
+    <!-- 2. 목차 -->
+    <nav class="card">
+      <div class="card-header"><h2>목차</h2></div>
+      <div class="card-body">
+        <div class="toc-grid">
+          <a href="#system-overview" class="toc-item" style="border-left-color: var(--text-primary)">1. 전체 시스템 개요도</a>
+          <a href="#screen-cards" class="toc-item" style="border-left-color: var(--screen-1)">2. 화면별 연결 카드 (7개)</a>
+          <a href="#connection-viz" class="toc-item" style="border-left-color: var(--color-rw)">3. 시각적 연결 맵</a>
+          <a href="#screen-table-matrix" class="toc-item" style="border-left-color: var(--color-read)">4. 화면-테이블 매트릭스</a>
+          <a href="#module-table-matrix" class="toc-item" style="border-left-color: var(--color-write)">5. 모듈-테이블 매트릭스</a>
+          <a href="#missing-check" class="toc-item" style="border-left-color: var(--color-warning)">6. 누락 연결 점검</a>
+          <a href="#retention" class="toc-item" style="border-left-color: var(--screen-7)">7. 데이터 보관 정책</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- 3. 전체 시스템 개요도 -->
+    <section id="system-overview" class="card">
+      <div class="card-header"><h2>1. 전체 시스템 개요도</h2></div>
+      <div class="card-body">
+        <div class="system-overview">
+          <div class="sys-block sys-flutter">
+            <h3>Flutter macOS App</h3>
+            <p>7개 화면 (Riverpod 상태관리)</p>
+            <p style="margin-top:4px; font-size:9px;">사용자 대시보드 / 설정 관리</p>
+          </div>
+          <div class="sys-arrow">
+            <span style="color: var(--color-read);">&#x2190;</span>
+            <small style="color: var(--color-read);">읽기 (SELECT)</small>
+            <small style="color: var(--color-write);">쓰기 (INSERT/UPDATE/DELETE)</small>
+            <span style="color: var(--color-write);">&#x2192;</span>
+          </div>
+          <div class="sys-block sys-sqlite">
+            <h3>SQLite (WAL 모드)</h3>
+            <p>7개 테이블</p>
+            <p style="margin-top:4px; font-size:9px;">Python/Flutter 공유 DB 파일</p>
+          </div>
+          <div class="sys-arrow">
+            <span style="color: var(--color-write);">&#x2190;</span>
+            <small style="color: var(--color-write);">쓰기 (INSERT/UPDATE)</small>
+            <small style="color: var(--color-read);">읽기 (SELECT)</small>
+            <span style="color: var(--color-read);">&#x2192;</span>
+          </div>
+          <div class="sys-block sys-python">
+            <h3>Python 백엔드</h3>
+            <p>17개 블럭 (launchd 매시 트리거)</p>
+            <p style="margin-top:4px; font-size:9px;">수집 / 요약 / 번역 / 전송 파이프라인</p>
+          </div>
+        </div>
+        <p class="interactive-hint">Flutter 앱은 별도 API 서버 없이 SQLite 파일을 직접 읽기/쓰기합니다. Python 백엔드도 같은 DB 파일에 접근합니다. (WAL 모드로 동시 접근 안전)</p>
+      </div>
+    </section>
+
+    <!-- 4. 화면별 연결 카드 -->
+    <section id="screen-cards">
+
+      <!-- 화면 1: 홈 (Overview) -->
+      <div class="screen-card card open" style="--screen-color: var(--screen-1)" data-screen="1">
+        <div class="card-header" onclick="toggleScreen(this)">
+          <span class="screen-num" style="background: var(--screen-1)">1</span>
+          <h2 style="font-size: 15px; font-weight: 700;">홈 (Overview)</h2>
+          <span class="screen-toggle">&#9654;</span>
+        </div>
+        <div class="card-body">
+          <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 16px;">
+            봇의 전체 상태를 한눈에 확인하는 대시보드 메인 화면. 읽기 전용으로 DB를 직접 조회합니다.
+          </p>
+          <div class="screen-grid">
+            <div class="screen-section">
+              <h4>기능 리스트</h4>
+              <ul>
+                <li>봇 상태 표시 (마지막 실행 시각, 성공/실패)</li>
+                <li>오늘 전송 건수 집계</li>
+                <li>최근 에러 요약 (최근 N건)</li>
+                <li>다음 실행 시간 계산 (launchd 스케줄)</li>
+                <li>구독자 수 표시 (대기/승인 각각)</li>
+              </ul>
+            </div>
+            <div class="screen-section">
+              <h4>연결 모듈 (Python 블럭)</h4>
+              <p style="font-size: 11px; color: var(--text-muted); padding: 8px 0;">직접 호출하는 모듈 없음 (읽기 전용, DB 직접 조회)</p>
+              <p style="font-size: 10px; color: var(--text-secondary);">다음 실행 시간은 launchd plist 스케줄 기반 코드 로직으로 계산</p>
+            </div>
+            <div class="screen-section">
+              <h4>연결 테이블</h4>
+              <div>
+                <span class="tag tag-table">run_history</span>
+                <span class="tag tag-table">processed_items</span>
+                <span class="tag tag-table">error_log</span>
+                <span class="tag tag-table">subscribers</span>
+              </div>
+            </div>
+            <div class="screen-section">
+              <h4>데이터 흐름 방향</h4>
+              <div class="flow-direction">
+                <div class="flow-item"><code class="mono" style="font-size:10px">run_history</code> <span class="flow-arrow read">&larr;</span> <span class="tag tag-read">R</span></div>
+                <div class="flow-item"><code class="mono" style="font-size:10px">processed_items</code> <span class="flow-arrow read">&larr;</span> <span class="tag tag-read">R</span></div>
+                <div class="flow-item"><code class="mono" style="font-size:10px">error_log</code> <span class="flow-arrow read">&larr;</span> <span class="tag tag-read">R</span></div>
+                <div class="flow-item"><code class="mono" style="font-size:10px">subscribers</code> <span class="flow-arrow read">&larr;</span> <span class="tag tag-read">R</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 화면 2: 날짜별 뉴스 -->
+      <div class="screen-card card" style="--screen-color: var(--screen-2)" data-screen="2">
+        <div class="card-header" onclick="toggleScreen(this)">
+          <span class="screen-num" style="background: var(--screen-2)">2</span>
+          <h2 style="font-size: 15px; font-weight: 700;">날짜별 뉴스</h2>
+          <span class="screen-toggle">&#9654;</span>
+        </div>
+        <div class="card-body">
+          <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 16px;">
+            30일치 뉴스를 날짜별로 브라우징하고, 핫뉴스를 수동 토글하는 화면. 읽기 + 쓰기 모두 수행합니다.
+          </p>
+          <div class="screen-grid">
+            <div class="screen-section">
+              <h4>기능 리스트</h4>
+              <ul>
+                <li>30일치 뉴스 날짜별 브라우징</li>
+                <li>일반 뉴스 / 핫뉴스 탭 분리</li>
+                <li>핫뉴스 영구 보관 (hot_news 테이블)</li>
+                <li>뉴스 상세: 제목, 요약, 태그, 원문 링크, 파이프라인 경로, 소요 시간</li>
+                <li>핫뉴스 수동 토글 (is_hot 업데이트 + hot_news INSERT/DELETE)</li>
+              </ul>
+            </div>
+            <div class="screen-section">
+              <h4>연결 모듈 (Python 블럭)</h4>
+              <div>
+                <span class="tag tag-module">HotNewsDetector (#11)</span>
+              </div>
+              <p style="font-size: 10px; color: var(--text-secondary); margin-top: 6px;">핫뉴스 판단 기준 참조 (업보트 임계값, 소스 자동 태그 조건)</p>
+            </div>
+            <div class="screen-section">
+              <h4>연결 테이블</h4>
+              <div>
+                <span class="tag tag-table">processed_items</span>
+                <span class="tag tag-table">hot_news</span>
+              </div>
+            </div>
+            <div class="screen-section">
+              <h4>데이터 흐름 방향</h4>
+              <div class="flow-direction">
+                <div class="flow-item"><code class="mono" style="font-size:10px">processed_items</code> <span class="flow-arrow rw">&harr;</span> <span class="tag tag-rw">RW</span></div>
+                <div class="flow-item"><code class="mono" style="font-size:10px">hot_news</code> <span class="flow-arrow rw">&harr;</span> <span class="tag tag-rw">RW</span></div>
+              </div>
+              <p style="font-size: 10px; color: var(--text-secondary); margin-top: 6px;">핫뉴스 토글 시: processed_items.is_hot UPDATE + hot_news INSERT/DELETE</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 화면 3: 구독자 관리 -->
+      <div class="screen-card card" style="--screen-color: var(--screen-3)" data-screen="3">
+        <div class="card-header" onclick="toggleScreen(this)">
+          <span class="screen-num" style="background: var(--screen-3)">3</span>
+          <h2 style="font-size: 15px; font-weight: 700;">구독자 관리</h2>
+          <span class="screen-toggle">&#9654;</span>
+        </div>
+        <div class="card-body">
+          <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 16px;">
+            텔레그램 봇 구독자를 승인/거부/삭제 관리하는 화면. 구독자 데이터를 읽고 상태를 변경합니다.
+          </p>
+          <div class="screen-grid">
+            <div class="screen-section">
+              <h4>기능 리스트</h4>
+              <ul>
+                <li>대기(pending) / 승인(approved) / 거부(rejected) 탭</li>
+                <li>검색 기능 (username, chat_id)</li>
+                <li>승인 / 거부 / 삭제 버튼</li>
+                <li>구독자 상세 (신청일, 승인일, 수신 이력)</li>
+              </ul>
+            </div>
+            <div class="screen-section">
+              <h4>연결 모듈 (Python 블럭)</h4>
+              <div>
+                <span class="tag tag-module">SubscriberPoller (#3)</span>
+              </div>
+              <p style="font-size: 10px; color: var(--text-secondary); margin-top: 6px;">SubscriberPoller가 getUpdates로 수집한 데이터의 소스 테이블</p>
+            </div>
+            <div class="screen-section">
+              <h4>연결 테이블</h4>
+              <div>
+                <span class="tag tag-table">subscribers</span>
+              </div>
+            </div>
+            <div class="screen-section">
+              <h4>데이터 흐름 방향</h4>
+              <div class="flow-direction">
+                <div class="flow-item"><code class="mono" style="font-size:10px">subscribers</code> <span class="flow-arrow rw">&harr;</span> <span class="tag tag-rw">RW</span></div>
+              </div>
+              <p style="font-size: 10px; color: var(--text-secondary); margin-top: 6px;">읽기: 구독자 목록 조회 / 쓰기: status UPDATE, DELETE</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 화면 4: 실행 이력 -->
+      <div class="screen-card card" style="--screen-color: var(--screen-4)" data-screen="4">
+        <div class="card-header" onclick="toggleScreen(this)">
+          <span class="screen-num" style="background: var(--screen-4)">4</span>
+          <h2 style="font-size: 15px; font-weight: 700;">실행 이력</h2>
+          <span class="screen-toggle">&#9654;</span>
+        </div>
+        <div class="card-body">
+          <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 16px;">
+            매시 정각 실행 결과를 시간순으로 확인하는 화면. 읽기 전용입니다.
+          </p>
+          <div class="screen-grid">
+            <div class="screen-section">
+              <h4>기능 리스트</h4>
+              <ul>
+                <li>매시 실행 결과 리스트</li>
+                <li>수집/필터/요약/전송 건수</li>
+                <li>총 소요시간, 모델 로드/추론 시간</li>
+                <li>에러 발생 시 에러 메시지</li>
+                <li>실행 상태 표시 (성공/부분실패/실패)</li>
+              </ul>
+            </div>
+            <div class="screen-section">
+              <h4>연결 모듈 (Python 블럭)</h4>
+              <div>
+                <span class="tag tag-module">RunLogger (#14)</span>
+              </div>
+              <p style="font-size: 10px; color: var(--text-secondary); margin-top: 6px;">RunLogger가 기록한 실행 이력 데이터의 소스 테이블</p>
+            </div>
+            <div class="screen-section">
+              <h4>연결 테이블</h4>
+              <div>
+                <span class="tag tag-table">run_history</span>
+              </div>
+            </div>
+            <div class="screen-section">
+              <h4>데이터 흐름 방향</h4>
+              <div class="flow-direction">
+                <div class="flow-item"><code class="mono" style="font-size:10px">run_history</code> <span class="flow-arrow read">&larr;</span> <span class="tag tag-read">R</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 화면 5: 오류 로그 + 헬스체크 -->
+      <div class="screen-card card" style="--screen-color: var(--screen-5)" data-screen="5">
+        <div class="card-header" onclick="toggleScreen(this)">
+          <span class="screen-num" style="background: var(--screen-5)">5</span>
+          <h2 style="font-size: 15px; font-weight: 700;">오류 로그 + 헬스체크</h2>
+          <span class="screen-toggle">&#9654;</span>
+        </div>
+        <div class="card-body">
+          <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 16px;">
+            오류 로그 조회 + 수동 헬스체크 실행 화면. 헬스체크 시 Python subprocess를 통해 HealthChecker 모듈을 직접 실행합니다.
+          </p>
+          <div class="screen-grid">
+            <div class="screen-section">
+              <h4>기능 리스트</h4>
+              <ul>
+                <li>[오류 로그 탭] 시간순 에러 목록</li>
+                <li>[오류 로그 탭] 심각도별 필터 (severity)</li>
+                <li>[헬스체크 탭] 수동 실행 버튼</li>
+                <li>[헬스체크 탭] Ollama/소스/Telegram/DB/디스크 상태 리포트</li>
+              </ul>
+            </div>
+            <div class="screen-section">
+              <h4>연결 모듈 (Python 블럭)</h4>
+              <div>
+                <span class="tag tag-module">HealthChecker (#17)</span>
+                <span class="tag tag-module">ErrorNotifier (#15)</span>
+              </div>
+              <p style="font-size: 10px; color: var(--text-secondary); margin-top: 6px;">HealthChecker: Flutter에서 Python subprocess로 직접 실행 트리거<br>ErrorNotifier: error_log 테이블의 데이터 소스</p>
+            </div>
+            <div class="screen-section">
+              <h4>연결 테이블</h4>
+              <div>
+                <span class="tag tag-table">error_log</span>
+                <span class="tag tag-table">health_check_results</span>
+              </div>
+            </div>
+            <div class="screen-section">
+              <h4>데이터 흐름 방향</h4>
+              <div class="flow-direction">
+                <div class="flow-item"><code class="mono" style="font-size:10px">error_log</code> <span class="flow-arrow read">&larr;</span> <span class="tag tag-read">R</span></div>
+                <div class="flow-item"><code class="mono" style="font-size:10px">health_check_results</code> <span class="flow-arrow read">&larr;</span> <span class="tag tag-read">R</span></div>
+              </div>
+              <p style="font-size: 10px; color: var(--text-secondary); margin-top: 6px;">헬스체크 실행 시: Python subprocess가 health_check_results에 쓰기 → Flutter가 읽기</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 화면 6: 통계 대시보드 -->
+      <div class="screen-card card" style="--screen-color: var(--screen-6)" data-screen="6">
+        <div class="card-header" onclick="toggleScreen(this)">
+          <span class="screen-num" style="background: var(--screen-6)">6</span>
+          <h2 style="font-size: 15px; font-weight: 700;">통계 대시보드</h2>
+          <span class="screen-toggle">&#9654;</span>
+        </div>
+        <div class="card-body">
+          <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 16px;">
+            소스별 수집 통계, 파이프라인 성공률, 응답 시간 추이 등을 차트로 시각화하는 화면. 통계 집계만 수행하므로 읽기 전용입니다.
+          </p>
+          <div class="screen-grid">
+            <div class="screen-section">
+              <h4>기능 리스트</h4>
+              <ul>
+                <li>소스별 건수 차트 (일별/주별)</li>
+                <li>파이프라인 성공률 (APEX/Kanana/Claude)</li>
+                <li>응답 시간 추이 (총 소요시간, 모델 로드/추론)</li>
+                <li>필터링 효율 (수집 vs 통과 vs 전송 비율)</li>
+              </ul>
+            </div>
+            <div class="screen-section">
+              <h4>연결 모듈 (Python 블럭)</h4>
+              <p style="font-size: 11px; color: var(--text-muted); padding: 8px 0;">직접 호출하는 모듈 없음 (통계 집계용 DB 직접 조회)</p>
+            </div>
+            <div class="screen-section">
+              <h4>연결 테이블</h4>
+              <div>
+                <span class="tag tag-table">processed_items</span>
+                <span class="tag tag-table">run_history</span>
+              </div>
+            </div>
+            <div class="screen-section">
+              <h4>데이터 흐름 방향</h4>
+              <div class="flow-direction">
+                <div class="flow-item"><code class="mono" style="font-size:10px">processed_items</code> <span class="flow-arrow read">&larr;</span> <span class="tag tag-read">R</span></div>
+                <div class="flow-item"><code class="mono" style="font-size:10px">run_history</code> <span class="flow-arrow read">&larr;</span> <span class="tag tag-read">R</span></div>
+              </div>
+              <p style="font-size: 10px; color: var(--text-secondary); margin-top: 6px;">GROUP BY source, 날짜별 집계, pipeline_path 분석</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 화면 7: 설정 -->
+      <div class="screen-card card" style="--screen-color: var(--screen-7)" data-screen="7">
+        <div class="card-header" onclick="toggleScreen(this)">
+          <span class="screen-num" style="background: var(--screen-7)">7</span>
+          <h2 style="font-size: 15px; font-weight: 700;">설정 (Settings)</h2>
+          <span class="screen-toggle">&#9654;</span>
+        </div>
+        <div class="card-body">
+          <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 16px;">
+            소스 ON/OFF, 필터 임계값, 실행 제한 등 봇 설정을 관리하는 화면. 설정값을 읽고 변경합니다.
+          </p>
+          <div class="screen-grid">
+            <div class="screen-section">
+              <h4>기능 리스트</h4>
+              <ul>
+                <li>소스 ON/OFF 토글 (12개 소스 각각)</li>
+                <li>필터 임계값 조정 (HN min_points, Reddit min_upvotes)</li>
+                <li>MAX_ITEMS_PER_RUN 조정</li>
+                <li>ALLOW_TIER1_OVERFLOW 토글</li>
+                <li>YOUNG_THRESHOLD_HOURS 조정</li>
+              </ul>
+            </div>
+            <div class="screen-section">
+              <h4>연결 모듈 (Python 블럭)</h4>
+              <div>
+                <span class="tag tag-module">Filter (#7)</span>
+              </div>
+              <p style="font-size: 10px; color: var(--text-secondary); margin-top: 6px;">Filter 블럭이 다음 실행 시 변경된 설정값을 읽어 반영</p>
+            </div>
+            <div class="screen-section">
+              <h4>연결 테이블</h4>
+              <div>
+                <span class="tag tag-table">filter_config</span>
+              </div>
+            </div>
+            <div class="screen-section">
+              <h4>데이터 흐름 방향</h4>
+              <div class="flow-direction">
+                <div class="flow-item"><code class="mono" style="font-size:10px">filter_config</code> <span class="flow-arrow rw">&harr;</span> <span class="tag tag-rw">RW</span></div>
+              </div>
+              <p style="font-size: 10px; color: var(--text-secondary); margin-top: 6px;">읽기: 현재 설정 표시 / 쓰기: 사용자 변경 값 UPDATE</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- 5. 시각적 연결 맵 -->
+    <section id="connection-viz" class="card">
+      <div class="card-header"><h2>3. 시각적 연결 맵 — 화면 &rarr; 모듈 &rarr; 테이블</h2></div>
+      <div class="card-body">
+        <div class="legend">
+          <div class="legend-item"><div class="legend-swatch" style="background:#d1fae5"></div> <span>R = 읽기</span></div>
+          <div class="legend-item"><div class="legend-swatch" style="background:#ffedd5"></div> <span>W = 쓰기</span></div>
+          <div class="legend-item"><div class="legend-swatch" style="background:#dbeafe"></div> <span>RW = 읽기+쓰기</span></div>
+          <div class="legend-item" style="font-size:10px; color: var(--text-muted);">화면 클릭 시 관련 테이블/모듈 하이라이트</div>
+        </div>
+
+        <div class="full-map-container">
+          <div class="full-map-cols">
+            <!-- 화면 열 -->
+            <div class="map-col">
+              <div class="map-col-title">Flutter 화면</div>
+              <div class="map-item" style="border-left: 3px solid var(--screen-1)" data-map-screen="1" onclick="highlightConnections(1)">1. 홈</div>
+              <div class="map-item" style="border-left: 3px solid var(--screen-2)" data-map-screen="2" onclick="highlightConnections(2)">2. 날짜별 뉴스</div>
+              <div class="map-item" style="border-left: 3px solid var(--screen-3)" data-map-screen="3" onclick="highlightConnections(3)">3. 구독자 관리</div>
+              <div class="map-item" style="border-left: 3px solid var(--screen-4)" data-map-screen="4" onclick="highlightConnections(4)">4. 실행 이력</div>
+              <div class="map-item" style="border-left: 3px solid var(--screen-5)" data-map-screen="5" onclick="highlightConnections(5)">5. 오류/헬스체크</div>
+              <div class="map-item" style="border-left: 3px solid var(--screen-6)" data-map-screen="6" onclick="highlightConnections(6)">6. 통계 대시보드</div>
+              <div class="map-item" style="border-left: 3px solid var(--screen-7)" data-map-screen="7" onclick="highlightConnections(7)">7. 설정</div>
+            </div>
+
+            <!-- 화살표 열 -->
+            <div class="map-col" style="flex:0.3; justify-content: center; align-items: center; padding-top: 30px;">
+              <div style="font-size: 20px; color: var(--text-muted); writing-mode: vertical-lr; text-align: center; letter-spacing: 8px;">&rarr;&rarr;&rarr;&rarr;&rarr;&rarr;&rarr;</div>
+            </div>
+
+            <!-- 모듈 열 -->
+            <div class="map-col">
+              <div class="map-col-title">Python 블럭</div>
+              <div class="map-item" data-map-module="1" style="border-left: 3px solid #94a3b8">1. ConfigLoader</div>
+              <div class="map-item" data-map-module="2" style="border-left: 3px solid #94a3b8">2. MemoryGuard</div>
+              <div class="map-item" data-map-module="3" style="border-left: 3px solid var(--screen-3)">3. SubscriberPoller</div>
+              <div class="map-item" data-map-module="4" style="border-left: 3px solid #94a3b8">4. Fetcher</div>
+              <div class="map-item" data-map-module="5" style="border-left: 3px solid #94a3b8">5. Dedup</div>
+              <div class="map-item" data-map-module="6" style="border-left: 3px solid #94a3b8">6. LanguageDetector</div>
+              <div class="map-item" data-map-module="7" style="border-left: 3px solid var(--screen-7)">7. Filter</div>
+              <div class="map-item" data-map-module="8" style="border-left: 3px solid #94a3b8">8. ModelEngine</div>
+              <div class="map-item" data-map-module="9" style="border-left: 3px solid #94a3b8">9. Summarizer</div>
+              <div class="map-item" data-map-module="10" style="border-left: 3px solid #94a3b8">10. Translator</div>
+              <div class="map-item" data-map-module="11" style="border-left: 3px solid var(--screen-2)">11. HotNewsDetector</div>
+              <div class="map-item" data-map-module="12" style="border-left: 3px solid #94a3b8">12. MessageFormatter</div>
+              <div class="map-item" data-map-module="13" style="border-left: 3px solid #94a3b8">13. TelegramSender</div>
+              <div class="map-item" data-map-module="14" style="border-left: 3px solid var(--screen-4)">14. RunLogger</div>
+              <div class="map-item" data-map-module="15" style="border-left: 3px solid var(--screen-5)">15. ErrorNotifier</div>
+              <div class="map-item" data-map-module="16" style="border-left: 3px solid #94a3b8">16. DataCleaner</div>
+              <div class="map-item" data-map-module="17" style="border-left: 3px solid var(--screen-5)">17. HealthChecker</div>
+            </div>
+
+            <!-- 화살표 열 -->
+            <div class="map-col" style="flex:0.3; justify-content: center; align-items: center; padding-top: 30px;">
+              <div style="font-size: 20px; color: var(--text-muted); writing-mode: vertical-lr; text-align: center; letter-spacing: 8px;">&rarr;&rarr;&rarr;&rarr;&rarr;&rarr;&rarr;</div>
+            </div>
+
+            <!-- 테이블 열 -->
+            <div class="map-col">
+              <div class="map-col-title">SQLite 테이블</div>
+              <div class="map-item" data-map-table="processed_items" style="border-left: 3px solid var(--color-rw)">processed_items</div>
+              <div class="map-item" data-map-table="hot_news" style="border-left: 3px solid var(--color-rw)">hot_news</div>
+              <div class="map-item" data-map-table="subscribers" style="border-left: 3px solid var(--color-rw)">subscribers</div>
+              <div class="map-item" data-map-table="run_history" style="border-left: 3px solid var(--color-rw)">run_history</div>
+              <div class="map-item" data-map-table="error_log" style="border-left: 3px solid var(--color-rw)">error_log</div>
+              <div class="map-item" data-map-table="filter_config" style="border-left: 3px solid var(--color-rw)">filter_config</div>
+              <div class="map-item" data-map-table="health_check_results" style="border-left: 3px solid var(--color-rw)">health_check_results</div>
+            </div>
+          </div>
+        </div>
+        <p class="interactive-hint">화면 이름을 클릭하면 관련 모듈과 테이블이 하이라이트됩니다. 다시 클릭하면 해제됩니다.</p>
+      </div>
+    </section>
+
+    <!-- 6. 화면-테이블 매트릭스 -->
+    <section id="screen-table-matrix" class="card">
+      <div class="card-header"><h2>4. 화면-테이블 데이터 흐름 매트릭스</h2></div>
+      <div class="card-body">
+        <div class="legend">
+          <div class="legend-item"><div class="legend-swatch" style="background:#d1fae5"></div> <span>R = 읽기 (SELECT)</span></div>
+          <div class="legend-item"><div class="legend-swatch" style="background:#ffedd5"></div> <span>W = 쓰기 (INSERT/UPDATE/DELETE)</span></div>
+          <div class="legend-item"><div class="legend-swatch" style="background:#dbeafe"></div> <span>RW = 읽기+쓰기</span></div>
+          <div class="legend-item"><span style="color: var(--text-muted)">- = 연결 없음</span></div>
+        </div>
+        <div class="matrix-wrapper">
+          <table class="matrix-table">
+            <thead>
+              <tr>
+                <th style="text-align:left">화면</th>
+                <th><code>processed<br>_items</code></th>
+                <th><code>hot<br>_news</code></th>
+                <th><code>sub<br>scribers</code></th>
+                <th><code>run<br>_history</code></th>
+                <th><code>error<br>_log</code></th>
+                <th><code>filter<br>_config</code></th>
+                <th><code>health_check<br>_results</code></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th style="color: var(--screen-1)">1. 홈</th>
+                <td class="cell-r" data-tooltip="오늘 전송 건수 집계 (telegram_sent=1, today)">R</td>
+                <td class="cell-none">-</td>
+                <td class="cell-r" data-tooltip="구독자 수 COUNT (pending/approved)">R</td>
+                <td class="cell-r" data-tooltip="마지막 실행 시각, 성공/실패 상태">R</td>
+                <td class="cell-r" data-tooltip="최근 에러 요약 (최근 N건)">R</td>
+                <td class="cell-none">-</td>
+                <td class="cell-none">-</td>
+              </tr>
+              <tr>
+                <th style="color: var(--screen-2)">2. 날짜별 뉴스</th>
+                <td class="cell-rw" data-tooltip="뉴스 브라우징 (R) + is_hot 토글 UPDATE (W)">RW</td>
+                <td class="cell-rw" data-tooltip="핫뉴스 목록 조회 (R) + INSERT/DELETE (W)">RW</td>
+                <td class="cell-none">-</td>
+                <td class="cell-none">-</td>
+                <td class="cell-none">-</td>
+                <td class="cell-none">-</td>
+                <td class="cell-none">-</td>
+              </tr>
+              <tr>
+                <th style="color: var(--screen-3)">3. 구독자 관리</th>
+                <td class="cell-none">-</td>
+                <td class="cell-none">-</td>
+                <td class="cell-rw" data-tooltip="구독자 조회/검색 (R) + 승인/거부/삭제 (W)">RW</td>
+                <td class="cell-none">-</td>
+                <td class="cell-none">-</td>
+                <td class="cell-none">-</td>
+                <td class="cell-none">-</td>
+              </tr>
+              <tr>
+                <th style="color: var(--screen-4)">4. 실행 이력</th>
+                <td class="cell-none">-</td>
+                <td class="cell-none">-</td>
+                <td class="cell-none">-</td>
+                <td class="cell-r" data-tooltip="실행 결과 리스트, 건수, 소요시간, 에러메시지">R</td>
+                <td class="cell-none">-</td>
+                <td class="cell-none">-</td>
+                <td class="cell-none">-</td>
+              </tr>
+              <tr>
+                <th style="color: var(--screen-5)">5. 오류/헬스체크</th>
+                <td class="cell-none">-</td>
+                <td class="cell-none">-</td>
+                <td class="cell-none">-</td>
+                <td class="cell-none">-</td>
+                <td class="cell-r" data-tooltip="에러 목록 조회, 심각도별 필터">R</td>
+                <td class="cell-none">-</td>
+                <td class="cell-r" data-tooltip="헬스체크 결과 리포트 조회">R</td>
+              </tr>
+              <tr>
+                <th style="color: var(--screen-6)">6. 통계 대시보드</th>
+                <td class="cell-r" data-tooltip="소스별 건수 GROUP BY, 필터링 효율">R</td>
+                <td class="cell-none">-</td>
+                <td class="cell-none">-</td>
+                <td class="cell-r" data-tooltip="성공률, 응답 시간, 모델 로드/추론 추이">R</td>
+                <td class="cell-none">-</td>
+                <td class="cell-none">-</td>
+                <td class="cell-none">-</td>
+              </tr>
+              <tr>
+                <th style="color: var(--screen-7)">7. 설정</th>
+                <td class="cell-none">-</td>
+                <td class="cell-none">-</td>
+                <td class="cell-none">-</td>
+                <td class="cell-none">-</td>
+                <td class="cell-none">-</td>
+                <td class="cell-rw" data-tooltip="소스 ON/OFF, 임계값, 최대건수, 오버플로우 등 읽기+수정">RW</td>
+                <td class="cell-none">-</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="interactive-hint">셀 위에 마우스를 올리면 상세 설명을 확인할 수 있습니다.</p>
+      </div>
+    </section>
+
+    <!-- 7. 모듈-테이블 매트릭스 -->
+    <section id="module-table-matrix" class="card">
+      <div class="card-header"><h2>5. 모듈-테이블 데이터 흐름 매트릭스</h2></div>
+      <div class="card-body">
+        <div class="legend">
+          <div class="legend-item"><div class="legend-swatch" style="background:#d1fae5"></div> <span>R = 읽기</span></div>
+          <div class="legend-item"><div class="legend-swatch" style="background:#ffedd5"></div> <span>W = 쓰기</span></div>
+          <div class="legend-item"><div class="legend-swatch" style="background:#dbeafe"></div> <span>RW = 읽기+쓰기</span></div>
+          <div class="legend-item"><span style="color: var(--text-muted)">- = 연결 없음</span></div>
+        </div>
+        <div class="matrix-wrapper">
+          <table class="matrix-table">
+            <thead>
+              <tr>
+                <th style="text-align:left">모듈 (Python 블럭)</th>
+                <th><code>processed<br>_items</code></th>
+                <th><code>hot<br>_news</code></th>
+                <th><code>sub<br>scribers</code></th>
+                <th><code>run<br>_history</code></th>
+                <th><code>error<br>_log</code></th>
+                <th><code>filter<br>_config</code></th>
+                <th><code>health_check<br>_results</code></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th>1. ConfigLoader</th>
+                <td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td>
+              </tr>
+              <tr>
+                <th>2. MemoryGuard</th>
+                <td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td>
+              </tr>
+              <tr>
+                <th>3. SubscriberPoller</th>
+                <td class="cell-none">-</td>
+                <td class="cell-none">-</td>
+                <td class="cell-w" data-tooltip="getUpdates로 수신한 /start 요청을 pending 상태로 INSERT">W</td>
+                <td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td>
+              </tr>
+              <tr>
+                <th>4. Fetcher</th>
+                <td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td>
+              </tr>
+              <tr>
+                <th>5. Dedup</th>
+                <td class="cell-rw" data-tooltip="해시 체크 (R) + 신규 아이템 해시 저장 (W)">RW</td>
+                <td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td>
+              </tr>
+              <tr>
+                <th>6. LanguageDetector</th>
+                <td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td>
+              </tr>
+              <tr>
+                <th>7. Filter</th>
+                <td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td>
+                <td class="cell-r" data-tooltip="소스 ON/OFF, 임계값, MAX_ITEMS 등 설정 읽기">R</td>
+                <td class="cell-none">-</td>
+              </tr>
+              <tr>
+                <th>8. ModelEngine</th>
+                <td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td>
+              </tr>
+              <tr>
+                <th>9. Summarizer</th>
+                <td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td>
+              </tr>
+              <tr>
+                <th>10. Translator</th>
+                <td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td>
+              </tr>
+              <tr>
+                <th>11. HotNewsDetector</th>
+                <td class="cell-w" data-tooltip="is_hot 플래그 UPDATE">W</td>
+                <td class="cell-w" data-tooltip="핫뉴스 판정 시 hot_news 테이블에 INSERT">W</td>
+                <td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td>
+              </tr>
+              <tr>
+                <th>12. MessageFormatter</th>
+                <td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td>
+              </tr>
+              <tr>
+                <th>13. TelegramSender</th>
+                <td class="cell-w" data-tooltip="전송 완료 후 telegram_sent=1 UPDATE">W</td>
+                <td class="cell-none">-</td>
+                <td class="cell-r" data-tooltip="approved 상태 구독자의 chat_id 목록 읽기">R</td>
+                <td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td>
+              </tr>
+              <tr>
+                <th>14. RunLogger</th>
+                <td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td>
+                <td class="cell-w" data-tooltip="매 실행 결과 (건수, 소요시간, 상태) INSERT">W</td>
+                <td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td>
+              </tr>
+              <tr>
+                <th>15. ErrorNotifier</th>
+                <td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td>
+                <td class="cell-w" data-tooltip="에러 발생 시 error_log 테이블에 INSERT">W</td>
+                <td class="cell-none">-</td><td class="cell-none">-</td>
+              </tr>
+              <tr>
+                <th>16. DataCleaner</th>
+                <td class="cell-w" data-tooltip="30일 초과 데이터 DELETE">W</td>
+                <td class="cell-none" data-tooltip="영구 보관 (정리 대상 아님)">-</td>
+                <td class="cell-none">-</td>
+                <td class="cell-w" data-tooltip="90일 초과 데이터 DELETE">W</td>
+                <td class="cell-w" data-tooltip="30일 초과 데이터 DELETE">W</td>
+                <td class="cell-none">-</td>
+                <td class="cell-w" data-tooltip="7일 초과 데이터 DELETE">W</td>
+              </tr>
+              <tr>
+                <th>17. HealthChecker</th>
+                <td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td><td class="cell-none">-</td>
+                <td class="cell-w" data-tooltip="헬스체크 실행 결과 INSERT">W</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="interactive-hint">셀 위에 마우스를 올리면 상세 설명을 확인할 수 있습니다.</p>
+      </div>
+    </section>
+
+    <!-- 8. 누락 연결 점검 -->
+    <section id="missing-check" class="card">
+      <div class="card-header"><h2>6. 누락 연결 점검</h2></div>
+      <div class="card-body">
+        <div class="check-grid">
+          <div class="check-box">
+            <h4>Flutter 화면에서 참조하지 않는 모듈</h4>
+            <div class="check-item check-ok"><span>1. ConfigLoader</span> — 정상: Python 내부 전용 (초기화)</div>
+            <div class="check-item check-ok"><span>2. MemoryGuard</span> — 정상: Python 내부 전용 (메모리 체크)</div>
+            <div class="check-item check-ok"><span>4. Fetcher</span> — 정상: Python 내부 전용 (데이터 수집)</div>
+            <div class="check-item check-ok"><span>5. Dedup</span> — 정상: Python 내부 전용 (중복 제거)</div>
+            <div class="check-item check-ok"><span>6. LanguageDetector</span> — 정상: Python 내부 전용 (언어 감지)</div>
+            <div class="check-item check-ok"><span>8. ModelEngine</span> — 정상: Python 내부 전용 (LLM 엔진)</div>
+            <div class="check-item check-ok"><span>9. Summarizer</span> — 정상: Python 내부 전용 (요약)</div>
+            <div class="check-item check-ok"><span>10. Translator</span> — 정상: Python 내부 전용 (번역)</div>
+            <div class="check-item check-ok"><span>12. MessageFormatter</span> — 정상: Python 내부 전용 (포맷팅)</div>
+            <div class="check-item check-ok"><span>13. TelegramSender</span> — 정상: Python 내부 전용 (전송)</div>
+            <div class="check-item check-ok"><span>16. DataCleaner</span> — 정상: Python 내부 전용 (데이터 정리)</div>
+            <p style="font-size: 10px; color: var(--text-secondary); margin-top: 8px;">위 11개 모듈은 Python 파이프라인 내부에서만 동작하므로 Flutter 화면 연결 없음이 정상입니다.</p>
+          </div>
+          <div class="check-box">
+            <h4>Flutter 화면에서 참조하는 모듈</h4>
+            <div class="check-item check-info"><span>3. SubscriberPoller</span> — 화면 3 (구독자 관리) 데이터 소스</div>
+            <div class="check-item check-info"><span>7. Filter</span> — 화면 7 (설정) 설정 반영 대상</div>
+            <div class="check-item check-info"><span>11. HotNewsDetector</span> — 화면 2 (날짜별 뉴스) 판단 기준 참조</div>
+            <div class="check-item check-info"><span>14. RunLogger</span> — 화면 4 (실행 이력) 데이터 소스</div>
+            <div class="check-item check-info"><span>15. ErrorNotifier</span> — 화면 5 (오류 로그) 데이터 소스</div>
+            <div class="check-item check-info"><span>17. HealthChecker</span> — 화면 5 (헬스체크) 직접 실행 트리거</div>
+          </div>
+          <div class="check-box">
+            <h4>사용되지 않는 테이블 점검</h4>
+            <p style="font-size: 11px; color: var(--color-read); font-weight: 600; padding: 8px 0;">모든 테이블이 하나 이상의 화면과 연결되어 있습니다.</p>
+            <div class="check-item check-ok"><code>processed_items</code> — 화면 1, 2, 6</div>
+            <div class="check-item check-ok"><code>hot_news</code> — 화면 2</div>
+            <div class="check-item check-ok"><code>subscribers</code> — 화면 1, 3</div>
+            <div class="check-item check-ok"><code>run_history</code> — 화면 1, 4, 6</div>
+            <div class="check-item check-ok"><code>error_log</code> — 화면 1, 5</div>
+            <div class="check-item check-ok"><code>filter_config</code> — 화면 7</div>
+            <div class="check-item check-ok"><code>health_check_results</code> — 화면 5</div>
+          </div>
+          <div class="check-box">
+            <h4>연결 특이사항</h4>
+            <div class="check-item check-warn"><strong>화면 5 (헬스체크)</strong>: HealthChecker를 Python subprocess로 직접 실행 — Flutter &rarr; Python 직접 트리거 (유일한 subprocess 호출)</div>
+            <div class="check-item check-warn"><strong>화면 1 (홈)</strong>: 다음 실행 시간은 DB가 아닌 launchd plist 스케줄 기반 코드 로직으로 계산</div>
+            <div class="check-item check-info"><strong>화면 2 (날짜별 뉴스)</strong>: 핫뉴스 토글 시 processed_items + hot_news 2개 테이블 동시 변경 (트랜잭션 필요)</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9. 데이터 보관 정책 -->
+    <section id="retention" class="card">
+      <div class="card-header"><h2>7. 데이터 보관 정책 요약</h2></div>
+      <div class="card-body">
+        <table class="retention-table">
+          <thead>
+            <tr>
+              <th>테이블</th>
+              <th>보관 기간</th>
+              <th>정리 블럭</th>
+              <th>정리 방식</th>
+              <th>관련 화면</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code class="mono">processed_items</code></td>
+              <td><span class="retention-badge ret-30d">30일</span></td>
+              <td><span class="tag tag-module">DataCleaner (#16)</span></td>
+              <td>30일 초과 레코드 DELETE</td>
+              <td>화면 1, 2, 6</td>
+            </tr>
+            <tr>
+              <td><code class="mono">hot_news</code></td>
+              <td><span class="retention-badge ret-permanent">영구</span></td>
+              <td><span style="color: var(--text-muted); font-size: 11px;">정리 대상 아님</span></td>
+              <td>-</td>
+              <td>화면 2</td>
+            </tr>
+            <tr>
+              <td><code class="mono">subscribers</code></td>
+              <td><span class="retention-badge ret-permanent">영구</span></td>
+              <td><span style="color: var(--text-muted); font-size: 11px;">정리 대상 아님</span></td>
+              <td>수동 삭제만 (화면 3)</td>
+              <td>화면 1, 3</td>
+            </tr>
+            <tr>
+              <td><code class="mono">run_history</code></td>
+              <td><span class="retention-badge ret-90d">90일</span></td>
+              <td><span class="tag tag-module">DataCleaner (#16)</span></td>
+              <td>90일 초과 레코드 DELETE</td>
+              <td>화면 1, 4, 6</td>
+            </tr>
+            <tr>
+              <td><code class="mono">error_log</code></td>
+              <td><span class="retention-badge ret-30d">30일</span></td>
+              <td><span class="tag tag-module">DataCleaner (#16)</span></td>
+              <td>30일 초과 레코드 DELETE</td>
+              <td>화면 1, 5</td>
+            </tr>
+            <tr>
+              <td><code class="mono">filter_config</code></td>
+              <td><span class="retention-badge ret-permanent">영구</span></td>
+              <td><span style="color: var(--text-muted); font-size: 11px;">정리 대상 아님</span></td>
+              <td>설정값, 삭제 불필요</td>
+              <td>화면 7</td>
+            </tr>
+            <tr>
+              <td><code class="mono">health_check_results</code></td>
+              <td><span class="retention-badge ret-7d">7일</span></td>
+              <td><span class="tag tag-module">DataCleaner (#16)</span></td>
+              <td>7일 초과 레코드 DELETE</td>
+              <td>화면 5</td>
+            </tr>
+          </tbody>
+        </table>
+        <p style="font-size: 10.5px; color: var(--text-secondary); margin-top: 12px;">
+          DataCleaner (#16)는 매시 정각 파이프라인 실행 시 마지막 단계에서 자동 실행되어 만료 데이터를 정리합니다.
+          영구 보관 테이블 (hot_news, subscribers, filter_config)은 DataCleaner의 정리 대상에서 제외됩니다.
+        </p>
+      </div>
+    </section>
+
+    <!-- 푸터 -->
+    <footer class="footer">
+      <p>news-pulse Page-Feature-Module-ERD 연결 맵 | 생성일: 2026-04-08</p>
+      <p style="margin-top: 4px;">Flutter macOS 7화면 &times; Python 17블럭 &times; SQLite 7테이블 | 통신: SQLite WAL 직접 접근 (API 서버 없음)</p>
+    </footer>
+
+  </div>
+
+  <script>
+    // 화면 카드 접기/펼치기
+    function toggleScreen(header) {
+      const card = header.closest('.screen-card');
+      card.classList.toggle('open');
+    }
+
+    // 연결 맵 하이라이트 데이터
+    const connectionData = {
+      1: { modules: [], tables: ['processed_items', 'run_history', 'error_log', 'subscribers'] },
+      2: { modules: [11], tables: ['processed_items', 'hot_news'] },
+      3: { modules: [3], tables: ['subscribers'] },
+      4: { modules: [14], tables: ['run_history'] },
+      5: { modules: [15, 17], tables: ['error_log', 'health_check_results'] },
+      6: { modules: [], tables: ['processed_items', 'run_history'] },
+      7: { modules: [7], tables: ['filter_config'] }
+    };
+
+    let activeScreen = null;
+
+    function highlightConnections(screenNum) {
+      const allItems = document.querySelectorAll('.full-map-container .map-item');
+
+      // 같은 화면 다시 클릭 시 해제
+      if (activeScreen === screenNum) {
+        activeScreen = null;
+        allItems.forEach(item => {
+          item.classList.remove('dimmed', 'active');
+        });
+        return;
+      }
+
+      activeScreen = screenNum;
+      const conn = connectionData[screenNum];
+
+      allItems.forEach(item => {
+        item.classList.remove('active');
+        item.classList.add('dimmed');
+      });
+
+      // 클릭한 화면 하이라이트
+      const screenItem = document.querySelector(`[data-map-screen="${screenNum}"]`);
+      if (screenItem) {
+        screenItem.classList.remove('dimmed');
+        screenItem.classList.add('active');
+      }
+
+      // 연결된 모듈 하이라이트
+      conn.modules.forEach(modNum => {
+        const modItem = document.querySelector(`[data-map-module="${modNum}"]`);
+        if (modItem) {
+          modItem.classList.remove('dimmed');
+          modItem.classList.add('active');
+        }
+      });
+
+      // 연결된 테이블 하이라이트
+      conn.tables.forEach(tableName => {
+        const tableItem = document.querySelector(`[data-map-table="${tableName}"]`);
+        if (tableItem) {
+          tableItem.classList.remove('dimmed');
+          tableItem.classList.add('active');
+        }
+      });
+
+      // 해당 화면 카드로 스크롤 + 하이라이트
+      const screenCard = document.querySelector(`.screen-card[data-screen="${screenNum}"]`);
+      if (screenCard) {
+        screenCard.classList.add('open');
+        screenCard.classList.add('highlight-pulse');
+        setTimeout(() => screenCard.classList.remove('highlight-pulse'), 2000);
+      }
+    }
+
+    // 첫 번째 화면 카드만 열린 상태로 시작
+    document.addEventListener('DOMContentLoaded', () => {
+      const firstCard = document.querySelector('.screen-card');
+      if (firstCard) firstCard.classList.add('open');
+    });
+  </script>
+</body>
+</html>
