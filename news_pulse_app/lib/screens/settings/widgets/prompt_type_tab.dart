@@ -43,12 +43,12 @@ class _PromptTypeTabState extends ConsumerState<PromptTypeTab> {
             return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [
                 Text(active != null ? 'v${active.version} (활성)' : '버전 없음',
-                    style: const TextStyle(color: AppColors.textSecondary, fontSize: 11)),
+                    style: TextStyle(color: AppColors.textSecondary, fontSize: 11)),
                 const Spacer(),
                 if (!_editMode)
                   TextButton(
                     onPressed: () => setState(() => _editMode = true),
-                    child: const Text('편집', style: TextStyle(color: AppColors.accent, fontSize: 12)),
+                    child: Text('편집', style: TextStyle(color: AppColors.accent, fontSize: 12)),
                   ),
               ]),
               const SizedBox(height: 4),
@@ -56,7 +56,7 @@ class _PromptTypeTabState extends ConsumerState<PromptTypeTab> {
                 controller: widget.controller,
                 enabled: _editMode,
                 maxLines: 4,
-                style: const TextStyle(color: AppColors.textPrimary, fontSize: 12, fontFamily: 'monospace'),
+                style: TextStyle(color: AppColors.textPrimary, fontSize: 12, fontFamily: 'monospace'),
                 decoration: const InputDecoration(isDense: true),
               ),
               if (_editMode)
@@ -70,17 +70,17 @@ class _PromptTypeTabState extends ConsumerState<PromptTypeTab> {
                     const SizedBox(width: 8),
                     TextButton(
                       onPressed: () => setState(() => _editMode = false),
-                      child: const Text('취소', style: TextStyle(color: AppColors.textMuted, fontSize: 12)),
+                      child: Text('취소', style: TextStyle(color: AppColors.textMuted, fontSize: 12)),
                     ),
                   ]),
                 ),
             ]);
           },
           loading: () => const SizedBox(height: 32, child: Center(child: CircularProgressIndicator(strokeWidth: 2))),
-          error: (e, _) => Text('오류: $e', style: const TextStyle(color: AppColors.error, fontSize: 11)),
+          error: (e, _) => Text('오류: $e', style: TextStyle(color: AppColors.error, fontSize: 11)),
         ),
         const SizedBox(height: 8),
-        const Divider(color: AppColors.border),
+        Divider(color: AppColors.border),
         // 버전 이력 목록
         Expanded(
           child: versionsAsync.when(
@@ -91,20 +91,20 @@ class _PromptTypeTabState extends ConsumerState<PromptTypeTab> {
                 return ListTile(
                   dense: true,
                   title: Text('v${v.version}',
-                      style: const TextStyle(color: AppColors.textPrimary, fontSize: 12)),
+                      style: TextStyle(color: AppColors.textPrimary, fontSize: 12)),
                   subtitle: Text(v.createdAt,
-                      style: const TextStyle(color: AppColors.textMuted, fontSize: 10)),
+                      style: TextStyle(color: AppColors.textMuted, fontSize: 10)),
                   trailing: v.isActive
-                      ? const Text('활성', style: TextStyle(color: AppColors.success, fontSize: 11))
+                      ? Text('활성', style: TextStyle(color: AppColors.success, fontSize: 11))
                       : TextButton(
                           onPressed: () => _activate(context, v),
-                          child: const Text('활성화', style: TextStyle(color: AppColors.accent, fontSize: 11)),
+                          child: Text('활성화', style: TextStyle(color: AppColors.accent, fontSize: 11)),
                         ),
                 );
               },
             ),
             loading: () => const Center(child: CircularProgressIndicator(strokeWidth: 2)),
-            error: (e, _) => Text('오류: $e', style: const TextStyle(color: AppColors.error, fontSize: 11)),
+            error: (e, _) => Text('오류: $e', style: TextStyle(color: AppColors.error, fontSize: 11)),
           ),
         ),
       ]),
@@ -123,7 +123,7 @@ class _PromptTypeTabState extends ConsumerState<PromptTypeTab> {
         setState(() => _editMode = false);
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('새 버전이 저장되고 활성화되었습니다',
+            SnackBar(content: Text('새 버전이 저장되고 활성화되었습니다',
                 style: TextStyle(color: AppColors.textPrimary))),
           );
         }

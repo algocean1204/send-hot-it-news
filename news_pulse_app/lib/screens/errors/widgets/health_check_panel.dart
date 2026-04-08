@@ -56,19 +56,19 @@ class HealthCheckPanel extends ConsumerWidget {
               const Spacer(),
               IconButton(
                 onPressed: () => ref.invalidate(latestHealthResultsProvider),
-                icon: const Icon(Icons.refresh, size: 16, color: AppColors.textSecondary),
+                icon: Icon(Icons.refresh, size: 16, color: AppColors.textSecondary),
                 tooltip: '새로고침',
               ),
             ],
           ),
         ),
-        const Divider(color: AppColors.border, height: 1),
+        Divider(color: AppColors.border, height: 1),
         // 헬스체크 결과 목록
         Expanded(
           child: resultsAsync.when(
             data: (results) {
               if (results.isEmpty) {
-                return const Center(
+                return Center(
                   child: Text(
                     '헬스체크 결과가 없습니다\n상단 버튼으로 실행하세요',
                     textAlign: TextAlign.center,
@@ -87,7 +87,7 @@ class HealthCheckPanel extends ConsumerWidget {
             },
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (e, _) => Center(
-              child: Text('오류: $e', style: const TextStyle(color: AppColors.error)),
+              child: Text('오류: $e', style: TextStyle(color: AppColors.error)),
             ),
           ),
         ),

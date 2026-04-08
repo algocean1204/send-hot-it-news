@@ -43,7 +43,7 @@ class _KeywordChipInputState extends ConsumerState<KeywordChipInput> {
             // 등록된 키워드 Chip 목록
             keywordsAsync.when(
               data: (keywords) => keywords.isEmpty
-                  ? const Text('등록된 키워드가 없습니다',
+                  ? Text('등록된 키워드가 없습니다',
                       style: TextStyle(color: AppColors.textMuted, fontSize: 12))
                   : Wrap(
                       spacing: 8,
@@ -51,18 +51,18 @@ class _KeywordChipInputState extends ConsumerState<KeywordChipInput> {
                       children: keywords
                           .map((kw) => Chip(
                                 label: Text(kw.keyword,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                         color: AppColors.textPrimary, fontSize: 12)),
                                 backgroundColor: AppColors.surfaceSecondary,
-                                side: const BorderSide(color: AppColors.border),
-                                deleteIcon: const Icon(Icons.close, size: 14, color: AppColors.textMuted),
+                                side: BorderSide(color: AppColors.border),
+                                deleteIcon: Icon(Icons.close, size: 14, color: AppColors.textMuted),
                                 onDeleted: () => _delete(kw.id),
                               ))
                           .toList(),
                     ),
               loading: () => const SizedBox(
                   height: 24, child: Center(child: CircularProgressIndicator(strokeWidth: 2))),
-              error: (e, _) => Text('오류: $e', style: const TextStyle(color: AppColors.error)),
+              error: (e, _) => Text('오류: $e', style: TextStyle(color: AppColors.error)),
             ),
             const SizedBox(height: 12),
             // 키워드 입력 Row
@@ -70,7 +70,7 @@ class _KeywordChipInputState extends ConsumerState<KeywordChipInput> {
               Expanded(
                 child: TextField(
                   controller: _controller,
-                  style: const TextStyle(color: AppColors.textPrimary, fontSize: 13),
+                  style: TextStyle(color: AppColors.textPrimary, fontSize: 13),
                   decoration: const InputDecoration(
                     hintText: '키워드 입력 (예: llm, claude)',
                     isDense: true,

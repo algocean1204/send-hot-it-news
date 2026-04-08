@@ -16,9 +16,9 @@ class ExportTitleBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        const Icon(Icons.download_outlined, size: 18, color: AppColors.textSecondary),
+        Icon(Icons.download_outlined, size: 18, color: AppColors.textSecondary),
         const SizedBox(width: 8),
-        const Text(
+        Text(
           '마크다운 내보내기',
           style: TextStyle(
             color: AppColors.textPrimary,
@@ -29,7 +29,7 @@ class ExportTitleBar extends StatelessWidget {
         const Spacer(),
         IconButton(
           onPressed: onClose,
-          icon: const Icon(Icons.close, size: 18, color: AppColors.textSecondary),
+          icon: Icon(Icons.close, size: 18, color: AppColors.textSecondary),
           padding: EdgeInsets.zero,
           constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
         ),
@@ -58,7 +58,7 @@ class ExportDateRangeSelector extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           '날짜 범위',
           style: TextStyle(color: AppColors.textSecondary, fontSize: 12, fontWeight: FontWeight.w500),
         ),
@@ -66,8 +66,8 @@ class ExportDateRangeSelector extends StatelessWidget {
         Row(
           children: [
             Expanded(child: DateButton(label: startLabel, onTap: onStartTap)),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
               child: Text('~', style: TextStyle(color: AppColors.textSecondary)),
             ),
             Expanded(child: DateButton(label: endLabel, onTap: onEndTap)),
@@ -89,7 +89,7 @@ class ExportHotOnlyToggle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        const Expanded(
+        Expanded(
           child: Text(
             '핫뉴스만 내보내기',
             style: TextStyle(color: AppColors.textPrimary, fontSize: 13),
@@ -150,9 +150,9 @@ class DateButton extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.calendar_today, size: 13, color: AppColors.textSecondary),
+            Icon(Icons.calendar_today, size: 13, color: AppColors.textSecondary),
             const SizedBox(width: 6),
-            Text(label, style: const TextStyle(color: AppColors.textPrimary, fontSize: 12)),
+            Text(label, style: TextStyle(color: AppColors.textPrimary, fontSize: 12)),
           ],
         ),
       ),

@@ -38,6 +38,24 @@ class ConfigRepository {
     );
   }
 
+  /// 키-값 쌍을 삽입하거나 기존 값을 갱신한다 (INSERT OR REPLACE)
+  Future<void> upsert(String key, String value) async {
+    final exists = await _db.rawQuery(
+      "SELECT COUNT(*) AS c FROM ${Tables.filterConfig} WHERE key = ?",
+      [key],
+    );
+    final count = (exists.first['c'] as int?) ?? 0;
+    if (count > 0) {
+      await updateValue(key, value);
+    } else {
+      await _db.rawInsert(
+        "INSERT INTO ${Tables.filterConfig} (key, value, description) "
+        "VALUES (?, ?, '')",
+        [key, value],
+      );
+    }
+  }
+
   /// 맵 형태로 모든 설정을 반환한다 (key -> FilterConfig)
   Future<Map<String, FilterConfig>> getAllAsMap() async {
     final configs = await getAll();

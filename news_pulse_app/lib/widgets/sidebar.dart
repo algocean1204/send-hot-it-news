@@ -43,7 +43,7 @@ class AppSidebar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: kSidebarWidth,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColors.sidebarBg,
         border: Border(
           right: BorderSide(color: AppColors.border, width: 1),
@@ -54,7 +54,7 @@ class AppSidebar extends StatelessWidget {
         children: [
           // 앱 타이틀 영역
           _buildHeader(),
-          const Divider(color: AppColors.border, height: 1),
+          Divider(color: AppColors.border, height: 1),
           // 네비게이션 항목 목록
           Expanded(
             child: ListView(
@@ -93,7 +93,7 @@ class AppSidebar extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              const Text(
+              Text(
                 'news-pulse',
                 style: TextStyle(
                   color: AppColors.textPrimary,
@@ -104,7 +104,7 @@ class AppSidebar extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 4),
-          const Text(
+          Text(
             'macOS 대시보드',
             style: TextStyle(
               color: AppColors.textMuted,
@@ -161,10 +161,10 @@ class AppSidebar extends StatelessWidget {
   Widget _buildFooter() {
     return Container(
       padding: const EdgeInsets.all(12),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         border: Border(top: BorderSide(color: AppColors.border, width: 1)),
       ),
-      child: const Text(
+      child: Text(
         'v1.0.0',
         style: TextStyle(color: AppColors.textMuted, fontSize: 11),
       ),

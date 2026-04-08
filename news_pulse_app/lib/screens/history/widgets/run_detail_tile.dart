@@ -15,7 +15,7 @@ class RunDetailTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         border: Border(bottom: BorderSide(color: AppColors.border, width: 1)),
       ),
       child: Column(
@@ -33,7 +33,7 @@ class RunDetailTile extends StatelessWidget {
               const SizedBox(width: 8),
               Text(
                 run.startedAt,
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppColors.textPrimary,
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
@@ -45,7 +45,7 @@ class RunDetailTile extends StatelessWidget {
               const Spacer(),
               Text(
                 run.durationDisplay,
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppColors.textSecondary,
                   fontSize: 12,
                   fontFamily: 'monospace',
@@ -61,15 +61,15 @@ class RunDetailTile extends StatelessWidget {
               children: [
                 _countChip('수집', run.fetchedCount, AppColors.info),
                 const SizedBox(width: 8),
-                const Icon(Icons.arrow_right, size: 14, color: AppColors.textMuted),
+                Icon(Icons.arrow_right, size: 14, color: AppColors.textMuted),
                 const SizedBox(width: 8),
                 _countChip('필터', run.filteredCount, AppColors.accent),
                 const SizedBox(width: 8),
-                const Icon(Icons.arrow_right, size: 14, color: AppColors.textMuted),
+                Icon(Icons.arrow_right, size: 14, color: AppColors.textMuted),
                 const SizedBox(width: 8),
                 _countChip('요약', run.summarizedCount, AppColors.warning),
                 const SizedBox(width: 8),
-                const Icon(Icons.arrow_right, size: 14, color: AppColors.textMuted),
+                Icon(Icons.arrow_right, size: 14, color: AppColors.textMuted),
                 const SizedBox(width: 8),
                 _countChip('전송', run.sentCount, AppColors.success),
                 const SizedBox(width: 12),
@@ -86,14 +86,14 @@ class RunDetailTile extends StatelessWidget {
                 if (run.modelLoadMs != null)
                   Text(
                     '모델 로드: ${(run.modelLoadMs! / 1000).toStringAsFixed(1)}s',
-                    style: const TextStyle(color: AppColors.textMuted, fontSize: 11),
+                    style: TextStyle(color: AppColors.textMuted, fontSize: 11),
                   ),
                 if (run.modelLoadMs != null && run.inferenceMs != null)
-                  const Text('  ·  ', style: TextStyle(color: AppColors.textMuted)),
+                  Text('  ·  ', style: TextStyle(color: AppColors.textMuted)),
                 if (run.inferenceMs != null)
                   Text(
                     '추론: ${(run.inferenceMs! / 1000).toStringAsFixed(1)}s',
-                    style: const TextStyle(color: AppColors.textMuted, fontSize: 11),
+                    style: TextStyle(color: AppColors.textMuted, fontSize: 11),
                   ),
               ],
             ),
@@ -109,7 +109,7 @@ class RunDetailTile extends StatelessWidget {
               ),
               child: Text(
                 run.errorMessage!,
-                style: const TextStyle(color: AppColors.error, fontSize: 11),
+                style: TextStyle(color: AppColors.error, fontSize: 11),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -143,7 +143,7 @@ class RunDetailTile extends StatelessWidget {
       children: [
         Text(
           label,
-          style: const TextStyle(color: AppColors.textMuted, fontSize: 11),
+          style: TextStyle(color: AppColors.textMuted, fontSize: 11),
         ),
         const SizedBox(width: 3),
         Text(

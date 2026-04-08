@@ -20,7 +20,7 @@ class SourceToggleTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         border: Border(bottom: BorderSide(color: AppColors.border, width: 1)),
       ),
       child: Row(
@@ -32,7 +32,7 @@ class SourceToggleTile extends StatelessWidget {
               children: [
                 Text(
                   _formatSourceKey(config.key),
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.textPrimary,
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
@@ -41,7 +41,7 @@ class SourceToggleTile extends StatelessWidget {
                 if (config.description != null)
                   Text(
                     config.description!,
-                    style: const TextStyle(color: AppColors.textMuted, fontSize: 11),
+                    style: TextStyle(color: AppColors.textMuted, fontSize: 11),
                   ),
               ],
             ),

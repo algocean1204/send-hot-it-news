@@ -57,7 +57,7 @@ class _ThresholdSliderState extends State<ThresholdSlider> {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         border: Border(bottom: BorderSide(color: AppColors.border, width: 1)),
       ),
       child: Column(
@@ -72,7 +72,7 @@ class _ThresholdSliderState extends State<ThresholdSlider> {
                   children: [
                     Text(
                       _formatKey(widget.config.key),
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppColors.textPrimary,
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
@@ -81,7 +81,7 @@ class _ThresholdSliderState extends State<ThresholdSlider> {
                     if (widget.config.description != null)
                       Text(
                         widget.config.description!,
-                        style: const TextStyle(color: AppColors.textMuted, fontSize: 11),
+                        style: TextStyle(color: AppColors.textMuted, fontSize: 11),
                       ),
                   ],
                 ),
@@ -94,7 +94,7 @@ class _ThresholdSliderState extends State<ThresholdSlider> {
                   controller: _textController,
                   keyboardType: TextInputType.number,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: AppColors.textPrimary, fontSize: 13),
+                  style: TextStyle(color: AppColors.textPrimary, fontSize: 13),
                   decoration: const InputDecoration(
                     isDense: true,
                     contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
@@ -143,12 +143,12 @@ class _ThresholdSliderState extends State<ThresholdSlider> {
             children: [
               Text(
                 '${widget.min.toInt()}',
-                style: const TextStyle(color: AppColors.textMuted, fontSize: 10),
+                style: TextStyle(color: AppColors.textMuted, fontSize: 10),
               ),
               const Spacer(),
               Text(
                 '${widget.max.toInt()}',
-                style: const TextStyle(color: AppColors.textMuted, fontSize: 10),
+                style: TextStyle(color: AppColors.textMuted, fontSize: 10),
               ),
             ],
           ),

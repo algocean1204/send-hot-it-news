@@ -13,7 +13,7 @@ class FilterEfficiencyCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (runs.isEmpty) {
-      return const Center(child: Text('데이터 없음', style: TextStyle(color: AppColors.textMuted)));
+      return Center(child: Text('데이터 없음', style: TextStyle(color: AppColors.textMuted)));
     }
 
     // 최근 실행들의 평균 건수를 계산한다
@@ -32,7 +32,7 @@ class FilterEfficiencyCard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           '필터링 효율 (최근 30회 평균)',
           style: TextStyle(color: AppColors.textPrimary, fontSize: 14, fontWeight: FontWeight.w600),
         ),
@@ -51,7 +51,7 @@ class FilterEfficiencyCard extends StatelessWidget {
       children: [
         SizedBox(
           width: 70,
-          child: Text(label, style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+          child: Text(label, style: TextStyle(color: AppColors.textSecondary, fontSize: 12)),
         ),
         Expanded(
           child: Column(
@@ -60,10 +60,10 @@ class FilterEfficiencyCard extends StatelessWidget {
               Row(
                 children: [
                   Text(avg.toStringAsFixed(1), style: TextStyle(color: color, fontSize: 16, fontWeight: FontWeight.w600)),
-                  const Text('건/회', style: TextStyle(color: AppColors.textMuted, fontSize: 11)),
+                  Text('건/회', style: TextStyle(color: AppColors.textMuted, fontSize: 11)),
                   if (rate != null) ...[
                     const SizedBox(width: 8),
-                    Text('(${rate.toStringAsFixed(0)}%)', style: const TextStyle(color: AppColors.textMuted, fontSize: 11)),
+                    Text('(${rate.toStringAsFixed(0)}%)', style: TextStyle(color: AppColors.textMuted, fontSize: 11)),
                   ],
                 ],
               ),

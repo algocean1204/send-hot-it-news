@@ -24,7 +24,7 @@ class SubscriberTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         border: Border(bottom: BorderSide(color: AppColors.border, width: 1)),
       ),
       child: Row(
@@ -37,7 +37,7 @@ class SubscriberTile extends StatelessWidget {
               subscriber.displayName.isNotEmpty
                   ? subscriber.displayName[0].toUpperCase()
                   : '?',
-              style: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
+              style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
             ),
           ),
           const SizedBox(width: 12),
@@ -50,7 +50,7 @@ class SubscriberTile extends StatelessWidget {
                   children: [
                     Text(
                       subscriber.displayName,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppColors.textPrimary,
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
@@ -64,7 +64,7 @@ class SubscriberTile extends StatelessWidget {
                           color: AppColors.accent.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(3),
                         ),
-                        child: const Text(
+                        child: Text(
                           'ADMIN',
                           style: TextStyle(
                             color: AppColors.accent,
@@ -81,7 +81,7 @@ class SubscriberTile extends StatelessWidget {
                   children: [
                     Text(
                       'chat_id: ${subscriber.chatId}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppColors.textMuted,
                         fontSize: 11,
                         fontFamily: 'monospace',
@@ -91,13 +91,13 @@ class SubscriberTile extends StatelessWidget {
                     // 길이 보호 — 짧은 날짜 문자열에서 크래시를 방지한다
                     Text(
                       '신청: ${subscriber.requestedAt.length >= 10 ? subscriber.requestedAt.substring(0, 10) : subscriber.requestedAt}',
-                      style: const TextStyle(color: AppColors.textMuted, fontSize: 11),
+                      style: TextStyle(color: AppColors.textMuted, fontSize: 11),
                     ),
                     if (subscriber.approvedAt != null) ...[
                       const SizedBox(width: 8),
                       Text(
                         '승인: ${subscriber.approvedAt!.length >= 10 ? subscriber.approvedAt!.substring(0, 10) : subscriber.approvedAt!}',
-                        style: const TextStyle(color: AppColors.success, fontSize: 11),
+                        style: TextStyle(color: AppColors.success, fontSize: 11),
                       ),
                     ],
                   ],

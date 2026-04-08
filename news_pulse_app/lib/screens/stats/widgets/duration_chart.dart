@@ -21,7 +21,7 @@ class DurationChart extends StatelessWidget {
       ..sort((a, b) => a.startedAt.compareTo(b.startedAt));
 
     if (validRuns.isEmpty) {
-      return const Center(
+      return Center(
         child: Text('데이터 없음', style: TextStyle(color: AppColors.textMuted)),
       );
     }
@@ -34,7 +34,7 @@ class DurationChart extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           '실행 소요 시간 추이 (최근 30회)',
           style: TextStyle(
             color: AppColors.textPrimary,
@@ -85,7 +85,7 @@ class DurationChart extends StatelessWidget {
                     showTitles: true,
                     getTitlesWidget: (value, meta) => Text(
                       '${value.toStringAsFixed(0)}s',
-                      style: const TextStyle(color: AppColors.textMuted, fontSize: 10),
+                      style: TextStyle(color: AppColors.textMuted, fontSize: 10),
                     ),
                     reservedSize: 36,
                   ),
@@ -100,7 +100,7 @@ class DurationChart extends StatelessWidget {
                   getTooltipItems: (touchedSpots) => touchedSpots.map((spot) {
                     return LineTooltipItem(
                       '${spot.y.toStringAsFixed(1)}s',
-                      const TextStyle(color: AppColors.textPrimary, fontSize: 12),
+                      TextStyle(color: AppColors.textPrimary, fontSize: 12),
                     );
                   }).toList(),
                 ),

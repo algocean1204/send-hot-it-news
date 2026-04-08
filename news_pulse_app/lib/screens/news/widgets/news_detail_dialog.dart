@@ -50,7 +50,7 @@ class _NewsDetailDialogState extends ConsumerState<NewsDetailDialog> {
       backgroundColor: AppColors.surfacePrimary,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
-        side: const BorderSide(color: AppColors.border),
+        side: BorderSide(color: AppColors.border),
       ),
       // 작은 윈도우에서 수직 오버플로가 발생하지 않도록 maxHeight를 제한한다
       child: ConstrainedBox(
@@ -64,7 +64,7 @@ class _NewsDetailDialogState extends ConsumerState<NewsDetailDialog> {
           children: [
             // 헤더 (제목 + 닫기 버튼)
             _buildHeader(context),
-            const Divider(color: AppColors.border, height: 1),
+            Divider(color: AppColors.border, height: 1),
             // 본문 (스크롤 가능)
             Flexible(
               child: SingleChildScrollView(
@@ -89,7 +89,7 @@ class _NewsDetailDialogState extends ConsumerState<NewsDetailDialog> {
           Expanded(
             child: Text(
               widget.item.title,
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.textPrimary,
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
@@ -98,7 +98,7 @@ class _NewsDetailDialogState extends ConsumerState<NewsDetailDialog> {
           ),
           IconButton(
             onPressed: () => Navigator.of(context).pop(),
-            icon: const Icon(Icons.close, size: 18, color: AppColors.textSecondary),
+            icon: Icon(Icons.close, size: 18, color: AppColors.textSecondary),
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
           ),
@@ -110,7 +110,7 @@ class _NewsDetailDialogState extends ConsumerState<NewsDetailDialog> {
   Widget _buildActions(BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         border: Border(top: BorderSide(color: AppColors.border, width: 1)),
       ),
       child: Row(
@@ -120,7 +120,7 @@ class _NewsDetailDialogState extends ConsumerState<NewsDetailDialog> {
             onPressed: () => Navigator.of(context).pop(),
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColors.textSecondary,
-              side: const BorderSide(color: AppColors.border),
+              side: BorderSide(color: AppColors.border),
             ),
             child: const Text('닫기'),
           ),

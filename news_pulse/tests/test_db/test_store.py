@@ -64,11 +64,11 @@ class TestMigration:
         assert row["cnt"] == 11
 
     def test_시드_filter_config_건수(self, store: SqliteStore) -> None:
-        """시드 데이터 21건이 filter_config에 삽입되어 있는지 확인한다 (F07 다이제스트 설정 2건 추가)."""
+        """시드 데이터 22건이 filter_config에 삽입되어 있는지 확인한다 (theme_mode 1건 추가)."""
         row = store._conn.execute(
             "SELECT COUNT(*) as cnt FROM filter_config"
         ).fetchone()
-        assert row["cnt"] == 21
+        assert row["cnt"] == 22
 
     def test_시드_subscribers_관리자(self, store: SqliteStore) -> None:
         """시드 구독자(관리자 1건)가 삽입되어 있는지 확인한다."""

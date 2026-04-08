@@ -29,8 +29,8 @@ class BlacklistSuggestionCard extends ConsumerWidget {
         data: (suggestions) {
           final visible = suggestions.where((s) => !ignored.contains(s.word)).toList();
           if (visible.isEmpty) {
-            return const Padding(
-              padding: EdgeInsets.all(16),
+            return Padding(
+              padding: const EdgeInsets.all(16),
               child: Text('제안 단어가 없습니다 (수집 데이터 부족)',
                   style: TextStyle(color: AppColors.textMuted, fontSize: 12)),
             );
@@ -43,7 +43,7 @@ class BlacklistSuggestionCard extends ConsumerWidget {
             height: 48, child: Center(child: CircularProgressIndicator(strokeWidth: 2))),
         error: (e, _) => Padding(
           padding: const EdgeInsets.all(16),
-          child: Text('분석 오류: $e', style: const TextStyle(color: AppColors.error, fontSize: 12)),
+          child: Text('분석 오류: $e', style: TextStyle(color: AppColors.error, fontSize: 12)),
         ),
       ),
     );
@@ -52,27 +52,27 @@ class BlacklistSuggestionCard extends ConsumerWidget {
   Widget _buildRow(BuildContext context, WidgetRef ref, dynamic wf) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
           border: Border(bottom: BorderSide(color: AppColors.border, width: 1))),
       child: Row(children: [
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(wf.word,
-                style: const TextStyle(
+                style: TextStyle(
                     color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.w500)),
             Text('${wf.count}회 등장',
-                style: const TextStyle(color: AppColors.textMuted, fontSize: 11)),
+                style: TextStyle(color: AppColors.textMuted, fontSize: 11)),
           ]),
         ),
         TextButton(
           onPressed: () => _addToBlacklist(context, ref, wf.word),
-          child: const Text('추가', style: TextStyle(color: AppColors.accent, fontSize: 12)),
+          child: Text('추가', style: TextStyle(color: AppColors.accent, fontSize: 12)),
         ),
         TextButton(
           onPressed: () {
             ref.read(ignoredSuggestionsProvider.notifier).update((s) => {...s, wf.word});
           },
-          child: const Text('무시', style: TextStyle(color: AppColors.textMuted, fontSize: 12)),
+          child: Text('무시', style: TextStyle(color: AppColors.textMuted, fontSize: 12)),
         ),
       ]),
     );
@@ -94,7 +94,7 @@ class BlacklistSuggestionCard extends ConsumerWidget {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('"$word"을 블랙리스트에 추가했습니다',
-                style: const TextStyle(color: AppColors.textPrimary))),
+                style: TextStyle(color: AppColors.textPrimary))),
           );
         }
       },

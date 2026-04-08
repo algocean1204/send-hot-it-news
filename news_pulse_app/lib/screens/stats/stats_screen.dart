@@ -39,7 +39,7 @@ class StatsScreen extends ConsumerWidget {
             _chartCard(sourceCountAsync.when(
               data: (data) => SourceChart(data: data),
               loading: () => const _ChartLoading(),
-              error: (e, _) => Text('오류: $e', style: const TextStyle(color: AppColors.error)),
+              error: (e, _) => Text('오류: $e', style: TextStyle(color: AppColors.error)),
             )),
             const SizedBox(height: 16),
             // 파이프라인 + 필터링 효율 (2열)
@@ -49,7 +49,7 @@ class StatsScreen extends ConsumerWidget {
                 Expanded(child: _chartCard(pipelineCountAsync.when(
                   data: (data) => PipelineChart(data: data),
                   loading: () => const _ChartLoading(),
-                  error: (e, _) => Text('오류: $e', style: const TextStyle(color: AppColors.error)),
+                  error: (e, _) => Text('오류: $e', style: TextStyle(color: AppColors.error)),
                 ))),
                 const SizedBox(width: 16),
                 Expanded(child: statsRunsAsync.when(
@@ -57,7 +57,7 @@ class StatsScreen extends ConsumerWidget {
                     .map((r) => {'fetched': r.fetchedCount, 'filtered': r.filteredCount, 'sent': r.sentCount})
                     .toList())),
                   loading: () => _chartCard(const _ChartLoading()),
-                  error: (e, _) => _chartCard(Text('오류: $e', style: const TextStyle(color: AppColors.error))),
+                  error: (e, _) => _chartCard(Text('오류: $e', style: TextStyle(color: AppColors.error))),
                 )),
               ],
             ),
@@ -66,14 +66,14 @@ class StatsScreen extends ConsumerWidget {
             _chartCard(statsRunsAsync.when(
               data: (runs) => DurationChart(runs: runs),
               loading: () => const _ChartLoading(),
-              error: (e, _) => Text('오류: $e', style: const TextStyle(color: AppColors.error)),
+              error: (e, _) => Text('오류: $e', style: TextStyle(color: AppColors.error)),
             )),
             const SizedBox(height: 16),
             // F06: 모델별 지연 추이 차트
             _chartCard(latencyAsync.when(
               data: (points) => LatencyChart(data: points),
               loading: () => const _ChartLoading(),
-              error: (e, _) => Text('오류: $e', style: const TextStyle(color: AppColors.error)),
+              error: (e, _) => Text('오류: $e', style: TextStyle(color: AppColors.error)),
             )),
           ],
         ),
@@ -84,7 +84,7 @@ class StatsScreen extends ConsumerWidget {
   Widget _buildHeader(WidgetRef ref) {
     return Row(
       children: [
-        const Column(
+        Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('통계 대시보드', style: TextStyle(color: AppColors.textPrimary, fontSize: 22, fontWeight: FontWeight.w600)),
@@ -99,7 +99,7 @@ class StatsScreen extends ConsumerWidget {
             ref.invalidate(statsRunsProvider);
             ref.invalidate(latencyTrendingProvider);
           },
-          icon: const Icon(Icons.refresh, color: AppColors.textSecondary),
+          icon: Icon(Icons.refresh, color: AppColors.textSecondary),
           tooltip: '새로고침',
         ),
       ],

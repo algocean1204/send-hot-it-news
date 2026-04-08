@@ -38,7 +38,7 @@ class NewsScreen extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildHeader(context, ref, selectedDate),
-            const Divider(color: AppColors.border, height: 1),
+            Divider(color: AppColors.border, height: 1),
             Container(
               color: AppColors.surfacePrimary,
               child: const TabBar(
@@ -64,7 +64,7 @@ class NewsScreen extends ConsumerWidget {
       padding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
       child: Row(
         children: [
-          const Column(
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text('날짜별 뉴스', style: TextStyle(color: AppColors.textPrimary, fontSize: 22, fontWeight: FontWeight.w600)),
@@ -82,7 +82,7 @@ class NewsScreen extends ConsumerWidget {
             label: const Text('내보내기', style: TextStyle(fontSize: 13)),
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColors.textSecondary,
-              side: const BorderSide(color: AppColors.border),
+              side: BorderSide(color: AppColors.border),
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             ),
           ),
@@ -106,14 +106,14 @@ class NewsScreen extends ConsumerWidget {
         ),
         child: Row(
           children: [
-            const Icon(Icons.calendar_today, size: 14, color: AppColors.textSecondary),
+            Icon(Icons.calendar_today, size: 14, color: AppColors.textSecondary),
             const SizedBox(width: 8),
             Text(
               DateFormat('yyyy년 MM월 dd일 (E)', 'ko').format(selectedDate),
-              style: const TextStyle(color: AppColors.textPrimary, fontSize: 13),
+              style: TextStyle(color: AppColors.textPrimary, fontSize: 13),
             ),
             const SizedBox(width: 6),
-            const Icon(Icons.arrow_drop_down, size: 16, color: AppColors.textSecondary),
+            Icon(Icons.arrow_drop_down, size: 16, color: AppColors.textSecondary),
           ],
         ),
       ),
@@ -146,7 +146,7 @@ class _NewsListTab extends ConsumerWidget {
     return newsAsync.when(
       data: (items) {
         if (items.isEmpty) {
-          return const Center(child: Text('해당 날짜의 뉴스가 없습니다', style: TextStyle(color: AppColors.textMuted)));
+          return Center(child: Text('해당 날짜의 뉴스가 없습니다', style: TextStyle(color: AppColors.textMuted)));
         }
         return ListView.builder(
           itemCount: items.length,
@@ -161,7 +161,7 @@ class _NewsListTab extends ConsumerWidget {
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, _) => Center(child: Text('오류: $e', style: const TextStyle(color: AppColors.error))),
+      error: (e, _) => Center(child: Text('오류: $e', style: TextStyle(color: AppColors.error))),
     );
   }
 

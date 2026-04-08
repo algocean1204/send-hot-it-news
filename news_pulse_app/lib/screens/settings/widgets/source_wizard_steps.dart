@@ -36,24 +36,24 @@ class Step1UrlInput extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-      const Text('소스 URL을 입력하세요', style: TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+      Text('소스 URL을 입력하세요', style: TextStyle(color: AppColors.textSecondary, fontSize: 13)),
       const SizedBox(height: 12),
       TextField(
         controller: controller,
-        style: const TextStyle(color: AppColors.textPrimary, fontSize: 13),
+        style: TextStyle(color: AppColors.textPrimary, fontSize: 13),
         decoration: const InputDecoration(hintText: 'https://example.com/rss', isDense: true),
         onChanged: (v) => onDetect(detectParserType(v)),
       ),
       const SizedBox(height: 12),
       if (detectedParser.isNotEmpty)
         Row(children: [
-          const Icon(Icons.check_circle, color: AppColors.success, size: 16),
+          Icon(Icons.check_circle, color: AppColors.success, size: 16),
           const SizedBox(width: 6),
           Text('파서 타입 감지됨: $detectedParser',
-              style: const TextStyle(color: AppColors.success, fontSize: 12)),
+              style: TextStyle(color: AppColors.success, fontSize: 12)),
         ])
       else
-        const Text('URL을 입력하면 파서 타입을 자동 감지합니다',
+        Text('URL을 입력하면 파서 타입을 자동 감지합니다',
             style: TextStyle(color: AppColors.textMuted, fontSize: 12)),
     ]);
   }
@@ -80,16 +80,16 @@ class Step2Config extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-      const Text('소스 정보를 입력하세요', style: TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+      Text('소스 정보를 입력하세요', style: TextStyle(color: AppColors.textSecondary, fontSize: 13)),
       const SizedBox(height: 12),
       TextField(
         controller: nameController,
-        style: const TextStyle(color: AppColors.textPrimary, fontSize: 13),
+        style: TextStyle(color: AppColors.textPrimary, fontSize: 13),
         decoration: const InputDecoration(labelText: '소스 이름', isDense: true),
       ),
       const SizedBox(height: 12),
       Row(children: [
-        const Text('Tier', style: TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+        Text('Tier', style: TextStyle(color: AppColors.textSecondary, fontSize: 13)),
         const SizedBox(width: 16),
         ...List.generate(3, (i) => Padding(
           padding: const EdgeInsets.only(right: 8),
@@ -104,7 +104,7 @@ class Step2Config extends StatelessWidget {
       ]),
       const SizedBox(height: 12),
       Row(children: [
-        const Text('언어', style: TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+        Text('언어', style: TextStyle(color: AppColors.textSecondary, fontSize: 13)),
         const SizedBox(width: 16),
         ...['KO', 'EN'].map((l) => Padding(
           padding: const EdgeInsets.only(right: 8),
@@ -140,7 +140,7 @@ class Step3Preview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-      const Text('연결을 테스트하세요', style: TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+      Text('연결을 테스트하세요', style: TextStyle(color: AppColors.textSecondary, fontSize: 13)),
       const SizedBox(height: 12),
       ConnectionTestButton(
         label: '연결 테스트',
@@ -156,15 +156,15 @@ class Step3Preview extends StatelessWidget {
             border: Border.all(color: AppColors.border),
           ),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            const Text('첫 번째 아이템 미리보기',
+            Text('첫 번째 아이템 미리보기',
                 style: TextStyle(color: AppColors.textMuted, fontSize: 11)),
             const SizedBox(height: 4),
             Text(previewTitle,
-                style: const TextStyle(color: AppColors.textPrimary, fontSize: 12)),
+                style: TextStyle(color: AppColors.textPrimary, fontSize: 12)),
           ]),
         ),
       if (!testPassed && previewTitle.isEmpty)
-        const Text('테스트 버튼을 눌러 연결을 확인하세요',
+        Text('테스트 버튼을 눌러 연결을 확인하세요',
             style: TextStyle(color: AppColors.textMuted, fontSize: 12)),
     ]);
   }

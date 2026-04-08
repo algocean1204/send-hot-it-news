@@ -34,21 +34,21 @@ class _ConnectionTestButtonState extends State<ConnectionTestButton> {
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.surfaceSecondary,
           foregroundColor: AppColors.textPrimary,
-          side: const BorderSide(color: AppColors.border),
+          side: BorderSide(color: AppColors.border),
         ),
         child: _status == TestStatus.loading
-            ? const SizedBox(
+            ? SizedBox(
                 width: 14, height: 14,
                 child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.accent))
             : Text(widget.label, style: const TextStyle(fontSize: 12)),
       ),
       if (_status == TestStatus.success) ...[
         const SizedBox(width: 8),
-        const Icon(Icons.check_circle, color: AppColors.success, size: 16),
+        Icon(Icons.check_circle, color: AppColors.success, size: 16),
       ],
       if (_status == TestStatus.failure) ...[
         const SizedBox(width: 8),
-        const Icon(Icons.error, color: AppColors.error, size: 16),
+        Icon(Icons.error, color: AppColors.error, size: 16),
       ],
     ]);
   }

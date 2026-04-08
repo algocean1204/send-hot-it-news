@@ -91,7 +91,7 @@ class HomeScreen extends ConsumerWidget {
   Widget _buildPageHeader(BuildContext context, WidgetRef ref) {
     return Row(
       children: [
-        const Column(
+        Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
@@ -112,7 +112,7 @@ class HomeScreen extends ConsumerWidget {
         const SizedBox(width: 8),
         IconButton(
           onPressed: () => _refreshAll(ref),
-          icon: const Icon(Icons.refresh, color: AppColors.textSecondary),
+          icon: Icon(Icons.refresh, color: AppColors.textSecondary),
           tooltip: '새로고침',
         ),
       ],
@@ -130,15 +130,15 @@ class HomeScreen extends ConsumerWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.schedule, size: 14, color: AppColors.textSecondary),
+          Icon(Icons.schedule, size: 14, color: AppColors.textSecondary),
           const SizedBox(width: 6),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('다음 실행', style: TextStyle(color: AppColors.textMuted, fontSize: 10)),
+              Text('다음 실행', style: TextStyle(color: AppColors.textMuted, fontSize: 10)),
               Text(
                 _calcNextRun(),
-                style: const TextStyle(color: AppColors.textPrimary, fontSize: 12, fontWeight: FontWeight.w500),
+                style: TextStyle(color: AppColors.textPrimary, fontSize: 12, fontWeight: FontWeight.w500),
               ),
             ],
           ),

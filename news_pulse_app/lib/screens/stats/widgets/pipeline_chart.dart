@@ -14,24 +14,24 @@ class PipelineChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (data.isEmpty) {
-      return const Center(
+      return Center(
         child: Text('데이터 없음', style: TextStyle(color: AppColors.textMuted)),
       );
     }
 
     final total = data.fold<int>(0, (sum, row) => sum + (row['cnt'] as int? ?? 0));
     if (total == 0) {
-      return const Center(
+      return Center(
         child: Text('데이터 없음', style: TextStyle(color: AppColors.textMuted)),
       );
     }
 
-    const colors = [AppColors.accent, AppColors.success, AppColors.warning];
+    final colors = [AppColors.accent, AppColors.success, AppColors.warning];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           '파이프라인 경로별 처리 건수',
           style: TextStyle(
             color: AppColors.textPrimary,
@@ -94,7 +94,7 @@ class PipelineChart extends StatelessWidget {
                       const SizedBox(width: 6),
                       Text(
                         '$path ($cnt건)',
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: AppColors.textSecondary,
                           fontSize: 12,
                         ),

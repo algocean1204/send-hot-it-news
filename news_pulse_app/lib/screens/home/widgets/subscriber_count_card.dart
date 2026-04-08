@@ -22,7 +22,7 @@ class SubscriberCountCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Row(
+            Row(
               children: [
                 Icon(Icons.people_outline, size: 18, color: AppColors.textSecondary),
                 SizedBox(width: 8),
@@ -66,7 +66,7 @@ class SubscriberCountCard extends StatelessWidget {
         ),
         Text(
           label,
-          style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+          style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
         ),
       ],
     );

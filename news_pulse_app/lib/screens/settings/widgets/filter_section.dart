@@ -89,11 +89,11 @@ class FilterSection extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(children: [
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text('ALLOW TIER1 OVERFLOW',
+          Text('ALLOW TIER1 OVERFLOW',
               style: TextStyle(color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.w500)),
           if (config.description != null)
             Text(config.description!,
-                style: const TextStyle(color: AppColors.textMuted, fontSize: 11)),
+                style: TextStyle(color: AppColors.textMuted, fontSize: 11)),
         ])),
         Switch(
           value: config.boolValue,
@@ -115,7 +115,7 @@ class FilterSection extends ConsumerWidget {
       error: (e, _) async {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('저장 실패: $e', style: const TextStyle(color: AppColors.textPrimary))),
+            SnackBar(content: Text('저장 실패: $e', style: TextStyle(color: AppColors.textPrimary))),
           );
         }
       },

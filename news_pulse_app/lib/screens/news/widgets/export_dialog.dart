@@ -32,7 +32,7 @@ class _ExportDialogState extends ConsumerState<ExportDialog> {
       backgroundColor: AppColors.surfacePrimary,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
-        side: const BorderSide(color: AppColors.border),
+        side: BorderSide(color: AppColors.border),
       ),
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 460),
@@ -77,7 +77,7 @@ class _ExportDialogState extends ConsumerState<ExportDialog> {
           onPressed: () => Navigator.of(context).pop(),
           style: OutlinedButton.styleFrom(
             foregroundColor: AppColors.textSecondary,
-            side: const BorderSide(color: AppColors.border),
+            side: BorderSide(color: AppColors.border),
           ),
           child: const Text('닫기'),
         ),

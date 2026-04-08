@@ -28,8 +28,8 @@ class ThresholdSuggestion extends ConsumerWidget {
       child: calibrationsAsync.when(
         data: (results) {
           if (results.isEmpty) {
-            return const Padding(
-              padding: EdgeInsets.all(16),
+            return Padding(
+              padding: const EdgeInsets.all(16),
               child: Text('분석 데이터가 없습니다 (30일 이상 수집 필요)',
                   style: TextStyle(color: AppColors.textMuted, fontSize: 12)),
             );
@@ -38,14 +38,14 @@ class ThresholdSuggestion extends ConsumerWidget {
             // 테이블 헤더
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: const Row(children: [
+              child: Row(children: [
                 Expanded(child: Text('소스', style: TextStyle(color: AppColors.textSecondary, fontSize: 11, fontWeight: FontWeight.w600))),
                 SizedBox(width: 60, child: Text('통과율', style: TextStyle(color: AppColors.textSecondary, fontSize: 11, fontWeight: FontWeight.w600))),
                 SizedBox(width: 40, child: Text('건수', style: TextStyle(color: AppColors.textSecondary, fontSize: 11, fontWeight: FontWeight.w600))),
-                SizedBox(width: 50),
+                const SizedBox(width: 50),
               ]),
             ),
-            const Divider(color: AppColors.border, height: 1),
+            Divider(color: AppColors.border, height: 1),
             ...results.map((r) => _buildRow(context, ref, r)),
           ]);
         },
@@ -53,7 +53,7 @@ class ThresholdSuggestion extends ConsumerWidget {
             height: 48, child: Center(child: CircularProgressIndicator(strokeWidth: 2))),
         error: (e, _) => Padding(
           padding: const EdgeInsets.all(16),
-          child: Text('분석 오류: $e', style: const TextStyle(color: AppColors.error, fontSize: 12)),
+          child: Text('분석 오류: $e', style: TextStyle(color: AppColors.error, fontSize: 12)),
         ),
       ),
     );
@@ -66,12 +66,12 @@ class ThresholdSuggestion extends ConsumerWidget {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
           border: Border(bottom: BorderSide(color: AppColors.border, width: 1))),
       child: Row(children: [
         Expanded(
           child: Text(r.source,
-              style: const TextStyle(color: AppColors.textPrimary, fontSize: 12)),
+              style: TextStyle(color: AppColors.textPrimary, fontSize: 12)),
         ),
         SizedBox(
           width: 60,
@@ -84,7 +84,7 @@ class ThresholdSuggestion extends ConsumerWidget {
         SizedBox(
           width: 40,
           child: Text('${r.totalCount}',
-              style: const TextStyle(color: AppColors.textMuted, fontSize: 11)),
+              style: TextStyle(color: AppColors.textMuted, fontSize: 11)),
         ),
         // 해당 filter_config 키가 있을 때만 "적용" 버튼을 표시한다
         if (r.suggestedThresholdKey != null && isOutOfRange)
@@ -96,7 +96,7 @@ class ThresholdSuggestion extends ConsumerWidget {
                 padding: EdgeInsets.zero,
                 minimumSize: const Size(40, 28),
               ),
-              child: const Text('적용', style: TextStyle(color: AppColors.accent, fontSize: 11)),
+              child: Text('적용', style: TextStyle(color: AppColors.accent, fontSize: 11)),
             ),
           )
         else
@@ -124,7 +124,7 @@ class ThresholdSuggestion extends ConsumerWidget {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('$key → $suggested 적용 완료',
-                style: const TextStyle(color: AppColors.textPrimary))),
+                style: TextStyle(color: AppColors.textPrimary))),
           );
         }
       },

@@ -14,7 +14,7 @@ class SourceChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (data.isEmpty) {
-      return const Center(
+      return Center(
         child: Text('데이터 없음', style: TextStyle(color: AppColors.textMuted)),
       );
     }
@@ -31,7 +31,7 @@ class SourceChart extends StatelessWidget {
       ..sort((a, b) => b.value.compareTo(a.value));
 
     if (sources.isEmpty) {
-      return const Center(
+      return Center(
         child: Text('데이터 없음', style: TextStyle(color: AppColors.textMuted)),
       );
     }
@@ -39,7 +39,7 @@ class SourceChart extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           '소스별 수집 건수 (최근 7일)',
           style: TextStyle(
             color: AppColors.textPrimary,
@@ -88,7 +88,7 @@ class SourceChart extends StatelessWidget {
                         padding: const EdgeInsets.only(top: 4),
                         child: Text(
                           label,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: AppColors.textMuted,
                             fontSize: 9,
                           ),
@@ -103,7 +103,7 @@ class SourceChart extends StatelessWidget {
                     showTitles: true,
                     getTitlesWidget: (value, meta) => Text(
                       '${value.toInt()}',
-                      style: const TextStyle(color: AppColors.textMuted, fontSize: 10),
+                      style: TextStyle(color: AppColors.textMuted, fontSize: 10),
                     ),
                     reservedSize: 28,
                   ),
@@ -121,7 +121,7 @@ class SourceChart extends StatelessWidget {
 
   Color _sourceColor(int index) {
     // 소스 인덱스에 따라 앱 테마 색상을 순환 적용한다 — 하드코딩 없이 AppColors만 사용한다
-    const colors = [
+    final colors = [
       AppColors.accent,
       AppColors.success,
       AppColors.warning,

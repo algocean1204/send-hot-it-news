@@ -36,7 +36,7 @@ class _SubscriberSearchState extends State<SubscriberSearch> {
         },
         decoration: InputDecoration(
           hintText: 'username 또는 chat_id 검색',
-          prefixIcon: const Icon(Icons.search, size: 16, color: AppColors.textSecondary),
+          prefixIcon: Icon(Icons.search, size: 16, color: AppColors.textSecondary),
           suffixIcon: _controller.text.isNotEmpty
               ? IconButton(
                   onPressed: () {
@@ -44,13 +44,13 @@ class _SubscriberSearchState extends State<SubscriberSearch> {
                     setState(() {});
                     widget.onSearch('');
                   },
-                  icon: const Icon(Icons.clear, size: 14, color: AppColors.textSecondary),
+                  icon: Icon(Icons.clear, size: 14, color: AppColors.textSecondary),
                 )
               : null,
           contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           isDense: true,
         ),
-        style: const TextStyle(color: AppColors.textPrimary, fontSize: 13),
+        style: TextStyle(color: AppColors.textPrimary, fontSize: 13),
       ),
     );
   }

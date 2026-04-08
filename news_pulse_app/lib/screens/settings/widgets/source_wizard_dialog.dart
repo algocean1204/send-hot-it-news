@@ -43,7 +43,7 @@ class _SourceWizardDialogState extends ConsumerState<_SourceWizardDialog> {
     return AlertDialog(
       backgroundColor: AppColors.surfacePrimary,
       title: Row(children: [
-        const Text('새 소스 추가', style: TextStyle(color: AppColors.textPrimary, fontSize: 16)),
+        Text('새 소스 추가', style: TextStyle(color: AppColors.textPrimary, fontSize: 16)),
         const Spacer(),
         _StepIndicator(step: _step),
       ]),
@@ -90,12 +90,12 @@ class _SourceWizardDialogState extends ConsumerState<_SourceWizardDialog> {
     return [
       TextButton(
         onPressed: () => Navigator.pop(context),
-        child: const Text('취소', style: TextStyle(color: AppColors.textMuted)),
+        child: Text('취소', style: TextStyle(color: AppColors.textMuted)),
       ),
       if (_step > 0)
         TextButton(
           onPressed: () => setState(() => _step--),
-          child: const Text('이전', style: TextStyle(color: AppColors.textSecondary)),
+          child: Text('이전', style: TextStyle(color: AppColors.textSecondary)),
         ),
       if (_step < 2)
         ElevatedButton(

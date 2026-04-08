@@ -29,13 +29,13 @@ class UnreadCountCard extends StatelessWidget {
               Container(
                 width: 8,
                 height: 8,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: AppColors.accent,
                   shape: BoxShape.circle,
                 ),
               ),
               const SizedBox(width: 8),
-              const Text(
+              Text(
                 '미읽음 뉴스',
                 style: TextStyle(
                   color: AppColors.textSecondary,
@@ -57,7 +57,7 @@ class UnreadCountCard extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             count > 0 ? '뉴스 화면에서 확인하세요' : '모두 읽었습니다',
-            style: const TextStyle(color: AppColors.textMuted, fontSize: 11),
+            style: TextStyle(color: AppColors.textMuted, fontSize: 11),
           ),
         ],
       ),

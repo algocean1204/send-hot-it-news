@@ -46,7 +46,7 @@ class NewsDetailContent extends StatelessWidget {
             ),
             child: Text(
               item.summaryKo!,
-              style: const TextStyle(color: AppColors.textPrimary, fontSize: 13, height: 1.6),
+              style: TextStyle(color: AppColors.textPrimary, fontSize: 13, height: 1.6),
             ),
           ),
           const SizedBox(height: 16),
@@ -67,7 +67,7 @@ class NewsDetailContent extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           item.url,
-          style: const TextStyle(
+          style: TextStyle(
             color: AppColors.info,
             fontSize: 12,
             fontFamily: 'monospace',
@@ -100,7 +100,7 @@ class NewsDetailContent extends StatelessWidget {
         // 수집 시각
         Text(
           '수집 시각: ${item.createdAt}',
-          style: const TextStyle(color: AppColors.textMuted, fontSize: 11),
+          style: TextStyle(color: AppColors.textMuted, fontSize: 11),
         ),
       ],
     );
@@ -109,7 +109,7 @@ class NewsDetailContent extends StatelessWidget {
   Widget _sectionLabel(String text) {
     return Text(
       text,
-      style: const TextStyle(
+      style: TextStyle(
         color: AppColors.textSecondary,
         fontSize: 11,
         fontWeight: FontWeight.w600,
@@ -140,7 +140,7 @@ class _MetaChip extends StatelessWidget {
         children: [
           Icon(icon, size: 12, color: AppColors.textMuted),
           const SizedBox(width: 4),
-          Text(text, style: const TextStyle(color: AppColors.textSecondary, fontSize: 11)),
+          Text(text, style: TextStyle(color: AppColors.textSecondary, fontSize: 11)),
         ],
       ),
     );
@@ -161,7 +161,7 @@ class _TagChip extends StatelessWidget {
         color: AppColors.accent.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(4),
       ),
-      child: Text(tag, style: const TextStyle(color: AppColors.info, fontSize: 11)),
+      child: Text(tag, style: TextStyle(color: AppColors.info, fontSize: 11)),
     );
   }
 }

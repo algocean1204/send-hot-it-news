@@ -26,7 +26,7 @@ class HistoryScreen extends ConsumerWidget {
             padding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
             child: Row(
               children: [
-                const Column(
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
@@ -46,7 +46,7 @@ class HistoryScreen extends ConsumerWidget {
                 const Spacer(),
                 IconButton(
                   onPressed: () => ref.invalidate(recentRunsProvider),
-                  icon: const Icon(Icons.refresh, color: AppColors.textSecondary),
+                  icon: Icon(Icons.refresh, color: AppColors.textSecondary),
                   tooltip: '새로고침',
                 ),
               ],
@@ -54,13 +54,13 @@ class HistoryScreen extends ConsumerWidget {
           ),
           // 컬럼 헤더
           _buildColumnHeader(),
-          const Divider(color: AppColors.border, height: 1),
+          Divider(color: AppColors.border, height: 1),
           // 이력 목록
           Expanded(
             child: runsAsync.when(
               data: (runs) {
                 if (runs.isEmpty) {
-                  return const Center(
+                  return Center(
                     child: Text(
                       '실행 기록이 없습니다',
                       style: TextStyle(color: AppColors.textMuted),
@@ -74,7 +74,7 @@ class HistoryScreen extends ConsumerWidget {
               },
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (e, _) => Center(
-                child: Text('오류: $e', style: const TextStyle(color: AppColors.error)),
+                child: Text('오류: $e', style: TextStyle(color: AppColors.error)),
               ),
             ),
           ),
@@ -89,7 +89,7 @@ class HistoryScreen extends ConsumerWidget {
     return Container(
       color: AppColors.surfacePrimary,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: const Row(
+      child: Row(
         children: [
           SizedBox(width: 16), // 상태 아이콘 자리
           SizedBox(width: 8),

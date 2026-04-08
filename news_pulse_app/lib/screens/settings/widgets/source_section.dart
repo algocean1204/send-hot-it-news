@@ -46,7 +46,7 @@ class SourceSection extends ConsumerWidget {
       error: (e, _) async {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('저장 실패: $e', style: const TextStyle(color: AppColors.textPrimary))),
+            SnackBar(content: Text('저장 실패: $e', style: TextStyle(color: AppColors.textPrimary))),
           );
         }
       },

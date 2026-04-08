@@ -1,187 +1,128 @@
 import 'package:flutter/material.dart';
+import 'app_colors.dart';
+
+// 기존 import 경로 호환을 위해 app_colors.dart를 재수출한다
+export 'app_colors.dart';
 
 // ============================================================
-// 앱 테마 정의 — Claude/Cursor 스타일 다크 테마 기반
-// awesome-design-md 참고: 개발자 친화적 다크 테마
+// 앱 테마 정의 — 다크/라이트 양 테마를 _buildTheme 헬퍼로 생성한다
 // ============================================================
-
-class AppColors {
-  // 기본 배경 계층
-  static const Color background = Color(0xFF0D1117);       // 최외곽 배경 (GitHub 다크 계열)
-  static const Color surfacePrimary = Color(0xFF161B22);   // 카드/패널 배경
-  static const Color surfaceSecondary = Color(0xFF21262D); // 호버/선택 배경
-  static const Color surfaceTertiary = Color(0xFF30363D);  // 입력 필드/구분선
-
-  // 사이드바
-  static const Color sidebarBg = Color(0xFF010409);        // 사이드바 배경 (더 진한 검정)
-  static const Color sidebarSelected = Color(0xFF1F6FEB);  // 선택된 항목 (GitHub 파란색)
-  static const Color sidebarHover = Color(0xFF21262D);     // 호버 상태
-
-  // 텍스트
-  static const Color textPrimary = Color(0xFFE6EDF3);      // 주 텍스트
-  static const Color textSecondary = Color(0xFF8B949E);    // 보조 텍스트
-  static const Color textMuted = Color(0xFF484F58);        // 흐린 텍스트
-
-  // 액센트 컬러
-  static const Color accent = Color(0xFF1F6FEB);           // 파란색 (주요 액션)
-  static const Color accentHover = Color(0xFF388BFD);      // 파란색 호버
-
-  // 상태 색상
-  static const Color success = Color(0xFF3FB950);          // 성공 (초록)
-  static const Color warning = Color(0xFFD29922);          // 경고 (주황)
-  static const Color error = Color(0xFFF85149);            // 에러 (빨강)
-  static const Color info = Color(0xFF58A6FF);             // 정보 (하늘색)
-  static const Color critical = Color(0xFFFF7B72);         // 심각 (연한 빨강)
-
-  // 구분선
-  static const Color border = Color(0xFF30363D);
-  static const Color borderSubtle = Color(0xFF21262D);
-}
 
 class AppTheme {
-  static ThemeData get darkTheme {
+  /// 다크 테마 — GitHub 다크 계열
+  static ThemeData get darkTheme => _buildTheme(
+    brightness: Brightness.dark, bg: DarkPalette.background,
+    surface: DarkPalette.surfacePrimary, surfaceSecondary: DarkPalette.surfaceSecondary,
+    surfaceTertiary: DarkPalette.surfaceTertiary, textPrimary: DarkPalette.textPrimary,
+    textSecondary: DarkPalette.textSecondary, textMuted: DarkPalette.textMuted,
+    accent: DarkPalette.accent, accentHover: DarkPalette.accentHover,
+    errorColor: DarkPalette.error, borderColor: DarkPalette.border,
+  );
+
+  /// 라이트 테마 — 따뜻한 오프화이트 기반
+  static ThemeData get lightTheme => _buildTheme(
+    brightness: Brightness.light, bg: LightPalette.background,
+    surface: LightPalette.surfacePrimary, surfaceSecondary: LightPalette.surfaceSecondary,
+    surfaceTertiary: LightPalette.surfaceTertiary, textPrimary: LightPalette.textPrimary,
+    textSecondary: LightPalette.textSecondary, textMuted: LightPalette.textMuted,
+    accent: LightPalette.accent, accentHover: LightPalette.accentHover,
+    errorColor: LightPalette.error, borderColor: LightPalette.border,
+  );
+
+  /// 공통 ThemeData 빌더 — 색상 파라미터만 달리 받아 중복을 제거한다
+  static ThemeData _buildTheme({
+    required Brightness brightness, required Color bg,
+    required Color surface, required Color surfaceSecondary,
+    required Color surfaceTertiary, required Color textPrimary,
+    required Color textSecondary, required Color textMuted,
+    required Color accent, required Color accentHover,
+    required Color errorColor, required Color borderColor,
+  }) {
+    final isDark = brightness == Brightness.dark;
+    final colorScheme = isDark
+        ? ColorScheme.dark(
+            surface: surface, primary: accent, secondary: accentHover,
+            error: errorColor, onSurface: textPrimary,
+            onPrimary: Colors.white, outline: borderColor,
+          )
+        : ColorScheme.light(
+            surface: surface, primary: accent, secondary: accentHover,
+            error: errorColor, onSurface: textPrimary,
+            onPrimary: Colors.white, outline: borderColor,
+          );
+    final borderRadius6 = BorderRadius.circular(6);
+
     return ThemeData(
       useMaterial3: true,
-      brightness: Brightness.dark,
-      scaffoldBackgroundColor: AppColors.background,
-      colorScheme: const ColorScheme.dark(
-        surface: AppColors.surfacePrimary,
-        primary: AppColors.accent,
-        secondary: AppColors.accentHover,
-        error: AppColors.error,
-        onSurface: AppColors.textPrimary,
-        onPrimary: Colors.white,
-        outline: AppColors.border,
-      ),
-      // 카드 스타일
+      brightness: brightness,
+      scaffoldBackgroundColor: bg,
+      colorScheme: colorScheme,
       cardTheme: CardThemeData(
-        color: AppColors.surfacePrimary,
-        elevation: 0,
+        color: surface, elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
-          side: const BorderSide(color: AppColors.border, width: 1),
+          side: BorderSide(color: borderColor, width: 1),
         ),
         margin: const EdgeInsets.all(0),
       ),
-      // 텍스트 스타일
-      textTheme: const TextTheme(
-        displayLarge: TextStyle(
-          color: AppColors.textPrimary,
-          fontSize: 32,
-          fontWeight: FontWeight.w600,
-        ),
-        titleLarge: TextStyle(
-          color: AppColors.textPrimary,
-          fontSize: 18,
-          fontWeight: FontWeight.w600,
-        ),
-        titleMedium: TextStyle(
-          color: AppColors.textPrimary,
-          fontSize: 15,
-          fontWeight: FontWeight.w500,
-        ),
-        bodyLarge: TextStyle(
-          color: AppColors.textPrimary,
-          fontSize: 14,
-        ),
-        bodyMedium: TextStyle(
-          color: AppColors.textSecondary,
-          fontSize: 13,
-        ),
-        bodySmall: TextStyle(
-          color: AppColors.textMuted,
-          fontSize: 12,
-        ),
-        labelSmall: TextStyle(
-          color: AppColors.textMuted,
-          fontSize: 11,
-          fontFamily: 'monospace',
-        ),
+      textTheme: TextTheme(
+        displayLarge: TextStyle(color: textPrimary, fontSize: 32, fontWeight: FontWeight.w600),
+        titleLarge: TextStyle(color: textPrimary, fontSize: 18, fontWeight: FontWeight.w600),
+        titleMedium: TextStyle(color: textPrimary, fontSize: 15, fontWeight: FontWeight.w500),
+        bodyLarge: TextStyle(color: textPrimary, fontSize: 14),
+        bodyMedium: TextStyle(color: textSecondary, fontSize: 13),
+        bodySmall: TextStyle(color: textMuted, fontSize: 12),
+        labelSmall: TextStyle(color: textMuted, fontSize: 11, fontFamily: 'monospace'),
       ),
-      // 앱바 스타일
-      appBarTheme: const AppBarTheme(
-        backgroundColor: AppColors.surfacePrimary,
-        foregroundColor: AppColors.textPrimary,
-        elevation: 0,
-        surfaceTintColor: Colors.transparent,
+      appBarTheme: AppBarTheme(
+        backgroundColor: surface, foregroundColor: textPrimary,
+        elevation: 0, surfaceTintColor: Colors.transparent,
       ),
-      // 탭바 스타일
-      tabBarTheme: const TabBarThemeData(
-        labelColor: AppColors.accent,
-        unselectedLabelColor: AppColors.textSecondary,
-        indicatorColor: AppColors.accent,
-        dividerColor: AppColors.border,
+      tabBarTheme: TabBarThemeData(
+        labelColor: accent, unselectedLabelColor: textSecondary,
+        indicatorColor: accent, dividerColor: borderColor,
       ),
-      // 입력 필드 스타일
       inputDecorationTheme: InputDecorationTheme(
-        filled: true,
-        fillColor: AppColors.surfaceSecondary,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(6),
-          borderSide: const BorderSide(color: AppColors.border),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(6),
-          borderSide: const BorderSide(color: AppColors.border),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(6),
-          borderSide: const BorderSide(color: AppColors.accent),
-        ),
-        labelStyle: const TextStyle(color: AppColors.textSecondary),
-        hintStyle: const TextStyle(color: AppColors.textMuted),
+        filled: true, fillColor: surfaceSecondary,
+        border: OutlineInputBorder(borderRadius: borderRadius6, borderSide: BorderSide(color: borderColor)),
+        enabledBorder: OutlineInputBorder(borderRadius: borderRadius6, borderSide: BorderSide(color: borderColor)),
+        focusedBorder: OutlineInputBorder(borderRadius: borderRadius6, borderSide: BorderSide(color: accent)),
+        labelStyle: TextStyle(color: textSecondary),
+        hintStyle: TextStyle(color: textMuted),
       ),
-      // 버튼 스타일
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.accent,
-          foregroundColor: Colors.white,
-          elevation: 0,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+          backgroundColor: accent, foregroundColor: Colors.white, elevation: 0,
+          shape: RoundedRectangleBorder(borderRadius: borderRadius6),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           textStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
         ),
       ),
-      // 스위치 스타일
       switchTheme: SwitchThemeData(
         thumbColor: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) return Colors.white;
-          return AppColors.textSecondary;
+          return states.contains(WidgetState.selected) ? Colors.white : textSecondary;
         }),
         trackColor: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) return AppColors.accent;
-          return AppColors.surfaceTertiary;
+          return states.contains(WidgetState.selected) ? accent : surfaceTertiary;
         }),
       ),
-      // 드롭다운 스타일
       dropdownMenuTheme: DropdownMenuThemeData(
         menuStyle: MenuStyle(
-          backgroundColor: WidgetStateProperty.all(AppColors.surfaceSecondary),
-          shape: WidgetStateProperty.all(
-            RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(6),
-              side: const BorderSide(color: AppColors.border),
-            ),
-          ),
+          backgroundColor: WidgetStateProperty.all(surfaceSecondary),
+          shape: WidgetStateProperty.all(RoundedRectangleBorder(
+            borderRadius: borderRadius6, side: BorderSide(color: borderColor),
+          )),
         ),
       ),
-      // 슬라이더 스타일
-      sliderTheme: const SliderThemeData(
-        activeTrackColor: AppColors.accent,
-        thumbColor: AppColors.accent,
-        inactiveTrackColor: AppColors.surfaceTertiary,
-        overlayColor: Color(0x331F6FEB),
+      sliderTheme: SliderThemeData(
+        activeTrackColor: accent, thumbColor: accent,
+        inactiveTrackColor: surfaceTertiary, overlayColor: accent.withAlpha(51),
       ),
-      // 구분선 스타일
-      dividerTheme: const DividerThemeData(
-        color: AppColors.border,
-        thickness: 1,
-      ),
-      // 스낵바 스타일
+      dividerTheme: DividerThemeData(color: borderColor, thickness: 1),
       snackBarTheme: SnackBarThemeData(
-        backgroundColor: AppColors.surfaceSecondary,
-        contentTextStyle: const TextStyle(color: AppColors.textPrimary),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+        backgroundColor: surfaceSecondary,
+        contentTextStyle: TextStyle(color: textPrimary),
+        shape: RoundedRectangleBorder(borderRadius: borderRadius6),
         behavior: SnackBarBehavior.floating,
       ),
     );

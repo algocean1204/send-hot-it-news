@@ -27,7 +27,7 @@ class SubscribersScreen extends ConsumerWidget {
           children: [
             // 헤더 + 검색
             _buildHeader(context, ref),
-            const Divider(color: AppColors.border, height: 1),
+            Divider(color: AppColors.border, height: 1),
             // 탭바
             Container(
               color: AppColors.surfacePrimary,
@@ -60,7 +60,7 @@ class SubscribersScreen extends ConsumerWidget {
       padding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
       child: Row(
         children: [
-          const Column(
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text('구독자 관리', style: TextStyle(color: AppColors.textPrimary, fontSize: 22, fontWeight: FontWeight.w600)),
@@ -92,7 +92,7 @@ class _SubscriberListTab extends ConsumerWidget {
       return ref.watch(subscriberSearchResultProvider).when(
         data: (items) => _buildList(context, ref, items.where((s) => s.status == status).toList()),
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('오류: $e', style: const TextStyle(color: AppColors.error))),
+        error: (e, _) => Center(child: Text('오류: $e', style: TextStyle(color: AppColors.error))),
       );
     }
 
@@ -100,14 +100,14 @@ class _SubscriberListTab extends ConsumerWidget {
       data: (items) => _buildList(context, ref, items),
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) => Center(
-        child: Text('오류: $e', style: const TextStyle(color: AppColors.error)),
+        child: Text('오류: $e', style: TextStyle(color: AppColors.error)),
       ),
     );
   }
 
   Widget _buildList(BuildContext context, WidgetRef ref, List<Subscriber> subscribers) {
     if (subscribers.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
           '해당하는 구독자가 없습니다',
           style: TextStyle(color: AppColors.textMuted),
@@ -158,10 +158,10 @@ class _SubscriberListTab extends ConsumerWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surfacePrimary,
-        title: const Text('구독자 삭제', style: TextStyle(color: AppColors.textPrimary)),
+        title: Text('구독자 삭제', style: TextStyle(color: AppColors.textPrimary)),
         content: Text(
           '$name을(를) 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.',
-          style: const TextStyle(color: AppColors.textSecondary),
+          style: TextStyle(color: AppColors.textSecondary),
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('취소')),

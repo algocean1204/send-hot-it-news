@@ -27,7 +27,7 @@ class HealthSummaryBar extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Text(
+          Text(
             '전체 상태',
             style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
           ),
@@ -100,7 +100,7 @@ class HealthResultCard extends StatelessWidget {
                 children: [
                   Text(
                     result.checkType,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppColors.textPrimary,
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
@@ -109,7 +109,7 @@ class HealthResultCard extends StatelessWidget {
                   const SizedBox(width: 8),
                   Text(
                     result.target,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppColors.textSecondary,
                       fontSize: 12,
                       fontFamily: 'monospace',
@@ -128,7 +128,7 @@ class HealthResultCard extends StatelessWidget {
           if (result.responseTimeMs != null)
             Text(
               '${result.responseTimeMs}ms',
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.textMuted,
                 fontSize: 11,
                 fontFamily: 'monospace',

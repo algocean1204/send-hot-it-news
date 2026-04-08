@@ -24,15 +24,15 @@ class HotNewsBadge extends StatelessWidget {
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           border: Border(bottom: BorderSide(color: AppColors.border, width: 1)),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // 핫뉴스 아이콘
-            const Padding(
-              padding: EdgeInsets.only(top: 2),
+            Padding(
+              padding: const EdgeInsets.only(top: 2),
               child: Icon(Icons.local_fire_department, color: AppColors.warning, size: 18),
             ),
             const SizedBox(width: 10),
@@ -42,7 +42,7 @@ class HotNewsBadge extends StatelessWidget {
                 children: [
                   Text(
                     item.title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppColors.textPrimary,
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
@@ -53,7 +53,7 @@ class HotNewsBadge extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     item.summaryKo,
-                    style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                    style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -71,7 +71,7 @@ class HotNewsBadge extends StatelessWidget {
                         item.createdAt.length >= 10
                             ? item.createdAt.substring(0, 10)
                             : item.createdAt,
-                        style: const TextStyle(color: AppColors.textMuted, fontSize: 11),
+                        style: TextStyle(color: AppColors.textMuted, fontSize: 11),
                       ),
                     ],
                   ),
@@ -82,7 +82,7 @@ class HotNewsBadge extends StatelessWidget {
             if (onRemove != null)
               IconButton(
                 onPressed: onRemove,
-                icon: const Icon(Icons.close, size: 16, color: AppColors.textMuted),
+                icon: Icon(Icons.close, size: 16, color: AppColors.textMuted),
                 tooltip: '핫뉴스 해제',
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(minWidth: 28, minHeight: 28),

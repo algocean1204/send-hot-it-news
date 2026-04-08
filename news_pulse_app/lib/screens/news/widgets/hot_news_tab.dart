@@ -21,7 +21,7 @@ class HotNewsTab extends ConsumerWidget {
     return hotNewsAsync.when(
       data: (items) {
         if (items.isEmpty) {
-          return const Center(
+          return Center(
             child: Text('핫뉴스가 없습니다', style: TextStyle(color: AppColors.textMuted)),
           );
         }
@@ -43,7 +43,7 @@ class HotNewsTab extends ConsumerWidget {
       },
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) =>
-          Center(child: Text('오류: $e', style: const TextStyle(color: AppColors.error))),
+          Center(child: Text('오류: $e', style: TextStyle(color: AppColors.error))),
     );
   }
 

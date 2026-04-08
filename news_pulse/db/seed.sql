@@ -86,6 +86,10 @@ INSERT OR IGNORE INTO filter_config (key, value, description) VALUES
 INSERT OR IGNORE INTO filter_config (key, value, description) VALUES
     ('digest_hour', '9', '다이제스트 발송 시간 (0-23, 기본 09시)');
 
+-- 테마 설정 (1건)
+INSERT OR IGNORE INTO filter_config (key, value, description) VALUES
+    ('theme_mode', 'light', '앱 테마 모드 (light/dark)');
+
 -- ============================================================
 -- prompt_versions 시드 데이터 — 초기 프롬프트 3종 (is_active=1)
 -- 운영 중 버전 교체 시 create_version() 함수로 자동 증가한다.

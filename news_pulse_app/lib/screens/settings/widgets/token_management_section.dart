@@ -54,12 +54,12 @@ class _TokenRowState extends ConsumerState<_TokenRow> {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
           border: Border(bottom: BorderSide(color: AppColors.border, width: 1))),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         // 키 이름
         Text(widget.tokenKey,
-            style: const TextStyle(
+            style: TextStyle(
                 color: AppColors.textSecondary, fontSize: 11, fontWeight: FontWeight.w600)),
         const SizedBox(height: 4),
         if (!isEditing) ...[
@@ -74,8 +74,8 @@ class _TokenRowState extends ConsumerState<_TokenRow> {
                       fontSize: 13,
                       fontFamily: 'monospace'),
                 ),
-                loading: () => const Text('...', style: TextStyle(color: AppColors.textMuted)),
-                error: (e, s) => const Text('읽기 오류', style: TextStyle(color: AppColors.error)),
+                loading: () => Text('...', style: TextStyle(color: AppColors.textMuted)),
+                error: (e, s) => Text('읽기 오류', style: TextStyle(color: AppColors.error)),
               ),
             ),
             TextButton(
@@ -84,7 +84,7 @@ class _TokenRowState extends ConsumerState<_TokenRow> {
                 _editController.text = current;
                 ref.read(tokenEditingProvider(widget.tokenKey).notifier).state = true;
               },
-              child: const Text('수정', style: TextStyle(color: AppColors.accent, fontSize: 12)),
+              child: Text('수정', style: TextStyle(color: AppColors.accent, fontSize: 12)),
             ),
             // BOT_TOKEN인 경우에만 Telegram 연결 테스트 버튼을 표시한다
             if (widget.tokenKey == 'BOT_TOKEN')
@@ -97,7 +97,7 @@ class _TokenRowState extends ConsumerState<_TokenRow> {
           // 편집 입력 필드
           TextField(
             controller: _editController,
-            style: const TextStyle(color: AppColors.textPrimary, fontSize: 13, fontFamily: 'monospace'),
+            style: TextStyle(color: AppColors.textPrimary, fontSize: 13, fontFamily: 'monospace'),
             decoration: const InputDecoration(isDense: true, contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8)),
             obscureText: widget.tokenKey == 'BOT_TOKEN',
           ),
@@ -112,7 +112,7 @@ class _TokenRowState extends ConsumerState<_TokenRow> {
               onPressed: () {
                 ref.read(tokenEditingProvider(widget.tokenKey).notifier).state = false;
               },
-              child: const Text('취소', style: TextStyle(color: AppColors.textMuted, fontSize: 12)),
+              child: Text('취소', style: TextStyle(color: AppColors.textMuted, fontSize: 12)),
             ),
           ]),
         ],
@@ -143,7 +143,7 @@ class _TokenRowState extends ConsumerState<_TokenRow> {
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('${widget.tokenKey} 저장 완료',
-            style: const TextStyle(color: AppColors.textPrimary))),
+            style: TextStyle(color: AppColors.textPrimary))),
       );
     }
   }

@@ -23,8 +23,8 @@ class ErrorsScreen extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // 헤더
-            const Padding(
-              padding: EdgeInsets.fromLTRB(24, 20, 24, 16),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -43,7 +43,7 @@ class ErrorsScreen extends ConsumerWidget {
                 ],
               ),
             ),
-            const Divider(color: AppColors.border, height: 1),
+            Divider(color: AppColors.border, height: 1),
             // 탭바
             Container(
               color: AppColors.surfacePrimary,
@@ -89,7 +89,7 @@ class _ErrorLogTab extends ConsumerWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Row(
             children: [
-              const Text(
+              Text(
                 '심각도 필터:',
                 style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
               ),
@@ -99,7 +99,7 @@ class _ErrorLogTab extends ConsumerWidget {
                 value: currentFilter,
                 isDense: true,
                 dropdownColor: AppColors.surfaceSecondary,
-                style: const TextStyle(color: AppColors.textPrimary, fontSize: 12),
+                style: TextStyle(color: AppColors.textPrimary, fontSize: 12),
                 items: [
                   const DropdownMenuItem(value: null, child: Text('전체')),
                   ..._severityOptions.skip(1).map(
@@ -113,19 +113,19 @@ class _ErrorLogTab extends ConsumerWidget {
               const Spacer(),
               IconButton(
                 onPressed: () => ref.invalidate(filteredErrorsProvider),
-                icon: const Icon(Icons.refresh, size: 16, color: AppColors.textSecondary),
+                icon: Icon(Icons.refresh, size: 16, color: AppColors.textSecondary),
                 tooltip: '새로고침',
               ),
             ],
           ),
         ),
-        const Divider(color: AppColors.border, height: 1),
+        Divider(color: AppColors.border, height: 1),
         // 에러 목록
         Expanded(
           child: errorsAsync.when(
             data: (errors) {
               if (errors.isEmpty) {
-                return const Center(
+                return Center(
                   child: Text(
                     '에러 로그가 없습니다',
                     style: TextStyle(color: AppColors.textMuted),
@@ -139,7 +139,7 @@ class _ErrorLogTab extends ConsumerWidget {
             },
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (e, _) => Center(
-              child: Text('오류: $e', style: const TextStyle(color: AppColors.error)),
+              child: Text('오류: $e', style: TextStyle(color: AppColors.error)),
             ),
           ),
         ),

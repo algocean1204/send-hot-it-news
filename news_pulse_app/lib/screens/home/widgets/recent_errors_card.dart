@@ -21,9 +21,9 @@ class RecentErrorsCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Icon(Icons.warning_amber_outlined, size: 18, color: AppColors.textSecondary),
+                Icon(Icons.warning_amber_outlined, size: 18, color: AppColors.textSecondary),
                 const SizedBox(width: 8),
-                const Text(
+                Text(
                   '최근 에러',
                   style: TextStyle(
                     color: AppColors.textSecondary,
@@ -52,7 +52,7 @@ class RecentErrorsCard extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             if (errors.isEmpty)
-              const Text(
+              Text(
                 '최근 에러 없음',
                 style: TextStyle(color: AppColors.textMuted, fontSize: 13),
               )
@@ -96,13 +96,13 @@ class RecentErrorsCard extends StatelessWidget {
               children: [
                 Text(
                   '[${error.module}] ${error.message}',
-                  style: const TextStyle(color: AppColors.textPrimary, fontSize: 12),
+                  style: TextStyle(color: AppColors.textPrimary, fontSize: 12),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
                   error.createdAt,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.textMuted,
                     fontSize: 11,
                     fontFamily: 'monospace',

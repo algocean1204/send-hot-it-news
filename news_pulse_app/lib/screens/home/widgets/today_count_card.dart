@@ -20,9 +20,9 @@ class TodayCountCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Icon(Icons.send_outlined, size: 18, color: AppColors.textSecondary),
+                Icon(Icons.send_outlined, size: 18, color: AppColors.textSecondary),
                 const SizedBox(width: 8),
-                const Text(
+                Text(
                   '오늘 전송',
                   style: TextStyle(
                     color: AppColors.textSecondary,
@@ -35,13 +35,13 @@ class TodayCountCard extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               '$sentCount',
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.textPrimary,
                 fontSize: 36,
                 fontWeight: FontWeight.w700,
               ),
             ),
-            const Text(
+            Text(
               '건 텔레그램 전송',
               style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
             ),

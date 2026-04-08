@@ -23,12 +23,12 @@ class MissedRunBanner extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(Icons.warning_amber_rounded, color: AppColors.warning, size: 18),
+          Icon(Icons.warning_amber_rounded, color: AppColors.warning, size: 18),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               '$missedCount건의 스케줄 실행이 누락되었습니다. launchd 설정을 확인하세요.',
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.warning,
                 fontSize: 13,
                 fontWeight: FontWeight.w500,

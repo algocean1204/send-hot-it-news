@@ -28,7 +28,7 @@ class NewsListTile extends StatelessWidget {
         onTap: onTap,
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             border: Border(bottom: BorderSide(color: AppColors.border, width: 1)),
           ),
           child: Row(
@@ -47,7 +47,7 @@ class NewsListTile extends StatelessWidget {
                   children: [
                     Text(
                       item.title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppColors.textPrimary,
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
@@ -59,7 +59,7 @@ class NewsListTile extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         item.summaryKo!,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: AppColors.textSecondary,
                           fontSize: 12,
                         ),
@@ -75,7 +75,7 @@ class NewsListTile extends StatelessWidget {
                           item.createdAt.length >= 16
                               ? item.createdAt.substring(0, 16)
                               : item.createdAt,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: AppColors.textMuted,
                             fontSize: 11,
                             fontFamily: 'monospace',
@@ -83,16 +83,16 @@ class NewsListTile extends StatelessWidget {
                         ),
                         if (item.upvotes > 0) ...[
                           const SizedBox(width: 8),
-                          const Icon(Icons.arrow_upward, size: 11, color: AppColors.textMuted),
+                          Icon(Icons.arrow_upward, size: 11, color: AppColors.textMuted),
                           Text(
                             '${item.upvotes}',
-                            style: const TextStyle(color: AppColors.textMuted, fontSize: 11),
+                            style: TextStyle(color: AppColors.textMuted, fontSize: 11),
                           ),
                         ],
                         if (item.telegramSent) ...[
                           const SizedBox(width: 8),
-                          const Icon(Icons.send, size: 11, color: AppColors.success),
-                          const Text(
+                          Icon(Icons.send, size: 11, color: AppColors.success),
+                          Text(
                             ' 전송됨',
                             style: TextStyle(color: AppColors.success, fontSize: 11),
                           ),
@@ -131,7 +131,7 @@ class NewsListTile extends StatelessWidget {
               margin: const EdgeInsets.only(top: 6),
               width: 8,
               height: 8,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: AppColors.accent,
                 shape: BoxShape.circle,
               ),
@@ -149,7 +149,7 @@ class NewsListTile extends StatelessWidget {
       ),
       child: Text(
         item.source,
-        style: const TextStyle(
+        style: TextStyle(
           color: AppColors.textSecondary,
           fontSize: 10,
           fontFamily: 'monospace',

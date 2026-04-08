@@ -9,7 +9,7 @@ import '../../../core/theme/app_theme.dart';
 // ============================================================
 
 /// 모델별 고정 색상 팔레트 — 최대 6개 모델을 구분한다
-const List<Color> _kModelColors = [
+final List<Color> _kModelColors = [
   AppColors.accent,
   AppColors.success,
   AppColors.warning,
@@ -26,7 +26,7 @@ class LatencyChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (data.isEmpty) {
-      return const SizedBox(
+      return SizedBox(
         height: 80,
         child: Center(
           child: Text('모델 사용 데이터 없음', style: TextStyle(color: AppColors.textMuted)),
@@ -75,7 +75,7 @@ class LatencyChart extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           '모델별 지연 추이 (최근 7일, 평균 ms)',
           style: TextStyle(
             color: AppColors.textPrimary,
@@ -99,7 +99,7 @@ class LatencyChart extends StatelessWidget {
               gridData: FlGridData(
                 show: true,
                 getDrawingHorizontalLine: (value) =>
-                    const FlLine(color: AppColors.border, strokeWidth: 1),
+                    FlLine(color: AppColors.border, strokeWidth: 1),
                 drawVerticalLine: false,
               ),
               titlesData: FlTitlesData(
@@ -117,7 +117,7 @@ class LatencyChart extends StatelessWidget {
                         padding: const EdgeInsets.only(top: 4),
                         child: Text(
                           label,
-                          style: const TextStyle(color: AppColors.textMuted, fontSize: 9),
+                          style: TextStyle(color: AppColors.textMuted, fontSize: 9),
                         ),
                       );
                     },
@@ -129,7 +129,7 @@ class LatencyChart extends StatelessWidget {
                     showTitles: true,
                     getTitlesWidget: (value, meta) => Text(
                       '${value.toInt()}',
-                      style: const TextStyle(color: AppColors.textMuted, fontSize: 10),
+                      style: TextStyle(color: AppColors.textMuted, fontSize: 10),
                     ),
                     reservedSize: 40,
                   ),
@@ -173,7 +173,7 @@ class _LegendItem extends StatelessWidget {
       children: [
         Container(width: 12, height: 3, color: color),
         const SizedBox(width: 4),
-        Text(label, style: const TextStyle(color: AppColors.textSecondary, fontSize: 11)),
+        Text(label, style: TextStyle(color: AppColors.textSecondary, fontSize: 11)),
       ],
     );
   }

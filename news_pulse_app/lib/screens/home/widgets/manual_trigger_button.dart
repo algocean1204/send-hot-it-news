@@ -41,7 +41,7 @@ class ManualTriggerButton extends ConsumerWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (isRunning)
-            const SizedBox(
+            SizedBox(
               width: 14,
               height: 14,
               child: CircularProgressIndicator(

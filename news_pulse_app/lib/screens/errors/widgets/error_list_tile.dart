@@ -24,7 +24,7 @@ class _ErrorListTileState extends State<ErrorListTile> {
 
     return Container(
       decoration: BoxDecoration(
-        border: const Border(bottom: BorderSide(color: AppColors.border, width: 1)),
+        border: Border(bottom: BorderSide(color: AppColors.border, width: 1)),
         color: _expanded ? AppColors.surfaceSecondary.withValues(alpha: 0.5) : null,
       ),
       child: Column(
@@ -68,7 +68,7 @@ class _ErrorListTileState extends State<ErrorListTile> {
                             children: [
                               TextSpan(
                                 text: '[${widget.error.module}] ',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   color: AppColors.info,
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
@@ -77,7 +77,7 @@ class _ErrorListTileState extends State<ErrorListTile> {
                               ),
                               TextSpan(
                                 text: widget.error.message,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   color: AppColors.textPrimary,
                                   fontSize: 12,
                                 ),
@@ -90,7 +90,7 @@ class _ErrorListTileState extends State<ErrorListTile> {
                         const SizedBox(height: 3),
                         Text(
                           widget.error.createdAt,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: AppColors.textMuted,
                             fontSize: 11,
                             fontFamily: 'monospace',
@@ -126,7 +126,7 @@ class _ErrorListTileState extends State<ErrorListTile> {
                 child: SingleChildScrollView(
                   child: SelectableText(
                     widget.error.traceback!,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppColors.textSecondary,
                       fontSize: 11,
                       fontFamily: 'monospace',

@@ -19,9 +19,9 @@ class LoadingCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label, style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+            Text(label, style: TextStyle(color: AppColors.textSecondary, fontSize: 13)),
             const SizedBox(height: 16),
-            const LinearProgressIndicator(
+            LinearProgressIndicator(
               backgroundColor: AppColors.surfaceSecondary,
               color: AppColors.accent,
             ),
@@ -46,9 +46,9 @@ class ErrorCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label, style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+            Text(label, style: TextStyle(color: AppColors.textSecondary, fontSize: 13)),
             const SizedBox(height: 8),
-            const Text('데이터 로드 실패', style: TextStyle(color: AppColors.error, fontSize: 13)),
+            Text('데이터 로드 실패', style: TextStyle(color: AppColors.error, fontSize: 13)),
           ],
         ),
       ),

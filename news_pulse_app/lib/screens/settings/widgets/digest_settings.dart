@@ -33,7 +33,7 @@ class DigestSettings extends ConsumerWidget {
           children: [
             // 활성화 토글
             Row(children: [
-              const Expanded(
+              Expanded(
                 child: Text('다이제스트 모드 활성화',
                     style: TextStyle(color: AppColors.textPrimary, fontSize: 13)),
               ),
@@ -48,12 +48,12 @@ class DigestSettings extends ConsumerWidget {
               opacity: enabled ? 1.0 : 0.4,
               duration: const Duration(milliseconds: 200),
               child: Row(children: [
-                const Text('발송 시간', style: TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+                Text('발송 시간', style: TextStyle(color: AppColors.textSecondary, fontSize: 13)),
                 const SizedBox(width: 16),
                 DropdownButton<int>(
                   value: hour.clamp(0, 23),
                   dropdownColor: AppColors.surfaceSecondary,
-                  style: const TextStyle(color: AppColors.textPrimary, fontSize: 13),
+                  style: TextStyle(color: AppColors.textPrimary, fontSize: 13),
                   underline: Container(height: 1, color: AppColors.border),
                   onChanged: enabled
                       ? (val) {
@@ -86,7 +86,7 @@ class DigestSettings extends ConsumerWidget {
       error: (e, _) async {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('저장 실패: $e', style: const TextStyle(color: AppColors.textPrimary))),
+            SnackBar(content: Text('저장 실패: $e', style: TextStyle(color: AppColors.textPrimary))),
           );
         }
       },

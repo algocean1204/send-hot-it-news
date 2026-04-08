@@ -35,16 +35,16 @@ class SettingsSectionCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(title,
-                    style: const TextStyle(
+                    style: TextStyle(
                         color: AppColors.textPrimary,
                         fontSize: 14,
                         fontWeight: FontWeight.w600)),
                 Text(description,
-                    style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
+                    style: TextStyle(color: AppColors.textMuted, fontSize: 12)),
               ],
             ),
           ),
-          const Divider(color: AppColors.border, height: 1),
+          Divider(color: AppColors.border, height: 1),
           child,
         ],
       ),

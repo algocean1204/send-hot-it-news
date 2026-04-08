@@ -19,7 +19,7 @@ class TriggerResultDialog extends StatelessWidget {
       backgroundColor: AppColors.surfacePrimary,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
-        side: const BorderSide(color: AppColors.border),
+        side: BorderSide(color: AppColors.border),
       ),
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 400),
@@ -52,7 +52,7 @@ class TriggerResultDialog extends StatelessWidget {
         const SizedBox(width: 8),
         Text(
           isError ? '실행 실패' : '실행 완료',
-          style: const TextStyle(
+          style: TextStyle(
             color: AppColors.textPrimary,
             fontSize: 16,
             fontWeight: FontWeight.w600,
@@ -73,7 +73,7 @@ class TriggerResultDialog extends StatelessWidget {
       ),
       child: Text(
         status.errorMessage ?? '알 수 없는 오류가 발생했습니다',
-        style: const TextStyle(color: AppColors.error, fontSize: 12),
+        style: TextStyle(color: AppColors.error, fontSize: 12),
       ),
     );
   }
@@ -81,7 +81,7 @@ class TriggerResultDialog extends StatelessWidget {
   Widget _buildSuccessBody() {
     final result = status.result;
     if (result == null) {
-      return const Text(
+      return Text(
         '파이프라인이 완료되었습니다',
         style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
       );
@@ -131,7 +131,7 @@ class _ResultRow extends StatelessWidget {
         const SizedBox(width: 8),
         Text(
           label,
-          style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
+          style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
         ),
         const Spacer(),
         Text(
